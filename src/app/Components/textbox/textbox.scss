@@ -1,0 +1,54 @@
+.input-wrapper {
+    position: relative;
+    margin-top: 20px;
+    font-family: crimson-text;
+  }
+  .floating-input {
+    padding: 12px 10px;
+    font-size: 12px;
+    width: 200px;
+    border-radius: 5px;
+    border: 1px solid #d9d9d9;
+    font-family: crimson-text;
+    padding-top: 20px;
+    padding-bottom: 5px
+  }
+  
+  .floating-label {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #4C4C4C;
+    pointer-events: none;
+    transition: 0.2s ease all;
+    font-size:12px
+  }
+  
+  /* Triggers when the input is focused OR when text is typed (placeholder is hidden) */
+  .floating-input:focus + .floating-label,
+  .floating-input:not(:placeholder-shown) + .floating-label {
+    top: 10px;
+    left: 6px;
+    font-size: 10px;
+    color: #4C4C4C;
+    background-color: #fff; /* Matches form background to look clean */
+    padding: 0 4px;
+  }
+  // label{
+//     font-size: 12px;
+//     font-family: crimson-text;
+//     color: #4c4c4c;
+// }
+// input {
+//     border: 1px solid #d9d9d9;
+//     border-radius: 5px;
+//     padding: 5px;
+//     display: flex;
+//     text-align: center;
+//     height: 20px;
+//     :focus{
+//         border-color: #00A3F5 !important;
+//         outline: #00A3F5
+//     }
+// }
