@@ -1,4 +1,13 @@
 <div class="input-wrapper">
-  <input type="text" id="username" placeholder=" " class="floating-input" />
+  <input 
+    type="text" 
+    id="username" 
+    placeholder="" 
+    class="floating-input" 
+    [formControl]="inputControl" 
+    [value]="value()" 
+    (input)="value.set($event.target.value)" 
+    [disabled]="disabled()" 
+    />
   <label for="username" class="floating-label">Username</label>
 </div>

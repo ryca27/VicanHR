@@ -152,7 +152,10 @@
         </a>
       </div>
     </div>
-    <app-textbox></app-textbox>
+    <form [formGroup] = "myForm">
+      <app-textbox formControlName="username"></app-textbox>
+    </form>
+    {{myForm.value.username}}
   </div>
 
 
