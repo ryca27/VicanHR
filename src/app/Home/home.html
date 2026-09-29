@@ -153,9 +153,13 @@
       </div>
     </div>
     <form [formGroup] = "myForm">
-      <app-textbox formControlName="username"></app-textbox>
+      <app-textbox formControlName="name"></app-textbox>
+      <app-dropdown formControlName="gender" [options]="genderOptions" [label]="'Username'"></app-dropdown>
+      <button type="submit" [disabled]="myForm.invalid">Submit</button>
+      {{myForm.invalid}}
     </form>
-    {{myForm.value.username}}
+    {{myForm.value.name}}
+    
   </div>
 
 

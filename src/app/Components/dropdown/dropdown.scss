@@ -1,12 +1,13 @@
-.input-wrapper {
+.select-wrapper {
     position: relative;
     margin-top: 20px;
     font-family: crimson-text;
     min-width: 200px;
   }
-  .floating-input {
-    width:200px;
-    padding: 12px 10px;
+  .select-wrapper select {
+    width: 221.33px;
+    display: block;
+    padding: 12px 6px;
     font-size: 12px;
     border-radius: 5px;
     border: 1px solid #d9d9d9;
@@ -15,11 +16,11 @@
     padding-bottom: 5px;
   }
 
-  .floating-input:focus, .floating-input:hover{
+  .select-wrapper select:focus, .select-wrapper select:hover{
     border:1px solid #7B7B7B
   }
   
-  .floating-label {
+  .select-wrapper label {
     position: absolute;
     left: 12px;
     top: 50%;
@@ -30,9 +31,9 @@
     font-size:12px
   }
   
-  /* Triggers when the input is focused OR when text is typed (placeholder is hidden) */
-  .floating-input:focus + .floating-label,
-  .floating-input:not(:placeholder-shown) + .floating-label {
+  /* Float label on focus or when a valid (non-empty) option is selected */
+  .select-wrapper select:focus ~ label,
+  .select-wrapper select:valid ~ label {
     top: 10px;
     left: 6px;
     font-size: 10px;

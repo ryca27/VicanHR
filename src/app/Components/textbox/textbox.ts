@@ -1,5 +1,5 @@
-import { Component, model, input } from '@angular/core';
-import {FormControl, ReactiveFormsModule, FormGroup} from '@angular/forms'
+import { Component, model, input, Input } from '@angular/core';
+import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms'
 import {FormValueControl } from '@angular/forms/signals'
 
 @Component({
@@ -8,8 +8,10 @@ import {FormValueControl } from '@angular/forms/signals'
   templateUrl: './textbox.html',
   styleUrl: './textbox.scss',
 })
-export class Textbox implements FormValueControl<string> {
+export class TextboxComponent implements FormValueControl<string> {
+  @Input() isRequired: boolean = false;
   inputControl = new FormControl('');
   readonly value = model('')
   readonly disabled = input<boolean>(false);
+
 }

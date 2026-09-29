@@ -1,4 +1,4 @@
-input:focus, textarea:focus {
+input:focus, textarea:focus, select:focus {
     outline: none; /* Removes the default black border on click */
     box-shadow: none; /* Removes any shadow glow applied by frameworks */
 }
