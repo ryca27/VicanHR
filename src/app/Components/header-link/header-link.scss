@@ -1,0 +1,32 @@
+.header-link-container{
+    height:100px;
+    display:flex;
+    width:100%
+}
+.link-wrapper{
+    align-items: center;
+    display: flex;
+    width: 100%;
+    float: right;
+    justify-content: flex-end;
+}
+.link-wrapper a{
+    font-size: 20px;
+    margin-right: 40px;
+    color: #1e1e1e;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: Inter, sans-serif;
+    font-feature-settings: 'liga' 1, 'calt' 1;
+    flex:1;
+    float:left
+}
+
+.username-wrapper{
+    display:inline-flex;
+    flex:2;
+    align-items: center;
+    gap: 5px;
+    font-size: 20px;
+    padding-right:20px
+}

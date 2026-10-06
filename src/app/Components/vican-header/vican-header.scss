@@ -1,0 +1,25 @@
+.header-container{
+    height: 180px;
+    background:linear-gradient(#6E9CFF, #BED8FF) ;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.header-main{
+    padding-top:20px;
+    font-size:80px;
+    font-weight: bold;
+    font-family: Inter, sans-serif;
+    font-feature-settings: 'liga' 1, 'calt' 1; 
+    height:100px
+}
+
+.header-sub{
+    font-size:60px;
+    font-family: Inter, sans-serif;
+    font-feature-settings: 'liga' 1, 'calt' 1; 
+    height:100px;
+    padding-bottom:20px;
+    color:white
+}
