@@ -1,0 +1,31 @@
+<p>some text</p>
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                @if(includeCheckBox){
+                    <th><input type="checkbox"></th>
+                }
+                
+                @for (column of columns; track $index){
+                    
+                        <th class={{column}}>{{column}}</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for(row of tableRows; track $index){
+                <tr>
+                    @if(includeCheckBox){
+                        <td><input type="checkbox"></td>
+                    }
+                    @for(value of row; track $index){
+                        
+                            <td>{{value}}</td>
+                        
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
