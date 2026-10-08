@@ -1,6 +1,6 @@
-import { Component, inject, OnInit, Input } from '@angular/core';
-import { Router, NavigationEnd, ActivatedRoute  } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { Component, inject, OnInit } from '@angular/core';
+import { Router, NavigationEnd   } from '@angular/router';
+import { filter, map, Observable   } from 'rxjs';
 import {subHeaderList} from './vican-header-constants'
 
 @Component({
@@ -11,16 +11,16 @@ import {subHeaderList} from './vican-header-constants'
 })
 export class VicanHeader implements OnInit {
   private router = inject(Router);
-  currentUrl = '';
-  subHeader = '';
-
-  constructor(private route: ActivatedRoute) {}
-
-  ngOnInit(){
-    this.route.url.subscribe(() => {
-      const fullUrl = this.route.snapshot.root.firstChild?.routeConfig?.path || '';
-      this.subHeader = this.onNavigatePage(fullUrl);
-    });
+  subHeader: string = ''
+  public currentUrl$: Observable<string> = this.router.events.pipe(
+    filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+    map((event: NavigationEnd) => event.urlAfterRedirects) // or event.url
+  );
+  ngOnInit() {
+    this.currentUrl$.subscribe(value => {
+      debugger;
+      this.subHeader = this.onNavigatePage((value).slice(1));
+    })
   }
   onNavigatePage(url: string): string{
     return subHeaderList.filter(s => s.url == url)[0].value
