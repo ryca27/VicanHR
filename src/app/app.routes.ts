@@ -9,9 +9,4 @@ export const routes: Routes = [
         path: '',
         component: Home
     },
-
-    {
-        path: '',
-        component: App
-    }
 ];
