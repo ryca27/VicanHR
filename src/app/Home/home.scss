@@ -173,3 +173,41 @@
       margin-block: 1.5rem;
     }
   }
+.cards-container{
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.row-container{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+  .card-wrapper{
+    margin-top: 100px;
+    margin-right: 20px;
+    width: 400px;
+    height: 150px;
+    border: 2px solid #808080;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  .card-wrapper:nth-child(even){
+    float:right;
+  }
+  .card-wrapper img{
+    width:120px;
+    height: 120px;
+    padding: 10px;
+  }
+  .card-wrapper h1{
+    font-size: 20px;
+    color: #1e1e1e
+  }
+
+  .card-wrapper h2{
+    font-size: 16px;
+    color: #757575
+  }

@@ -20,7 +20,6 @@ export class VicanHeader implements OnInit {
     this.route.url.subscribe(() => {
       const fullUrl = this.route.snapshot.root.firstChild?.routeConfig?.path || '';
       this.subHeader = this.onNavigatePage(fullUrl);
-      debugger;
     });
   }
   onNavigatePage(url: string): string{
