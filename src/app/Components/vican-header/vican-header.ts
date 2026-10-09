@@ -18,7 +18,6 @@ export class VicanHeader implements OnInit {
   );
   ngOnInit() {
     this.currentUrl$.subscribe(value => {
-      debugger;
       this.subHeader = this.onNavigatePage((value).slice(1));
     })
   }

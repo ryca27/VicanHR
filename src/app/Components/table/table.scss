@@ -1,8 +1,13 @@
+.table-wrapper{
+    display: flex;
+}
+
 table{
     border-spacing: 0px;
     color: #1e1e1e;
     font-family: Inter, sans-serif;
     font-feature-settings: 'liga' 1, 'calt' 1; 
+    width: 100%;
 }
 thead tr{
     height:60px;

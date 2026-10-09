@@ -1,13 +1,12 @@
 .input-wrapper {
     position: relative;
-    margin-top: 20px;
     font-family: crimson-text;
     min-width: 200px;
   }
   .floating-input {
     width:200px;
     padding: 12px 10px;
-    font-size: 12px;
+    font-size: 14px;
     border-radius: 5px;
     border: 1px solid #d9d9d9;
     font-family: crimson-text;
@@ -27,7 +26,7 @@
     color: #4C4C4C;
     pointer-events: none;
     transition: 0.2s ease all;
-    font-size:12px
+    font-size:14px
   }
   
   /* Triggers when the input is focused OR when text is typed (placeholder is hidden) */

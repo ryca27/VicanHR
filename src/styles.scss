@@ -5,3 +5,17 @@ input:focus, textarea:focus, select:focus {
 input {
     outline: none
 }
+
+app-payroll app-table tbody td{
+    background-color: #FFFFFF;
+}
+
+app-payroll app-table tbody tr td:not(:last-child){
+    color: #5b5b5b;
+}
+
+app-payroll app-table tbody tr td:last-child{
+    font-weight: bolder !important;
+    color: #0E9DF6;
+    cursor: pointer;
+}

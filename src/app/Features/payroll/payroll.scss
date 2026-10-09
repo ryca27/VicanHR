@@ -1,0 +1,38 @@
+.container{
+    display: flex;
+    
+}
+.row-container {
+    background-color: #FAFAFA;
+    margin: 3%;
+    padding:5px 20px 20px 20px;
+    min-height: 500px;
+    border-radius:10px ;
+}
+
+.row-container h1{
+
+    font-size: 22px;
+    font-weight: 400;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.row-container.list{
+    width:58%;
+    min-width: 600px;
+    
+
+}
+
+.row-container h3{
+    color: #4C4C4C;
+    font-size: 14px;
+    font-weight: 200;
+
+}
+
+.row-container.action{
+    width:28%;
+    min-width: 300px;
+    
+}

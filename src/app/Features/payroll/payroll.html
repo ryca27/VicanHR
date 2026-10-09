@@ -1,1 +1,15 @@
-<p>payroll works!</p>
+<div class="container">
+    <div class="row-container list">
+        <h1>Payroll Cutoffs</h1>
+        <h3>View Existing cutoff</h3>
+        <app-table
+            [columns]="mockData.tableColumns"
+            [rows]="mockData.tableRows"
+        ></app-table>
+    </div>
+    <div class="row-container action">
+        <h1>New Payroll Cutoff</h1>
+        <h3>Create a new payroll</h3>
+        <!-- <app-date-picker></app-date-picker> -->
+    </div>
+</div>
