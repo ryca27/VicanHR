@@ -23,6 +23,10 @@ app-payroll .mat-date-range-input-wrapper{
   width: 100% !important;
 }
 
+app-double-date-picker .mat-date-range-input-wrapper{
+  width: 100% !important;
+}
+
 mat body {
   // Default the application to a light color theme. This can be changed to
   // `dark` to enable the dark color theme, or to `light dark` to defer to the
@@ -50,9 +54,13 @@ input {
   outline: none;
 }
 
-app-payroll app-table tbody td {
+app-payroll app-table tbody tr:nth-child(even) td {
   background-color: #ffffff;
 }
+app-payroll app-table tbody tr:nth-child(odd) td {
+  background-color: #fafafa;
+}
+
 
 app-payroll app-table tbody tr td:not(:last-child) {
   color: #5b5b5b;

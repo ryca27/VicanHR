@@ -10,4 +10,5 @@ import { NgClass } from '@angular/common';
 export class ButtonComponent {
   @Input() label: string = ""
   @Input() color: string = ""
+  @Input() disabled: boolean = true;
 }

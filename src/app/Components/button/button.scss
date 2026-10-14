@@ -13,6 +13,12 @@ button{
     cursor:pointer
 }
 
+button:disabled{
+    cursor:not-allowed;
+    background:linear-gradient(#43A5EB, #0047A4) ;
+    opacity: 50%;
+}
+
 .blue {
     background:linear-gradient(#43A5EB, #0047A4) ;
 }

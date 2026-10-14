@@ -1,0 +1,26 @@
+@if(isOpen){
+    <div class="modal-overlay" (click)="closeModal()">
+        <!-- (click)="$event.stopPropagation()" prevents closing when clicking inside the content box -->
+        <div class="modal-container" (click)="$event.stopPropagation()">
+          
+          <div class="modal-header">
+            <h3>{{ title }}</h3>
+          </div>
+      
+          <div class="modal-body">
+            <form [formGroup]="uploadFormGroup">
+                <app-double-date-picker [label]="'Cutoff Period'"
+                [startDate]="startDate"
+                [endDate]="endDate"
+                [startDateDisabled]="true"
+                [endDateDisabled]="true"
+                (startDateOutput)="startDateOutputListener($event)"
+                (endDateOutput)="endDateOutputListener($event)"
+                ></app-double-date-picker>
+            </form>
+
+          </div>
+      
+        </div>
+      </div>
+}

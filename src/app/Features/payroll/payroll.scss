@@ -43,7 +43,8 @@
 }
 
 .requirements-container{
-    padding-left: 10px
+    padding-left: 10px;
+    height: 180px;
 }
 
 .row-container.action p{
@@ -56,6 +57,9 @@ app-button{
     width: 50%;
     margin-top:auto;
 }
+  .row-container.action mat-form-field{
+    width: 100%;
+  }
 
 .mat-date-range-input-inner {
     text-align: center;
@@ -71,9 +75,6 @@ app-button{
     text-align: center;
   }
 
-  .row-container.action mat-form-field{
-    width: 100%;
-  }
   .mat-date-range-input-container{
     display: flex;
   }

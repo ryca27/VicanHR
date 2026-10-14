@@ -1,0 +1,25 @@
+.mat-date-range-input-inner {
+    text-align: center;
+  }
+  
+  /* Optional: Center the placeholder text */
+  .mat-date-range-input-inner::placeholder {
+    text-align: center;
+  }
+  
+  /* Target individual input elements if needed */
+  mat-date-range-input input.mat-input-element {
+    text-align: center;
+  }
+
+  .mat-date-range-input-container{
+    display: flex;
+  }
+
+  .mat-date-range-input-container div{
+    width: 100%;
+  }
+
+  .double-date-picker-wrapper mat-form-field{
+    width:100%
+  }

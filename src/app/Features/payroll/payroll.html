@@ -8,17 +8,24 @@
         ></app-table>
     </div>
     <div class="row-container action">
+      <form [formGroup]="createPayrollFormGroup">
         <h1>New Payroll Cutoff</h1>
         <h3>Create a new payroll</h3>
-        <mat-form-field appearance="fill">
+        <!-- <mat-form-field appearance="fill">
             <mat-label>Enter a date range</mat-label>
             <mat-date-range-input [rangePicker]="doublePicker">
-              <input matStartDate placeholder="Start date">
-              <input matEndDate placeholder="End date">
+              <input matStartDate placeholder="Start date" formControlName="startDate">
+              <input matEndDate placeholder="End date" formControlName="endDate">
             </mat-date-range-input>
             <mat-datepicker-toggle matIconSuffix [for]="doublePicker"></mat-datepicker-toggle>
             <mat-date-range-picker #doublePicker></mat-date-range-picker>
-          </mat-form-field>
+          </mat-form-field> -->
+          <app-double-date-picker [label]="'Cutoff Period'"
+          [startDate]="createPayrollFormGroup.value.startDate ?? ''"
+          [endDate]="createPayrollFormGroup.value.endDate ?? ''"
+          (startDateOutput)="startDateOutputListener($event)"
+          (endDateOutput)="endDateOutputListener($event)"
+          ></app-double-date-picker>
 
           <div class="requirements-container">
             <h3>Required Inputs</h3>
@@ -28,10 +35,20 @@
             </p>
           </div>
           <div class="button-container">
-            <app-button [label]="'Start Prepartion'"
+            <app-button [label]="'Start Prepartion'" (click)="onSubmit()"
             [color]="'blue'"
+            [disabled]="false"
         ></app-button>
           </div>
+      </form>
+        
           
     </div>
 </div>
+
+<upload-modal 
+  [isOpen]="isUploadModalVisible" 
+  [title]="'Upload File'" 
+  [startDate]="createPayrollFormGroup.value.startDate ?? ''"
+  [endDate]="createPayrollFormGroup.value.endDate ?? ''"
+  (closeEvent)="closeModal()"> </upload-modal>

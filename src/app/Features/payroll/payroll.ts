@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+import {FormControl, ReactiveFormsModule, Validators, FormGroup, FormBuilder} from '@angular/forms'
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -10,26 +10,37 @@ import {TextboxComponent} from './../../Components/textbox/textbox'
 import {DropdownComponent} from './../../Components/dropdown/dropdown'
 import {ButtonComponent} from './../../Components/button/button'
 import {TableComponent} from './../../Components/table/table'
-import {DatePickerComponent} from './../../Components/date-picker/date-picker'
+import {DoubleDatePickerComponent} from './../../Components/double-date-picker/double-date-picker'
+import {UploadModal} from './modals/upload/upload'
+import { FormField } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-payroll',
   imports: [TextboxComponent,
-    DropdownComponent, 
-    TableComponent, 
-    DatePickerComponent,
+    DropdownComponent,
+    TableComponent,
+    DoubleDatePickerComponent,
     ButtonComponent,
+    UploadModal,
     MatFormFieldModule,
     MatInputModule,
-    MatDatepickerModule],
+    MatDatepickerModule,
+    ReactiveFormsModule, FormField],
   providers:[provideNativeDateAdapter()],
   templateUrl: './payroll.html',
   styleUrl: './payroll.scss',
 })
 export class Payroll implements OnInit {
-  constructor(){}
-
   mockData: any = {}
+  isUploadModalVisible: boolean = false;
+  createPayrollFormGroup = new FormGroup({
+    startDate: new FormControl('', {
+      validators: [Validators.required, Validators.minLength(2)]
+    }),
+    endDate : new FormControl('', {
+      validators: [Validators.required, Validators.minLength(2)]
+    }),
+  })
 
   ngOnInit(){
     this.mockData = {
@@ -55,6 +66,23 @@ export class Payroll implements OnInit {
         },
       ]
     }
+  }
+
+  onSubmit(){
+    console.log(this.createPayrollFormGroup.value)
+    this.isUploadModalVisible = true
+  }
+
+  closeModal(){
+    this.isUploadModalVisible = false
+  }
+
+  //Double date picker output listener
+  startDateOutputListener(message:string){
+    this.createPayrollFormGroup.controls.startDate.setValue(message)
+  }
+  endDateOutputListener(message:string){
+    this.createPayrollFormGroup.controls.endDate.setValue(message)
   }
 
 }
