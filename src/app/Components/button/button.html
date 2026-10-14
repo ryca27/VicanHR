@@ -1,1 +1,3 @@
-<p>button works!</p>
+<div class="button-wrapper">
+    <button [ngClass]="color=='blue' ? 'blue' : color=='gray' ? 'gray': 'red'">{{label}}</button>
+</div>

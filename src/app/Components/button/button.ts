@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { NgClass } from '@angular/common';
 
 @Component({
-  imports: [],
+  imports: [NgClass],
   selector: 'app-button',
   styleUrl: './button.scss',
   templateUrl: './button.html',
 })
-export class Button {}
+export class ButtonComponent {
+  @Input() label: string = ""
+  @Input() color: string = ""
+}

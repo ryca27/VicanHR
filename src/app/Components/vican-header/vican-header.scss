@@ -1,5 +1,5 @@
 .header-container{
-    height: 180px;
+    height: 160px;
     background:linear-gradient(#6E9CFF, #BED8FF) ;
     justify-content: center;
     display: flex;
@@ -8,7 +8,7 @@
     min-width: 1000px;
 }
 .header-main{
-    padding-top:20px;
+    padding-top:10px;
     font-size:80px;
     font-weight: bold;
     font-family: Inter, sans-serif;
@@ -21,6 +21,6 @@
     font-family: Inter, sans-serif;
     font-feature-settings: 'liga' 1, 'calt' 1; 
     height:100px;
-    padding-bottom:20px;
+    padding-bottom:10px;
     color:white
 }

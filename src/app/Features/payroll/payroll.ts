@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import {TextboxComponent} from './../../Components/textbox/textbox'
-import {DropdownComponent} from './../../Components/dropdown/dropdown'
-import {TableComponent} from './../../Components/table/table'
-import {DatePickerComponent} from './../../Components/date-picker/date-picker'
+
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { provideNativeDateAdapter } from '@angular/material/core';
+
+// Components Import
+import {TextboxComponent} from './../../Components/textbox/textbox'
+import {DropdownComponent} from './../../Components/dropdown/dropdown'
+import {ButtonComponent} from './../../Components/button/button'
+import {TableComponent} from './../../Components/table/table'
+import {DatePickerComponent} from './../../Components/date-picker/date-picker'
 
 @Component({
   selector: 'app-payroll',
@@ -14,6 +18,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
     DropdownComponent, 
     TableComponent, 
     DatePickerComponent,
+    ButtonComponent,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule],

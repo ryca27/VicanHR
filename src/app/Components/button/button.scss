@@ -1,0 +1,24 @@
+.button-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+button{
+    border: 0px;
+    border-radius: 5px;
+    width: 50%;
+    height: 40px;
+    font-size: 17px;
+    color: white;
+    cursor:pointer
+}
+
+.blue {
+    background:linear-gradient(#43A5EB, #0047A4) ;
+}
+.red {
+    background:linear-gradient(#FF7371, #A91917) ;
+}
+.gray {
+    background:linear-gradient(#929292, #2C2C2C) ;
+}
