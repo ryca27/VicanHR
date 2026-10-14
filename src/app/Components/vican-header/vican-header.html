@@ -1,4 +1,5 @@
 <div class="header-container">
     <div class="header-main">Vican HR</div>
-    <div class="header-sub">{{subHeader}}</div>
+    <!-- The async pipe automatically handles the subscription and updates on refresh -->
+    <div class="header-sub">{{ subHeader$ | async }}</div>
 </div>
