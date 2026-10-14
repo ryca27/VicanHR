@@ -3,10 +3,21 @@ import {TextboxComponent} from './../../Components/textbox/textbox'
 import {DropdownComponent} from './../../Components/dropdown/dropdown'
 import {TableComponent} from './../../Components/table/table'
 import {DatePickerComponent} from './../../Components/date-picker/date-picker'
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 @Component({
   selector: 'app-payroll',
-  imports: [TextboxComponent,DropdownComponent, TableComponent, DatePickerComponent],
+  imports: [TextboxComponent,
+    DropdownComponent, 
+    TableComponent, 
+    DatePickerComponent,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule],
+  providers:[provideNativeDateAdapter()],
   templateUrl: './payroll.html',
   styleUrl: './payroll.scss',
 })

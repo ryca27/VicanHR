@@ -28,6 +28,7 @@
     color: #4C4C4C;
     font-size: 14px;
     font-weight: 200;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
 
 }
 
@@ -36,3 +37,28 @@
     min-width: 300px;
     
 }
+
+.mat-date-range-input-inner {
+    text-align: center;
+  }
+  
+  /* Optional: Center the placeholder text */
+  .mat-date-range-input-inner::placeholder {
+    text-align: center;
+  }
+  
+  /* Target individual input elements if needed */
+  mat-date-range-input input.mat-input-element {
+    text-align: center;
+  }
+
+  .row-container.action mat-form-field{
+    width: 100%;
+  }
+  .mat-date-range-input-container{
+    display: flex;
+  }
+
+  .mat-date-range-input-container div{
+    width: 100%;
+  }

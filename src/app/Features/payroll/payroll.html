@@ -10,6 +10,23 @@
     <div class="row-container action">
         <h1>New Payroll Cutoff</h1>
         <h3>Create a new payroll</h3>
-        <!-- <app-date-picker></app-date-picker> -->
+        <mat-form-field appearance="fill">
+            <mat-label>Enter a date range</mat-label>
+            <mat-date-range-input [rangePicker]="doublePicker">
+              <input matStartDate placeholder="Start date">
+              <input matEndDate placeholder="End date">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="doublePicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #doublePicker></mat-date-range-picker>
+          </mat-form-field>
+
+          <div class="requirements-container">
+            <h3>Required Inputs</h3>
+            <p>
+                -Attendance <br>
+                -Expenses
+            </p>
+            
+          </div>
     </div>
 </div>
