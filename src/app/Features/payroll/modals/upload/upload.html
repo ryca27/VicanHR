@@ -17,6 +17,8 @@
                 (startDateOutput)="startDateOutputListener($event)"
                 (endDateOutput)="endDateOutputListener($event)"
                 ></app-double-date-picker>
+                <app-dropdown [options]="fileTypeOptions" [label]="fileTypeLabel">
+                </app-dropdown>
             </form>
 
           </div>

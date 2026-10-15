@@ -3,15 +3,19 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule  } from '@angular/forms';
 
 //Components Import
-import {DoubleDatePickerComponent} from './../../../../Components/double-date-picker/double-date-picker'
+import { DoubleDatePickerComponent } from './../../../../Components/double-date-picker/double-date-picker'
+import { DropdownComponent } from './../../../../Components/dropdown/dropdown'
+import { fileTypeList, expenseTypeList } from './upload-constants'
 
 @Component({
-  imports: [CommonModule, DoubleDatePickerComponent, ReactiveFormsModule ],
+  imports: [CommonModule,  ReactiveFormsModule, DoubleDatePickerComponent, DropdownComponent, ],
   selector: 'upload-modal',
   styleUrl: './upload.scss',
   templateUrl: './upload.html',
 })
 export class UploadModal implements OnInit {
+  constructor(){
+  }
   private fb = inject(FormBuilder)
 
   @Input() isOpen = false;
@@ -20,6 +24,9 @@ export class UploadModal implements OnInit {
   @Input() endDate: string ='';
   @Output() closeEvent = new EventEmitter<void>();
 
+  public fileTypeOptions = fileTypeList; 
+  public expenseTypeOptions = expenseTypeList;
+  public fileTypeLabel: string = 'File Type'
   uploadFormGroup = this.fb.group({
     startDate: this.startDate,
     endDate: this.endDate

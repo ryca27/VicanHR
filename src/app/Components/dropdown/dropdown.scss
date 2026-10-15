@@ -3,17 +3,21 @@
     margin-top: 20px;
     font-family: crimson-text;
     min-width: 200px;
+    height: 70px;
+    display: flex;
   }
   .select-wrapper select {
-    width: 221.33px;
+    width: 100%;
     display: block;
     padding: 12px 6px;
-    font-size: 12px;
+    font-size: 16px;
     border-radius: 5px;
     border: 1px solid #d9d9d9;
-    font-family: crimson-text;
-    padding-top: 20px;
+    font-family: Helvetica, Arial, sans-serif;
+    padding-top: 10px;
     padding-bottom: 5px;
+    height: 50px;
+    text-align: center;
   }
 
   .select-wrapper select:focus, .select-wrapper select:hover{
@@ -28,7 +32,7 @@
     color: #4C4C4C;
     pointer-events: none;
     transition: 0.2s ease all;
-    font-size:12px
+    font-size:14px
   }
   
   /* Float label on focus or when a valid (non-empty) option is selected */
@@ -36,7 +40,7 @@
   .select-wrapper select:valid ~ label {
     top: 10px;
     left: 6px;
-    font-size: 10px;
+    font-size: 12px;
     color: #4C4C4C;
     background-color: #fff; /* Matches form background to look clean */
     padding: 0 4px;
