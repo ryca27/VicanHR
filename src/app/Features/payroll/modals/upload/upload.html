@@ -1,5 +1,5 @@
 @if(isOpen){
-    <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-overlay" (click)="closeUploadModal()">
         <!-- (click)="$event.stopPropagation()" prevents closing when clicking inside the content box -->
         <div class="modal-container" (click)="$event.stopPropagation()">
           
@@ -66,7 +66,7 @@
                   [disabled]="false"
                   [size]="'long'"
                 ></app-button>
-                <app-button [label]="'Cancel'" (click)="closeModal()"
+                <app-button [label]="'Cancel'" (click)="closeUploadModal()"
                 [color]="'red'"
                 [disabled]="false"
                 [size]="'long'"
@@ -77,7 +77,7 @@
             </form>
 
           </div>
-      
+          
         </div>
       </div>
 }

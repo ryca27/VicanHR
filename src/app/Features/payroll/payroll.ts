@@ -4,6 +4,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { FormField } from '@angular/forms/signals';
 
 // Components Import
 import {TextboxComponent} from './../../Components/textbox/textbox'
@@ -11,8 +12,9 @@ import {DropdownComponent} from './../../Components/dropdown/dropdown'
 import {ButtonComponent} from './../../Components/button/button'
 import {TableComponent} from './../../Components/table/table'
 import {DoubleDatePickerComponent} from './../../Components/double-date-picker/double-date-picker'
-import {UploadModal} from './modals/upload/upload'
-import { FormField } from '@angular/forms/signals';
+import {UploadModal} from './modals/upload/upload';
+import {AcceptedRowsModal} from './modals/accepted-rows/accepted-rows';
+
 
 @Component({
   selector: 'app-payroll',
@@ -22,6 +24,7 @@ import { FormField } from '@angular/forms/signals';
     DoubleDatePickerComponent,
     ButtonComponent,
     UploadModal,
+    AcceptedRowsModal,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
@@ -33,6 +36,7 @@ import { FormField } from '@angular/forms/signals';
 export class Payroll implements OnInit {
   mockData: any = {}
   isUploadModalVisible: boolean = false;
+  isAcceptedRowsModalVisible: boolean = false;
   createPayrollFormGroup = new FormGroup({
     startDate: new FormControl('', {
       validators: [Validators.required, Validators.minLength(2)]
@@ -73,8 +77,12 @@ export class Payroll implements OnInit {
     this.isUploadModalVisible = true
   }
 
-  closeModal(){
+  closeUploadModal(){
     this.isUploadModalVisible = false
+  }
+
+  acceptedrows(){
+    this.isAcceptedRowsModalVisible = true
   }
 
   //Double date picker output listener

@@ -40,6 +40,11 @@
             [disabled]="false"
             [size]="'medium'"
         ></app-button>
+        <app-button [label]="'accepted rows'" (click)="acceptedrows()"
+        [color]="'blue'"
+        [disabled]="false"
+        [size]="'medium'"
+    ></app-button>
           </div>
       </form>
         
@@ -52,4 +57,10 @@
   [title]="'Upload File'" 
   [startDate]="createPayrollFormGroup.value.startDate ?? ''"
   [endDate]="createPayrollFormGroup.value.endDate ?? ''"
-  (closeEvent)="closeModal()"> </upload-modal>
+  (closeEvent)="closeUploadModal()"> </upload-modal>
+
+<accepted-rows-modal
+[isOpen]="isAcceptedRowsModalVisible"
+>
+
+</accepted-rows-modal>

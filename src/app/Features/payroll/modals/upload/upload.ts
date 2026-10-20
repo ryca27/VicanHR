@@ -27,7 +27,7 @@ export class UploadModal implements OnInit {
   private destroyRef = inject(DestroyRef)
 
   @Input() isOpen = false;
-  @Input() title = 'Modal Title';
+  @Input() title = '';
   @Input() startDate: string ='';
   @Input() endDate: string ='';
   @Output() closeEvent = new EventEmitter<void>();
@@ -44,7 +44,7 @@ export class UploadModal implements OnInit {
   // })
   uploadFormGroup!: FormGroup
 
-  closeModal() {
+  closeUploadModal() {
     this.isOpen = false;
     this.closeEvent.emit();
     this.uploadFormGroup.reset();
