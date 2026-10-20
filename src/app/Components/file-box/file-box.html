@@ -1,0 +1,15 @@
+<div class="upload-container">
+    <!-- Hidden native file input bound to Angular (change) event -->
+    <input [disabled]="isDisabled"
+      type="file" 
+      [id]="'file-upload-' + id" 
+      class="upload-input" 
+      (change)="onFileSelected($event)" />
+    
+    <!-- Styled textbox wrapper using Angular class binding for state -->
+    <label [for]="'file-upload-' + id" class="upload-box" [class.has-file]="hasFile" [ngClass]="isDisabled ? 'disabled' : ''">
+      <span class="floating-label" >Upload Document</span>
+      <span class="file-name">{{ fileName || 'No file chosen...' }}</span>
+    </label>
+
+  </div>

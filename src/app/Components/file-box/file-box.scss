@@ -1,0 +1,81 @@
+.upload-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    font-family: sans-serif;
+  }
+  
+  .upload-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+  
+  .upload-box {
+    display: block;
+    width: 100%;
+    padding: 16px 12px;
+    height: 50px;
+    font-size: 16px;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .upload-box.disabled{
+    cursor:not-allowed;
+    opacity: 50%;
+  }
+  
+  .file-name {
+    color: #888;
+    font-size: 15px;
+    display: inline-block;
+    margin-top: 3px;
+  }
+  
+  .floating-label {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 16px;
+    background-color: #fff;
+    padding: 0 4px;
+    transition: 0.2s ease all;
+    pointer-events: none;
+  }
+  
+  .upload-input:focus ~ .upload-box {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+  
+  /* Float label on focus or when Angular detects a selected file (.has-file) */
+  .upload-input:focus ~ .upload-box .floating-label,
+  .upload-box.has-file .floating-label {
+    top: 0;
+    font-size: 12px;
+    color: #2563eb;
+  }
+  
+  .upload-box.has-file .file-name {
+    color: #222;
+  }
+
+  .upload-box.has-file{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
