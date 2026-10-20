@@ -11,4 +11,5 @@ export class ButtonComponent {
   @Input() label: string = ""
   @Input() color: string = ""
   @Input() disabled: boolean = true;
+  @Input() size: string = "short"
 }

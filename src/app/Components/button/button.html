@@ -1,3 +1,11 @@
 <div class="button-wrapper">
-    <button [ngClass]="color=='blue' ? 'blue' : color=='gray' ? 'gray': 'red'" [disabled]="disabled">{{label}}</button>
+    <button [ngClass]="{
+            'blue': color=='blue',
+            'red': color=='red',
+            'gray': color=='gray',
+            'long': size=='long',
+            'medium': size=='medium',
+            'short': size=='short',
+        }"
+        [disabled]="disabled">{{label}}</button>
 </div>

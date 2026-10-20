@@ -13,6 +13,18 @@ button{
     cursor:pointer
 }
 
+.long{
+    width: 90%;
+    margin-bottom: 10px;
+}
+.long parent
+.medium{
+    width: 50%;
+}
+.short{
+    width: 20%;
+}
+
 button:disabled{
     cursor:not-allowed;
     background:linear-gradient(#43A5EB, #0047A4) ;

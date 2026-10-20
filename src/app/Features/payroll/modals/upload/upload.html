@@ -55,8 +55,25 @@
                   <button mat-icon-button (click)="addUploadFileGroup()"><img src="assets/plus-icon.png" style="width:40px; height:40px;"></button>
                 </div>
 
+                <div class="button-container">
+                  <app-button [label]="'Validate'" (click)="validateInput()"
+                    [color]="'blue'"
+                    [size]="'long'"
+                    [disabled]="false"
+                  ></app-button>
+                  <app-button [label]="'Upload'" (click)="submitForm()"
+                  [color]="'gray'"
+                  [disabled]="false"
+                  [size]="'long'"
+                ></app-button>
+                <app-button [label]="'Cancel'" (click)="closeModal()"
+                [color]="'red'"
+                [disabled]="false"
+                [size]="'long'"
+              ></app-button>
+              
+                </div>
                 
-                <button (click)="onsubmit()" [disabled]="uploadFormGroup.invalid" >submit</button>
             </form>
 
           </div>

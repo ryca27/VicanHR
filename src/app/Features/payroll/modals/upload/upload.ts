@@ -11,10 +11,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { DoubleDatePickerComponent } from './../../../../Components/double-date-picker/double-date-picker'
 import { DropdownComponent } from './../../../../Components/dropdown/dropdown'
 import { FileBoxComponent } from './../../../../Components/file-box/file-box'
+import { ButtonComponent } from '../../../../Components/button/button';
 
 
 @Component({
-  imports: [CommonModule, ReactiveFormsModule, DoubleDatePickerComponent, DropdownComponent, FileBoxComponent, MatIconModule, MatButtonModule],
+  imports: [CommonModule, ReactiveFormsModule, DoubleDatePickerComponent, DropdownComponent, FileBoxComponent, MatIconModule, MatButtonModule, ButtonComponent],
   selector: 'upload-modal',
   styleUrl: './upload.scss',
   templateUrl: './upload.html',
@@ -100,7 +101,10 @@ export class UploadModal implements OnInit {
     return this.uploadFileArray
   }
 
-  onsubmit(){
+  submitForm(){
+    debugger;
+  }
+  validateInput(){
     debugger;
   }
 
