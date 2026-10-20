@@ -113,12 +113,11 @@ export class UploadModal implements OnInit {
   }
 
   //File box output listener
-  fileContentOutputListener(message:string, i:any){
+  fileContentOutputListener(message:string, i:number){
     debugger;
-    i.get('fileContent').setValue(message)
     this.uploadFileArray.at(i).get('fileContent')?.setValue(message)
   }
-  fileNameOutputListener(message:string, i:any){
+  fileNameOutputListener(message:string, i:number){
     debugger;
     this.uploadFileArray.at(i).get('fileName')?.setValue(message)
   }

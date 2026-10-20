@@ -35,7 +35,8 @@
                           ></app-dropdown>
                         }
                         <app-file-box [id]="i"
-                      
+                        (fileContentOutput)="fileContentOutputListener($event,i )"
+                        (fileNameOutput)="fileNameOutputListener($event,i )"
                       ></app-file-box>
                       @if(i!=0){
                         <div class="button-container">
