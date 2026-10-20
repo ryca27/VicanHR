@@ -5,5 +5,6 @@ export const fileTypeList = [
 ]
 
 export const expenseTypeList =[
-    {'value':'123', 'label':'123'}
+    {'value':'training', 'label':'Training'},
+    {'value':'equipment', 'label':'Equipment'},
 ]

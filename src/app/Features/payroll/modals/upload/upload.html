@@ -17,8 +17,45 @@
                 (startDateOutput)="startDateOutputListener($event)"
                 (endDateOutput)="endDateOutputListener($event)"
                 ></app-double-date-picker>
-                <app-dropdown [options]="fileTypeOptions" [label]="fileTypeLabel">
-                </app-dropdown>
+                <div class="add-file-container" formArrayName="uploadFileArray">
+                  @if(uploadFileArray.length > 0){
+                    @for(uploadFile of uploadFileArray.controls; track uploadFile; let i = $index){
+                      <div [formGroupName]="i">
+                        <app-dropdown 
+                          [options]="fileTypeOptions" 
+                          [label]="fileTypeLabel" 
+                          formControlName="fileType">
+                        </app-dropdown>
+
+                        @if(uploadFileArray.controls[i].get('fileType')?.value == 'expenses' ){
+                          <app-dropdown
+                            [options]="expenseTypeOptions"
+                            [label]="expenseTypeLabel"
+                            formControlName="expenseType"
+                          ></app-dropdown>
+                        }
+                        <app-file-box [id]="i"
+                      
+                      ></app-file-box>
+                      @if(i!=0){
+                        <div class="button-container">
+                          <button mat-icon-button (click)="removeFileGroup(i)" aria-label="Delete item">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>
+                      }
+                        
+                      </div>
+                    }
+                  }
+                </div>
+
+                <div class="plus-container">
+                  <button mat-icon-button (click)="addUploadFileGroup()"><img src="assets/plus-icon.png" style="width:40px; height:40px;"></button>
+                </div>
+
+                
+                <button (click)="onsubmit()" [disabled]="uploadFormGroup.invalid" >submit</button>
             </form>
 
           </div>
