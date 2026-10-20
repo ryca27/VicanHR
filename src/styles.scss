@@ -54,19 +54,19 @@ input {
   outline: none;
 }
 
-app-payroll app-table tbody tr:nth-child(even) td {
+app-payroll .row-container.list app-table tbody tr:nth-child(even) td {
   background-color: #ffffff;
 }
-app-payroll app-table tbody tr:nth-child(odd) td {
+app-payroll .row-container.list app-table tbody tr:nth-child(odd) td {
   background-color: #fafafa;
 }
 
 
-app-payroll app-table tbody tr td:not(:last-child) {
+app-payroll .row-container.list app-table tbody tr td:not(:last-child) {
   color: #5b5b5b;
 }
 
-app-payroll app-table tbody tr td:last-child {
+app-payroll .row-container.list app-table tbody tr td:last-child {
   font-weight: bolder !important;
   color: #0e9df6;
   cursor: pointer;

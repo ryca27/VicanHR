@@ -86,10 +86,10 @@ export class Payroll implements OnInit {
   }
 
   //Double date picker output listener
-  startDateOutputListener(message:string){
+  startDateOutputListener(message:string): void{
     this.createPayrollFormGroup.controls.startDate.setValue(message)
   }
-  endDateOutputListener(message:string){
+  endDateOutputListener(message:string): void{
     this.createPayrollFormGroup.controls.endDate.setValue(message)
   }
 

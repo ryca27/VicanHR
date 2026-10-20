@@ -1,0 +1,13 @@
+span.tab{
+    font-size: 16px;
+    color: #767676;
+    cursor: pointer;
+    font-family: Helvetica, Arial, sans-serif;
+    border-bottom: 2px solid;
+    padding-right: 7px;
+    padding-left: 7px;
+    padding-bottom: 5px;
+}
+span.tab.active{
+    color:#00AAFF;
+}

@@ -1,0 +1,5 @@
+<div class="table-tab-wrapper">
+    @for(tab of tabNames; track $index){
+        <span class="tab" [ngClass]="tab.isActive? 'active' : ''" (click)="changeTab(tab.name)">{{tab.name}}</span>
+    }
+</div>

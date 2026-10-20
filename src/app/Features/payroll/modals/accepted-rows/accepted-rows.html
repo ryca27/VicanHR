@@ -1,10 +1,38 @@
 @if(isOpen){
-    <div class="modal-overlay" (click)="closeAcceptedRowsModal()">
+    <div class="modal-overlay">
         <div class="modal-container" (click)="$event.stopPropagation()">
             <div class="modal-header">
                 <h3>{{ title }}</h3>
               </div>
             <div class="modal-body">
+                <div>
+                    <app-table-tab
+                        [tabNames]="tabNames"
+                        (activeTabOutput)="activeTabOutputListener($event)"
+                        ></app-table-tab>
+                </div>
+                <div>
+                    @if(activeTab=='Attendance'){
+                        <app-table
+                        [columns]="attendanceData.tableColumns"
+                        [rows]="attendanceData.tableRows"
+                    ></app-table>
+                    }
+    
+                    @if(activeTab=='Equipment'){
+                        <app-table
+                        [columns]="equipmentData.tableColumns"
+                        [rows]="equipmentData.tableRows"
+                    ></app-table>
+                    }
+    
+                    @if(activeTab=='Training'){
+                        <app-table
+                        [columns]="trainingData.tableColumns"
+                        [rows]="trainingData.tableRows"
+                    ></app-table>
+                    }
+                </div>
                 
             </div>
         </div>
