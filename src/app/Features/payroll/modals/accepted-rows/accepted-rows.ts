@@ -4,10 +4,11 @@ import { CommonModule } from '@angular/common';
 //Components Import
 import { TableTabComponent } from './../../../../Components/table-tab/table-tab'
 import {TableComponent} from './../../../../Components/table/table'
+import { ButtonComponent } from '../../../../Components/button/button';
 
 
 @Component({
-  imports: [TableTabComponent, TableComponent],
+  imports: [TableTabComponent, TableComponent, ButtonComponent],
   selector: 'accepted-rows-modal',
   styleUrl: './accepted-rows.scss',
   templateUrl: './accepted-rows.html',
@@ -16,6 +17,7 @@ export class AcceptedRowsModal implements OnInit {
   constructor(){
   }
   @Input() isOpen = false;
+  @Output() closeModalOutput : EventEmitter<boolean> = new EventEmitter<boolean>();
   title: string = 'Validated Rows to Add';
   activeTab: string = 'Attendance' 
   tabNames: {name: string, isActive: boolean}[] = [
@@ -79,10 +81,15 @@ export class AcceptedRowsModal implements OnInit {
 
   closeAcceptedRowsModal(){
     this.isOpen = false;
+    this.closeModalOutput.emit(false);
   }
 
+  uploadRows(){
+    //do something
+  }
+
+  //Output event Listener
   activeTabOutputListener(message: string) {
-    debugger;
     this.activeTab = message;
   }
 }

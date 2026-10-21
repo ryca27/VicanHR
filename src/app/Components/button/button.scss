@@ -31,6 +31,10 @@ button:disabled{
     opacity: 50%;
 }
 
+button:active{
+    opacity: 90%;
+}
+
 .blue {
     background:linear-gradient(#43A5EB, #0047A4) ;
 }

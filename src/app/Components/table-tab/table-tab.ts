@@ -12,7 +12,6 @@ export class TableTabComponent {
   @Output() activeTabOutput: EventEmitter<string> = new EventEmitter<string>();
 
   changeTab(name: string){
-    debugger;
     this.activeTabOutput.emit(name);
     this.tabNames.map(t=> {
       t.isActive = false;

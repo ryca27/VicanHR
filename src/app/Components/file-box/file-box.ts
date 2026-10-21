@@ -18,7 +18,6 @@ export class FileBoxComponent {
 
 
   onFileSelected(event: any): void {
-    debugger;
     const file: File = event.target.files[0];
     if (file) {
       this.fileName = file.name;

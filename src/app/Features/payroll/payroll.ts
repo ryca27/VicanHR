@@ -77,12 +77,13 @@ export class Payroll implements OnInit {
     this.isUploadModalVisible = true
   }
 
-  closeUploadModal(){
-    this.isUploadModalVisible = false
+  closeUploadModalListener(message: boolean){
+    this.isUploadModalVisible = false;
+    this.isAcceptedRowsModalVisible = message;
   }
 
-  acceptedrows(){
-    this.isAcceptedRowsModalVisible = true
+  closeAcceptedRowsListener(message: boolean){
+    this.isAcceptedRowsModalVisible = message
   }
 
   //Double date picker output listener

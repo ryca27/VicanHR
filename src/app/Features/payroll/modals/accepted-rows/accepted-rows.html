@@ -5,13 +5,13 @@
                 <h3>{{ title }}</h3>
               </div>
             <div class="modal-body">
-                <div>
+                <div class="header-container">
                     <app-table-tab
                         [tabNames]="tabNames"
                         (activeTabOutput)="activeTabOutputListener($event)"
                         ></app-table-tab>
                 </div>
-                <div>
+                <div class="body-container">
                     @if(activeTab=='Attendance'){
                         <app-table
                         [columns]="attendanceData.tableColumns"
@@ -32,6 +32,21 @@
                         [rows]="trainingData.tableRows"
                     ></app-table>
                     }
+                </div>
+
+                <div class="button-container">
+                    <app-button
+                    [label]="'Cancel'"
+                    [color]="'red'"
+                    [size]="'long'"
+                    (click)="closeAcceptedRowsModal()"
+                    ></app-button>
+                    <app-button
+                    [label]="'Upload'"
+                    [color]="'gray'"
+                    [size]="'long'"
+                    (click)="uploadRows()"
+                    ></app-button>
                 </div>
                 
             </div>

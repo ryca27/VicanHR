@@ -42,3 +42,16 @@
   .modal-body{
     padding:12px
   }
+
+  .body-container {
+    margin: 20px 0px;
+  }
+
+  .button-container{
+    display: flex;
+    justify-content: center;
+  }
+
+  .button-container app-button{
+    width: 200px;
+  }

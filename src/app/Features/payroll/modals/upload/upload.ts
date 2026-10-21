@@ -30,28 +30,15 @@ export class UploadModal implements OnInit {
   @Input() title = '';
   @Input() startDate: string ='';
   @Input() endDate: string ='';
-  @Output() closeEvent = new EventEmitter<void>();
+  @Output() isSubmit = new EventEmitter<boolean>();
   
 
   public fileTypeOptions = fileTypeList; 
   public expenseTypeOptions = expenseTypeList;
   public fileTypeLabel: string = 'File Type'
   public expenseTypeLabel: string = 'Expense Type'
-  // uploadFormGroup = this.fb.group({
-  //   startDate: this.startDate,
-  //   endDate: this.endDate,
-  //   uploadFileArray: this.fb.array([this.createUploadFileGroup()])
-  // })
   uploadFormGroup!: FormGroup
 
-  closeUploadModal() {
-    this.isOpen = false;
-    this.closeEvent.emit();
-    this.uploadFormGroup.reset();
-    this.uploadFileArray.clear();
-    this.uploadFileArray.push(this.createUploadFileGroup());
-    debugger;
-  }
   ngOnInit(){
     this.uploadFormGroup = this.fb.group({
       startDate: this.startDate,
@@ -94,6 +81,14 @@ export class UploadModal implements OnInit {
         }
     })
   }
+  closeUploadModal() {
+    this.isOpen = false;
+    this.isSubmit.emit(false);
+    this.uploadFormGroup.reset();
+    this.uploadFileArray.clear();
+    this.uploadFileArray.push(this.createUploadFileGroup());
+  }
+
   get uploadFileArray(): FormArray {
     return this.uploadFormGroup.get('uploadFileArray') as FormArray;
   }
@@ -102,10 +97,10 @@ export class UploadModal implements OnInit {
   }
 
   submitForm(){
-    debugger;
+    this.isOpen = false;
+    this.isSubmit.emit(true);
   }
   validateInput(){
-    debugger;
   }
 
   //Double date picker output listener
@@ -118,11 +113,9 @@ export class UploadModal implements OnInit {
 
   //File box output listener
   fileContentOutputListener(message:string, i:number){
-    debugger;
     this.uploadFileArray.at(i).get('fileContent')?.setValue(message)
   }
   fileNameOutputListener(message:string, i:number){
-    debugger;
     this.uploadFileArray.at(i).get('fileName')?.setValue(message)
   }
 }
