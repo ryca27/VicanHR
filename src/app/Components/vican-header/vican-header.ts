@@ -22,7 +22,9 @@ export class VicanHeader {
   );
 
   onNavigatePage(url: string): string {
-    const found = subHeaderList.find(s => s.url === url);
+    let slashIndex = url.indexOf('/');
+    let rawUrl = slashIndex == -1 ? url :  url.substring(0, slashIndex)
+    const found = subHeaderList.find(s => s.url === rawUrl);
     return found ? found.value : ''; // Safeguard against undefined
   }
 }

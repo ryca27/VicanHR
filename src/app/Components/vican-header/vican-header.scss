@@ -1,15 +1,15 @@
 .header-container{
-    height: 160px;
+    height: 180px;
     background:linear-gradient(#6E9CFF, #BED8FF) ;
     justify-content: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 1000px;
+    min-width: 1200px;
 }
 .header-main{
     padding-top:10px;
-    font-size:80px;
+    font-size:70px;
     font-weight: bold;
     font-family: Inter, sans-serif;
     font-feature-settings: 'liga' 1, 'calt' 1; 
@@ -17,10 +17,10 @@
 }
 
 .header-sub{
-    font-size:60px;
+    font-size:40px;
     font-family: Inter, sans-serif;
     font-feature-settings: 'liga' 1, 'calt' 1; 
     height:100px;
-    padding-bottom:10px;
+    padding-bottom:30px;
     color:white
 }

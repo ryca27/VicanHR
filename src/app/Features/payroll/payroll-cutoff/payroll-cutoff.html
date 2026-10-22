@@ -1,11 +1,71 @@
-<!-- <div class="filter-container">
-    <app-dropdown
-    [label]="'Payroll Cutoff'"
-    [options]="cutOffOptions"
-    >
-    </app-dropdown>
-    <app-textbox
-    [label]="'Payroll Cutoff'"
-    [isRequired]="false"
-    ></app-textbox>
-</div> -->
+<div class="container">
+    <div class="sub-header-container">
+        <div class="wrapper left">
+            <div class="filter-component">
+                <app-textbox
+                [label]="'Name'"
+                ></app-textbox>
+            </div>
+            <div class="filter-component">
+                <app-dropdown
+                [label]="'Detachment'"
+                [options]="detachmentOptions"
+                ></app-dropdown>
+            </div>
+            <div class="filter-component">
+                <app-dropdown
+                [label]="'Status'"
+                [options]="statusOptions"
+                ></app-dropdown>
+            </div>
+        </div>
+
+        <div class="wrapper right">
+            <div class="filter-component button-container">
+                <app-button
+                [label]="'Preview'"
+                [color]="'black'"
+                [size]="'long'"
+                (click)="onPreview()"
+                ></app-button>
+            </div>
+    
+            <div class="filter-component button-container">
+                <app-button
+                [label]="'Finalize'"
+                [color]="'black'"
+                [size]="'long'"
+                (click)="onPreview()"
+                ></app-button>
+            </div>
+    
+            <div class="filter-component button-container">
+                <app-button
+                [label]="'Download'"
+                [color]="'black'"
+                [size]="'long'"
+                (click)="onPreview()"
+                ></app-button>
+            </div>
+    
+            <div class="status-container">
+                <div class="circle-container"><div class="circle green"></div><span> Payroll Ready</span> <br></div>
+                <div class="circle-container"><div class="circle yellow"></div><span> For Approval</span> <br></div>
+                <div class="circle-container"><div class="circle red"></div><span> Needs Attention</span> <br></div>
+                <!-- <div class="circle"></div><span> For Approval</span> <br>
+                <div class="circle"></div><span> Needs Attention</span> <br>
+                 -->
+                <!-- <div class="circle container"><div class="circle"></div><span> For Approval</span> <br></div>
+                <div class="circle container"><div class="circle"></div><span> Needs Attention</span> <br></div> -->
+            </div>
+        </div>
+
+       
+    </div>
+    <div class="statistics-container">
+        statistics here
+    </div>
+    <div class="table-container">
+
+    </div>
+</div>

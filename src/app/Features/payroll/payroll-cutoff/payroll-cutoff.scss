@@ -1,0 +1,76 @@
+.sub-header-container{
+    display: flex;
+    background-color: #CAD9FF;
+    height: 100px;
+    padding: 0px 1%;
+    position: relative;
+    width: 98%;
+}
+
+.container{
+    min-width: 1200px;
+}
+
+.wrapper{
+    display: flex;
+    min-width: 500px;
+}
+.wrapper.left{
+    width: 50%;
+}
+.wrapper.right{
+    width: 50%;
+    justify-content: end;
+}
+.sub-header-container div:nth-child(4){
+}
+
+.filter-component{
+    align-content: center;
+    display: grid;
+    margin-right: 20px;
+    min-width:200px;
+    width: 20%;
+}
+
+.button-container{
+    min-width: 110px;
+    width: 8%;
+    margin-right: 0px;
+}
+
+.circle {
+    width: 15px !important;
+    height: 15px !important;
+    border-radius: 50%;        /* Turns the square into a circle */
+    margin-right: 10px;
+    box-shadow: 0px 0px 2px 0.1px #1274b4;
+    border:1px solid white
+    
+  }
+
+.circle.green{
+    background-image: radial-gradient(#14AE5C, #6BFFB0);
+}
+.circle.yellow{
+    background-image: radial-gradient(#FFF71B, #FFFB81);
+}
+.circle.red{
+    background-image: radial-gradient(#AD4545, #FF6262);
+}
+.circle-container{
+    display: flex;
+}
+
+.status-container{
+    display: grid;
+    margin-left: 20px;
+    align-items: center;
+    min-width: 150px;
+}
+span {
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: bold;
+}
+
+

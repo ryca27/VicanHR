@@ -1,11 +1,13 @@
 <div class="button-wrapper">
     <button [ngClass]="{
             'blue': color=='blue',
+            'black': color=='black',
             'red': color=='red',
             'gray': color=='gray',
             'long': size=='long',
             'medium': size=='medium',
             'short': size=='short',
+            
         }"
         [disabled]="disabled">{{label}}</button>
 </div>

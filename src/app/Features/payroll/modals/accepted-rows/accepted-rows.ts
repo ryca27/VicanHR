@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit,DestroyRef  } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit,DestroyRef,   } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 //Components Import
 import { TableTabComponent } from './../../../../Components/table-tab/table-tab'
@@ -14,6 +15,9 @@ import { ButtonComponent } from '../../../../Components/button/button';
   templateUrl: './accepted-rows.html',
 })
 export class AcceptedRowsModal implements OnInit {
+
+  private router = inject(Router);
+
   constructor(){
   }
   @Input() isOpen = false;
@@ -85,7 +89,7 @@ export class AcceptedRowsModal implements OnInit {
   }
 
   uploadRows(){
-    //do something
+    this.router.navigateByUrl('/cutoff/1')
   }
 
   //Output event Listener

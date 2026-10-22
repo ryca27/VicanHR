@@ -1,17 +1,21 @@
 .input-wrapper {
     position: relative;
     font-family: crimson-text;
-    min-width: 200px;
+    min-width: 160px;
+    width: 100%;
   }
   .floating-input {
-    width:200px;
-    padding: 12px 10px;
-    font-size: 14px;
-    border-radius: 5px;
+    min-width:150px;
+    padding: 12px 15px;
+    font-size: 12px;
+    border-radius: 20px;
     border: 1px solid #d9d9d9;
-    font-family: crimson-text;
+    font-family: Helvetica, Arial, sans-serif;
     padding-top: 20px;
     padding-bottom: 5px;
+    height: 24px;
+    text-align: center;
+    width: 80%;
   }
 
   .floating-input:focus, .floating-input:hover{
@@ -33,9 +37,9 @@
   .floating-input:focus + .floating-label,
   .floating-input:not(:placeholder-shown) + .floating-label {
     top: 10px;
-    left: 6px;
+    left: 10px;
     font-size: 10px;
-    color: #4C4C4C;
+    color: #005cbb;
     background-color: #fff; /* Matches form background to look clean */
     padding: 0 4px;
   }
