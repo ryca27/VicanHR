@@ -63,9 +63,39 @@
        
     </div>
     <div class="statistics-container">
-        statistics here
+        <div class="card-container">
+            <app-card 
+            [header]="'Employees'"
+            [display]="employeeCount.toString()"
+            [color]="'blue'"
+            ></app-card>
+        </div>
+        <div class="card-container">
+            <app-card 
+            [header]="'Gross Pay'"
+            [display]="grossPay.toString()"
+            [color]="'green'"
+            ></app-card>
+        </div>
+        <div class="card-container">
+            <app-card 
+            [header]="'Deductions'"
+            [display]="'PHP' + deductions.toString()"
+            [color]="'yellow'"
+            ></app-card>
+        </div>
+        <div class="card-container">
+            <app-card 
+            [header]="'Net Pay'"
+            [display]="'PHP ' + netPay.toString()"
+            [color]="'red'"
+            ></app-card>
+        </div>
+        
     </div>
     <div class="table-container">
-
+        <app-table
+        [columns]="mockData.tableColumns"
+        [rows]="mockData.tableRows"></app-table>
     </div>
 </div>

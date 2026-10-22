@@ -1,5 +1,7 @@
 .table-wrapper{
     display: flex;
+    width: 100%;
+    overflow-x: scroll;
 }
 
 table{
@@ -13,6 +15,22 @@ thead tr{
     height:60px;
     background-color: #B3B3B3;
     
+}
+table tr :first-child{
+    position: sticky;
+    z-index: 10;
+    left:0;
+}
+table tr th:first-child{
+    background-color: #B3B3B3;
+}
+
+table tr:nth-child(odd) td:first-child{
+    background-color: #ADBBFF;
+}
+
+table tr:nth-child(even) td:first-child{
+    background-color: #CECECE;
 }
 thead th:first-child{
     border-radius: 10px 0px 0px 0px;
@@ -35,6 +53,7 @@ thead th{
     padding: 5px;
     font-size: 16px;
     text-align: center;
+    min-width: 100px;
     }
 tbody td{
     font-family: Inter, sans-serif;
@@ -57,5 +76,5 @@ tbody tr:last-child td:last-child {
     border-radius: 0px 0px 10px 0px
 }
 .Name{
-    min-width: 200px;
+    min-width: 200px !important;
 }
