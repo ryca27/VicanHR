@@ -95,7 +95,9 @@
     </div>
     <div class="table-container">
         <app-table
-        [columns]="mockData.tableColumns"
-        [rows]="mockData.tableRows"></app-table>
+        [includeCheckBox]="true"
+        [columnsInput]="mockData.tableColumns"
+        [rowsInput]="mockData.tableRows"
+        [actionRowsInput]="mockData.tableActionRows"></app-table>
     </div>
 </div>

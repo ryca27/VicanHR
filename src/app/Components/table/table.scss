@@ -21,15 +21,24 @@ table tr :first-child{
     z-index: 10;
     left:0;
 }
-table tr th:first-child{
+table tr:has(>:first-child.check-box) >:nth-child(2){
+    position: sticky;
+    z-index: 9;
+    left:0;
+}
+
+table tr:nth-child(odd):has(>:first-child.check-box) > td:nth-child(2){
+    background-color: red;
+}
+table tr th:first-child, table tr:has(>:first-child.check-box) > th:nth-child(2){
     background-color: #B3B3B3;
 }
 
-table tr:nth-child(odd) td:first-child{
+table tr:nth-child(odd) td:first-child, table tr:nth-child(odd):has(>:first-child.check-box) > td:nth-child(2){
     background-color: #ADBBFF;
 }
 
-table tr:nth-child(even) td:first-child{
+table tr:nth-child(even) td:first-child, table tr:nth-child(even):has(>:first-child.check-box) > td:nth-child(2){
     background-color: #CECECE;
 }
 thead th:first-child{
@@ -45,6 +54,10 @@ tbody td:first-child{
 }
 tbody td:last-child{
     padding-right: 20px;
+}
+th.check-box, td.check-box{
+    width: 20px;
+    min-width: 0px !important;
 }
 thead th{
     font-family: Inter, sans-serif;
@@ -77,4 +90,28 @@ tbody tr:last-child td:last-child {
 }
 .Name{
     min-width: 200px !important;
+}
+
+img {
+    cursor:pointer;
+    margin-right: 5px;
+    
+}
+
+img.disabled{
+    opacity: 75%;
+    cursor: not-allowed
+}
+
+img:active:not(.disabled){
+    opacity: 90%;
+}
+
+.action-td{
+    justify-content: space-evenly;
+    display: table-cell;
+}
+
+.action-td div{
+    background-color: inherit;
 }

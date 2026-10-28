@@ -14,22 +14,22 @@
                 <div class="body-container">
                     @if(activeTab=='Attendance'){
                         <app-table
-                        [columns]="attendanceData.tableColumns"
-                        [rows]="attendanceData.tableRows"
+                        [columnsInput]="attendanceData.tableColumns"
+                        [rowsInput]="attendanceData.tableRows"
                     ></app-table>
                     }
     
                     @if(activeTab=='Equipment'){
                         <app-table
-                        [columns]="equipmentData.tableColumns"
-                        [rows]="equipmentData.tableRows"
+                        [columnsInput]="equipmentData.tableColumns"
+                        [rowsInput]="equipmentData.tableRows"
                     ></app-table>
                     }
     
                     @if(activeTab=='Training'){
                         <app-table
-                        [columns]="trainingData.tableColumns"
-                        [rows]="trainingData.tableRows"
+                        [columnsInput]="trainingData.tableColumns"
+                        [rowsInput]="trainingData.tableRows"
                     ></app-table>
                     }
                 </div>

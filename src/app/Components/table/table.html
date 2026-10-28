@@ -1,31 +1,43 @@
 
 <div class="table-wrapper">
+    <form [formGroup]="checkBoxFormGroup">
     <table>
         <thead>
             <tr>
                 @if(includeCheckBox){
-                    <th><input type="checkbox"></th>
+                    <th class="check-box"><input type="checkbox" (click)= "onClickAllCheck(!allCheck.value)" [formControl]="allCheck"> {{allCheck.value}}</th>
                 }
                 
-                @for (column of columns; track $index){
+                @for (column of columnsInput; track $index){
                     
                         <th class={{column}}>{{column}}</th>
                 }
             </tr>
         </thead>
         <tbody>
-            @for(row of tableRows; track $index){
-                <tr>
-                    @if(includeCheckBox){
-                        <td><input type="checkbox"></td>
-                    }
-                    @for(value of row; track $index){
-                        
-                            <td>{{value}}</td>
-                        
-                    }
-                </tr>
-            }
+            
+                @for(row of tableRows; track $index; let i = $index){
+                    <tr [formArray]="checkBoxArray">
+                        @if(includeCheckBox){
+                            <td class="check-box"><input type="checkbox" [formControlName]="$index">{{checkBoxArray.value[$index]}}</td>
+                        }
+                        @for(value of row; track $index; let j = $index){
+                            @if($index == actionColumnIndex){
+                                <td class="action-td">
+                                    @for(actionRow of actionRows[i]; track actionRow){
+                                        <img [src]="actionRow.imgSrc" style="width:20px; height:20px; mix-blend-mode: multiply" [ngClass]="{'disabled': actionRow.isDisabled}"> 
+                                    }
+                                 </td>
+                            }
+                            @else {
+                                <td>{{value}}</td>
+                            } 
+                        }
+                    </tr>
+                }
+                
+            
         </tbody>
     </table>
+</form>
 </div>
