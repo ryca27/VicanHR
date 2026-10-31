@@ -5,7 +5,7 @@
         <thead>
             <tr>
                 @if(includeCheckBox){
-                    <th class="check-box"><input type="checkbox" (click)= "onClickAllCheck(!allCheck.value)" [formControl]="allCheck"> {{allCheck.value}}</th>
+                    <th class="check-box"><input type="checkbox" (click)= "onClickAllCheck(!allCheck.value)" [formControl]="allCheck"></th>
                 }
                 
                 @for (column of columnsInput; track $index){
@@ -16,10 +16,10 @@
         </thead>
         <tbody>
             
-                @for(row of tableRows; track $index; let i = $index){
+                @for(row of tableRowsDisplay; track $index; let i = $index){
                     <tr [formArray]="checkBoxArray">
                         @if(includeCheckBox){
-                            <td class="check-box"><input type="checkbox" [formControlName]="$index">{{checkBoxArray.value[$index]}}</td>
+                            <td class="check-box"><input type="checkbox" [formControlName]="$index"></td>
                         }
                         @for(value of row; track $index; let j = $index){
                             @if($index == actionColumnIndex){
@@ -29,9 +29,22 @@
                                     }
                                  </td>
                             }
+                            @else if($index == statusColumnIndex){
+                                <td class="status-td">
+                                    <div class="circle-container">
+                                        <div class="circle" [ngClass]="{
+                                    'green': value == 1,
+                                    'yellow': value == 2,
+                                    'red': value == 3,
+                                    }"></div>
+                                    </div>
+                                </td>
+                            }
                             @else {
                                 <td>{{value}}</td>
-                            } 
+                            }
+                            
+                            
                         }
                     </tr>
                 }
@@ -40,4 +53,13 @@
         </tbody>
     </table>
 </form>
+</div>
+<div class="pagination-wrapper">
+    <ul class="pagination">
+        <li><span (click)="decreasePageNumber()" >&laquo;</span></li>
+        @for(page of pageArray; track $index){
+            <li><span (click)="movePageNumber(page)"[ngClass]="{'active': currentPage == page}">{{page}}</span></li>
+        }
+        <li><span (click)="increasePageNumber()">&raquo;</span></li>
+      </ul>
 </div>

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import {detachmentList, statusList} from './payroll-cutoff-constants'
+import { Component, OnInit, inject } from '@angular/core';
+import {detachmentList, statusList} from './payroll-cutoff-constants';
+import {FormControl, ReactiveFormsModule, Validators, FormArray, FormGroup, FormBuilder,} from '@angular/forms'
 
 //Components Import
 import {TextboxComponent} from './../../../Components/textbox/textbox'
@@ -11,11 +12,12 @@ import {TableComponent} from './../../../Components/table/table'
 
 @Component({
   selector: 'app-payroll-cutoff',
-  imports: [TextboxComponent, DropdownComponent, ButtonComponent, CardComponent, TableComponent],
+  imports: [TextboxComponent, DropdownComponent, ButtonComponent, CardComponent, TableComponent, ReactiveFormsModule],
   templateUrl: './payroll-cutoff.html',
   styleUrl: './payroll-cutoff.scss',
 })
 export class PayrollCutoff implements OnInit {
+  private fb = inject(FormBuilder);
   detachmentOptions = detachmentList;
   statusOptions = statusList;
   employeeCount : number = 0;
@@ -23,6 +25,10 @@ export class PayrollCutoff implements OnInit {
   deductions: number = 0;
   netPay: number = 0;
   mockData:any ={} ;
+  tableRows!: Array<any>;
+  tableColumns!: Array<string>;
+  filters!: Array<{key: string, value: string}>;
+  filterFormGroup!: FormGroup;
 
   ngOnInit(){
     this.mockData = {
@@ -47,7 +53,7 @@ export class PayrollCutoff implements OnInit {
           netPay:'90000',
           payrollCutoff:'January 1-15 2026',
           remarks:'Payroll Ready',
-          status:2,
+          status:1,
           actions:[1,2,3],
         },
         {
@@ -72,7 +78,7 @@ export class PayrollCutoff implements OnInit {
           actions:[1,2,3],
         },
         {
-          fullName:'Ryan Tabernilla',
+          fullName:'Ryan Kukulit',
           detachment: 'Megabold',
           regularHours: '40',
           regularOvertime:'10',
@@ -89,11 +95,11 @@ export class PayrollCutoff implements OnInit {
           netPay:'90000',
           payrollCutoff:'January 1-15 2026',
           remarks:'Payroll Ready',
-          status:2,
+          status:3,
           actions:[1,2,3],
         },
         {
-          fullName:'Lea Ganda',
+          fullName:'Lea Babaet',
           detachment: 'Bold of Asia',
           regularHours: '40',
           regularOvertime:'10',
@@ -110,18 +116,54 @@ export class PayrollCutoff implements OnInit {
           netPay:'90000',
           payrollCutoff:'January 1-15 2026',
           remarks:'Payroll Ready',
-          status:2,
+          status:'3',
           actions:[1,2,3],
         },
       ],
       tableActionRows:[
         [{value: 1, isDisabled: true}, {value: 2, isDisabled: true}, {value: 3, isDisabled: false}],
         [{value: 1, isDisabled: true}, {value: 2, isDisabled: false}, {value: 3, isDisabled: false}],
+        [{value: 1, isDisabled: true}, {value: 2, isDisabled: false}, {value: 3, isDisabled: false}],
+        [{value: 1, isDisabled: false}, {value: 2, isDisabled: true}, {value: 3, isDisabled: false}],
       ]
     }
+    this.initializeFormGroup();
+    this.initializeTableRows();
+
   }
 
+  createObject<T extends object>(obj: T): T{
+    return obj;
+  }
+
+  initializeFormGroup(): void{
+    this.filterFormGroup = this.fb.group({
+      name: '',
+      detachment: '',
+      status: ''
+    })
+  }
+
+  initializeTableRows(): void{
+    this.tableRows = this.mockData.tableRows;
+  }
+
+
   onPreview(): void {
-    //do something
+    // Use optional chaining and fallbacks to prevent crashes
+    const name = (this.filterFormGroup.value.name?.toLowerCase()) || '';
+    const detachment = (this.filterFormGroup.value.detachment?.toLowerCase()) || '';
+    const status = this.filterFormGroup.value.status ?? '';
+  
+    this.tableRows = this.mockData.tableRows.filter((t: any) => {
+      const matchName = (t.fullName || '').toLowerCase().includes(name);
+      const matchDetachment = (t.detachment || '').toLowerCase().includes(detachment);
+      
+      // Fallback if status is an object or primitive
+      const statusString = typeof t.status === 'object' ? JSON.stringify(t.status) : String(t.status || '');
+      const matchStatus = statusString.includes(status);
+  
+      return matchName && matchDetachment && matchStatus;
+    });
   }
 }

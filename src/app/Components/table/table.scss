@@ -99,12 +99,12 @@ img {
 }
 
 img.disabled{
-    opacity: 75%;
+    opacity: 50%;
     cursor: not-allowed
 }
 
 img:active:not(.disabled){
-    opacity: 90%;
+    opacity: 80%;
 }
 
 .action-td{
@@ -114,4 +114,51 @@ img:active:not(.disabled){
 
 .action-td div{
     background-color: inherit;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none; /* remove list bullets */
+    padding: 0px;
+  }
+  
+  .pagination li span {
+    display: block; /* let links fill the list item */
+    padding: 8px 12px;
+    text-decoration: none;
+    color: black;  
+    margin: 0 4px;
+    border-radius: 5px; /* add rounded borders */
+    cursor: pointer;
+  }
+
+  .pagination li span.active{
+    border: 1px solid gray;
+    color: blue;
+    font-weight: bold;
+  }
+
+.circle{
+width: 15px !important;
+height: 15px !important;
+border-radius: 50%;        /* Turns the square into a circle */
+margin-right: 10px;
+box-shadow: 0px 0px 2px 0.1px #1274b4;
+border:1px solid white
+}
+
+td .circle-container{
+    display: flex;
+    justify-content: center;
+}
+
+.circle.green{
+    background-image: radial-gradient(#14AE5C, #6BFFB0);
+}
+.circle.yellow{
+    background-image: radial-gradient(#FFF71B, #FFFB81);
+}
+.circle.red{
+    background-image: radial-gradient(#AD4545, #FF6262);
 }

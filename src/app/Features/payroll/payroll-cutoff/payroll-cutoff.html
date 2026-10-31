@@ -1,24 +1,29 @@
 <div class="container">
     <div class="sub-header-container">
+        <form [formGroup]="filterFormGroup">
         <div class="wrapper left">
-            <div class="filter-component">
-                <app-textbox
-                [label]="'Name'"
-                ></app-textbox>
-            </div>
-            <div class="filter-component">
-                <app-dropdown
-                [label]="'Detachment'"
-                [options]="detachmentOptions"
-                ></app-dropdown>
-            </div>
-            <div class="filter-component">
-                <app-dropdown
-                [label]="'Status'"
-                [options]="statusOptions"
-                ></app-dropdown>
-            </div>
+            
+                <div class="filter-component">
+                    <app-textbox formControlName="name"
+                    [label]="'Name'"
+                    ></app-textbox>
+                </div>
+                <div class="filter-component">
+                    <app-dropdown
+                    [label]="'Detachment'"
+                    [options]="detachmentOptions"
+                    ></app-dropdown>
+                </div>
+                <div class="filter-component">
+                    <app-dropdown
+                    [label]="'Status'"
+                    [options]="statusOptions"
+                    ></app-dropdown>
+                </div>
+            
+            
         </div>
+        </form>
 
         <div class="wrapper right">
             <div class="filter-component button-container">
@@ -97,7 +102,7 @@
         <app-table
         [includeCheckBox]="true"
         [columnsInput]="mockData.tableColumns"
-        [rowsInput]="mockData.tableRows"
+        [rowsInput]="tableRows"
         [actionRowsInput]="mockData.tableActionRows"></app-table>
     </div>
 </div>
