@@ -1,8 +1,9 @@
-import { Component, Input, OnInit, inject, OnChanges } from '@angular/core';
+import { Component, Input, OnInit, inject, OnChanges, DestroyRef, Output, EventEmitter } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { actionList } from './table-constants'
+import { actionList, CheckBoxOutputInterface } from './table-constants'
 import {FormControl, ReactiveFormsModule, Validators, FormArray, FormGroup, FormBuilder,} from '@angular/forms'
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-table',
   imports: [NgClass, MatFormFieldModule, ReactiveFormsModule],
@@ -15,9 +16,12 @@ export class TableComponent implements OnInit {
   @Input() columnsInput: String[] = []
   @Input() rowsInput: any[] = [];
   @Input() includeCheckBox: boolean = false;
+  @Input() rowsIdInput: Array<string> = [];
   @Input() includeStatus: boolean = false;
   @Input() actionRowsInput: Array<Array<{value: number, isDisabled:boolean}>> = [];
+  @Output() checkBoxOutput: EventEmitter<Array<CheckBoxOutputInterface>> = new EventEmitter<Array<CheckBoxOutputInterface>>();
   private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef); 
   actionColumnIndex: number = -1;
   statusColumnIndex: number = -1;
   actionRows: Array<Array<{imgSrc: string, isDisabled: boolean}>> = [];
@@ -25,9 +29,10 @@ export class TableComponent implements OnInit {
   tableRowsDisplay: Array<Array<string| number| boolean>>= [];
   checkBoxFormGroup!: FormGroup;
   checkAll: boolean = false;
+  
 
   //Pagination Variables
-  pageSize: number = 3;
+  pageSize: number = 50;
   currentPage: number = 1;
   pageArray: number[] = [];
 
@@ -55,7 +60,7 @@ export class TableComponent implements OnInit {
       for (const key of this.getObjectKeys(row)){
         rowToAdd.push(key)
       }
-      this.tableRows.push(rowToAdd)
+      this.tableRows.push(rowToAdd);
     }
   }
 
@@ -73,11 +78,24 @@ export class TableComponent implements OnInit {
 
   initializeCheckFormGroup(): void{
     if(this.includeCheckBox){
+      let formArray = []
+      for(const i of this.rowsIdInput){
+        let group = this.createCheckBoxFormGroup(i);
+        formArray.push(group);
+      }
       this.checkBoxFormGroup = this.fb.group({
         allCheck: false,
-        checkBoxArray : this.fb.array(this.tableRows.map(() => new FormControl(false)))
+        checkBoxArray : this.fb.array(formArray)
       })
     }
+  }
+
+  createCheckBoxFormGroup(id: string): FormGroup{
+    let group = this.fb.group({
+      isChecked: [false],
+      id: [id]
+    })
+    return group;
   }
 
   getActionRows(){
@@ -115,19 +133,27 @@ export class TableComponent implements OnInit {
   }
 
   onChangeCheckBox(){
+    this.checkBoxArray.valueChanges
+    .pipe(
+      takeUntilDestroyed(this.destroyRef) 
+    )
+    .subscribe((formArrayValue) => {
+      const totalRows = this.tableRowsDisplay.length;
+      
+      const checkedCount = (this.checkBoxArray.controls as FormGroup[]).filter(cba => {
+        return cba.controls['isChecked']?.value === true && !cba.disabled;
+      }).length;
+      debugger;
+      this.checkBoxOutput.emit(formArrayValue);
 
-    for(const checkBoxControl of this.checkBoxArray.controls){
+      // 4. Update the "Select All" master checkbox state cleanly
+      if (checkedCount === totalRows) {
+        this.allCheck.setValue(true, { emitEvent: false });
+      } else {
+        this.allCheck.setValue(false, { emitEvent: false });
+      }
 
-      checkBoxControl.valueChanges.subscribe((c) => {
-        if(this.checkBoxArray.controls.filter((cba: any) => cba.value == true).length == this.rowsInput.length){
-          this.allCheck.setValue(true)
-        }
-        else if(this.checkBoxArray.controls.filter((cba: any) => cba.value == false).length > 0)
-        {
-          this.allCheck.setValue(false)
-        }
-      })
-    }
+    });
   }
   //End of CheckBox functions
 
@@ -158,7 +184,9 @@ export class TableComponent implements OnInit {
   }
 
   reloadTable(){
+    // this.checkBoxArray.disable();
     this.currentPage = 1;
     this.getDisplayByPageNumber();
+    this.getPageArray(this.pageSize);
   }
 }

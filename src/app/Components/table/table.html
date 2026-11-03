@@ -7,6 +7,8 @@
                 @if(includeCheckBox){
                     <th class="check-box"><input type="checkbox" (click)= "onClickAllCheck(!allCheck.value)" [formControl]="allCheck"></th>
                 }
+
+                <th class='id'>ID</th>
                 
                 @for (column of columnsInput; track $index){
                     
@@ -14,12 +16,13 @@
                 }
             </tr>
         </thead>
-        <tbody>
+        <tbody [formArray]="checkBoxArray">
             
                 @for(row of tableRowsDisplay; track $index; let i = $index){
-                    <tr [formArray]="checkBoxArray">
+                    <tr [formGroupName]="i">
                         @if(includeCheckBox){
-                            <td class="check-box"><input type="checkbox" [formControlName]="$index"></td>
+                            <td class="check-box"><input type="checkbox" formControlName="isChecked"></td>
+                            <td class="action-td">{{rowsIdInput[i]}}</td>
                         }
                         @for(value of row; track $index; let j = $index){
                             @if($index == actionColumnIndex){

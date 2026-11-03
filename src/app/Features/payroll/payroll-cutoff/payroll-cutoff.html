@@ -49,7 +49,7 @@
                 [label]="'Download'"
                 [color]="'black'"
                 [size]="'long'"
-                (click)="onPreview()"
+                (click)="onDownload()"
                 ></app-button>
             </div>
     
@@ -103,6 +103,8 @@
         [includeCheckBox]="true"
         [columnsInput]="mockData.tableColumns"
         [rowsInput]="tableRows"
-        [actionRowsInput]="mockData.tableActionRows"></app-table>
+        [actionRowsInput]="mockData.tableActionRows"
+        [rowsIdInput]="mockData.rowsId"
+        (checkBoxOutput)="checkBoxOutputListener($event)"></app-table>
     </div>
 </div>

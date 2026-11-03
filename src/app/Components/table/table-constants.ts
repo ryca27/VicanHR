@@ -4,3 +4,8 @@ export const actionList = [
     { value:3, imgSrc: 'assets/print-icon.png'},
 
 ]
+
+export interface CheckBoxOutputInterface {
+    id: string,
+    isChecked: boolean
+}

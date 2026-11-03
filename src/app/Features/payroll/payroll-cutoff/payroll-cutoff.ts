@@ -125,7 +125,8 @@ export class PayrollCutoff implements OnInit {
         [{value: 1, isDisabled: true}, {value: 2, isDisabled: false}, {value: 3, isDisabled: false}],
         [{value: 1, isDisabled: true}, {value: 2, isDisabled: false}, {value: 3, isDisabled: false}],
         [{value: 1, isDisabled: false}, {value: 2, isDisabled: true}, {value: 3, isDisabled: false}],
-      ]
+      ],
+      rowsId: ['0001', '0002', '0003', '0004']
     }
     this.initializeFormGroup();
     this.initializeTableRows();
@@ -165,5 +166,14 @@ export class PayrollCutoff implements OnInit {
   
       return matchName && matchDetachment && matchStatus;
     });
+  }
+
+  onDownload(): void{
+    debugger;
+  }
+
+  //Table Output Listener
+  checkBoxOutputListener(message: {isChecked: boolean, id: string}[]): void {
+    debugger;
   }
 }

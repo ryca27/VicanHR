@@ -1,7 +1,9 @@
 .table-wrapper{
     display: flex;
     width: 100%;
-    overflow-x: scroll;
+    overflow: auto;
+    max-height: 400px;
+    overflow: auto;
 }
 
 table{
@@ -10,13 +12,29 @@ table{
     font-family: Inter, sans-serif;
     font-feature-settings: 'liga' 1, 'calt' 1; 
     width: 100%;
+    
+}
+
+th:first-child{
+    z-index: 12 !important;
+    left: 0;
+}
+th:nth-child(2){
+    z-index: 11 !important;
+}
+
+th{
+    position: sticky;
+    z-index: 10 !important;
+    top: 0;
+    background-color: #B3B3B3;
 }
 thead tr{
     height:60px;
     background-color: #B3B3B3;
     
 }
-table tr :first-child{
+table tr td:first-child{
     position: sticky;
     z-index: 10;
     left:0;
