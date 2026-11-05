@@ -14,3 +14,7 @@ export const allowanceTypeList = [
     {'value':'allowance', 'label':'Allowance'},
     {'value':'uniformAllowance', 'label':'Uniform Allowance'},
 ]
+
+export const fileTypeLabel: string = 'File Type';
+export const expenseTypeLabel: string = 'Expense Type';
+export const allowanceTypeLabel: string = 'Allowance Type';

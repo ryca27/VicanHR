@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject, OnInit,DestroyRef  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, FormControl  } from '@angular/forms';
-import { fileTypeList, expenseTypeList, allowanceTypeList } from './upload-constants'
+import { fileTypeList, expenseTypeList, allowanceTypeList, expenseTypeLabel, allowanceTypeLabel, fileTypeLabel } from './upload-constants'
 import { form, required, email } from '@angular/forms/signals';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
@@ -32,14 +32,14 @@ export class UploadModal implements OnInit {
   @Input() endDate: string ='';
   @Output() isSubmit = new EventEmitter<boolean>();
   
-
   public fileTypeOptions = fileTypeList; 
   public expenseTypeOptions = expenseTypeList;
   public allowanceOptions = allowanceTypeList;
-  public fileTypeLabel: string = 'File Type'
-  public expenseTypeLabel: string = 'Expense Type'
-  public allowanceTypeLabel: string = 'Allowance Type';
+  public fileTypeLabel: string = fileTypeLabel;
+  public expenseTypeLabel: string = expenseTypeLabel;
+  public allowanceTypeLabel: string = allowanceTypeLabel;
   uploadFormGroup!: FormGroup
+  isDisabledUpload: boolean = true;
 
   ngOnInit(){
     this.uploadFormGroup = this.fb.group({
@@ -104,6 +104,7 @@ export class UploadModal implements OnInit {
     this.isSubmit.emit(true);
   }
   validateInput(){
+    this.isDisabledUpload = false;
   }
 
   //Double date picker output listener

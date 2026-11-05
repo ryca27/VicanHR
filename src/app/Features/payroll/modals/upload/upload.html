@@ -66,11 +66,11 @@
                   <app-button [label]="'Validate'" (click)="validateInput()"
                     [color]="'blue'"
                     [size]="'long'"
-                    [disabled]="false"
+                    [disabled]="!uploadFormGroup.valid"
                   ></app-button>
                   <app-button [label]="'Upload'" (click)="submitForm()"
                   [color]="'gray'"
-                  [disabled]="false"
+                  [disabled]="isDisabledUpload"
                   [size]="'long'"
                 ></app-button>
                 <app-button [label]="'Cancel'" (click)="closeUploadModal()"
