@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject, OnInit,DestroyRef  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, FormControl  } from '@angular/forms';
-import { fileTypeList, expenseTypeList } from './upload-constants'
+import { fileTypeList, expenseTypeList, allowanceTypeList } from './upload-constants'
 import { form, required, email } from '@angular/forms/signals';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
@@ -35,8 +35,10 @@ export class UploadModal implements OnInit {
 
   public fileTypeOptions = fileTypeList; 
   public expenseTypeOptions = expenseTypeList;
+  public allowanceOptions = allowanceTypeList;
   public fileTypeLabel: string = 'File Type'
   public expenseTypeLabel: string = 'Expense Type'
+  public allowanceTypeLabel: string = 'Allowance Type';
   uploadFormGroup!: FormGroup
 
   ngOnInit(){
@@ -51,6 +53,7 @@ export class UploadModal implements OnInit {
     let group = this.fb.group({
       fileType:['', Validators.required],
       expenseType:['',],
+      allowanceType: [''],
       fileName:['', Validators.required],
       fileContent:['', Validators.required]
     })

@@ -34,6 +34,13 @@
                             formControlName="expenseType"
                           ></app-dropdown>
                         }
+                        <!-- @else if(uploadFileArray.controls[i].get('fileType')?.value == 'allowance' ){
+                          <app-dropdown
+                            [options]="allowanceOptions"
+                            [label]="allowanceTypeLabel"
+                            formControlName="allowanceType"
+                          ></app-dropdown>
+                        } -->
                         <app-file-box [id]="i"
                         (fileContentOutput)="fileContentOutputListener($event,i )"
                         (fileNameOutput)="fileNameOutputListener($event,i )"

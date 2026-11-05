@@ -3,23 +3,15 @@
         <h1>Payroll Cutoffs</h1>
         <h3>View Existing cutoff</h3>
         <app-table
-            [columnsInput]="mockData.tableColumns"
-            [rowsInput]="mockData.tableRows"
+            [columnsInput]="tableColumns"
+            [rowsInput]="tableRows"
+            [rowsIdInput]="tableRowsId"
         ></app-table>
     </div>
     <div class="row-container action">
       <form [formGroup]="createPayrollFormGroup">
         <h1>New Payroll Cutoff</h1>
         <h3>Create a new payroll</h3>
-        <!-- <mat-form-field appearance="fill">
-            <mat-label>Enter a date range</mat-label>
-            <mat-date-range-input [rangePicker]="doublePicker">
-              <input matStartDate placeholder="Start date" formControlName="startDate">
-              <input matEndDate placeholder="End date" formControlName="endDate">
-            </mat-date-range-input>
-            <mat-datepicker-toggle matIconSuffix [for]="doublePicker"></mat-datepicker-toggle>
-            <mat-date-range-picker #doublePicker></mat-date-range-picker>
-          </mat-form-field> -->
           <app-double-date-picker [label]="'Cutoff Period'"
           [startDate]="createPayrollFormGroup.value.startDate ?? ''"
           [endDate]="createPayrollFormGroup.value.endDate ?? ''"
@@ -37,7 +29,7 @@
           <div class="button-container">
             <app-button [label]="'Start Prepartion'" (click)="onSubmit()"
             [color]="'blue'"
-            [disabled]="false"
+            [disabled]="!createPayrollFormGroup.valid"
             [size]="'medium'"
         ></app-button>
           </div>

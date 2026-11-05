@@ -8,6 +8,7 @@ import {DropdownComponent} from './../../../Components/dropdown/dropdown'
 import {ButtonComponent} from './../../../Components/button/button'
 import {CardComponent} from './../../../Components/card/card'
 import {TableComponent} from './../../../Components/table/table'
+import {CheckBoxOutputInterface} from './../../../Components/table/./table-constants'
 
 
 @Component({
@@ -27,8 +28,12 @@ export class PayrollCutoff implements OnInit {
   mockData:any ={} ;
   tableRows!: Array<any>;
   tableColumns!: Array<string>;
+  tableRowsId: Array<string> = [];
   filters!: Array<{key: string, value: string}>;
   filterFormGroup!: FormGroup;
+  selectedRows!: Array<string>;
+  isFinalizeDisabled: boolean = true;
+  isDownloadDisabled: boolean = true;
 
   ngOnInit(){
     this.mockData = {
@@ -37,6 +42,7 @@ export class PayrollCutoff implements OnInit {
       tableRows:[
         {
           fullName:'Ryan Tabernilla',
+          id:'0001',
           detachment: 'Megabold',
           regularHours: '40',
           regularOvertime:'10',
@@ -58,6 +64,7 @@ export class PayrollCutoff implements OnInit {
         },
         {
           fullName:'Lea Ganda',
+          id:'0002',
           detachment: 'Bold of Asia',
           regularHours: '40',
           regularOvertime:'10',
@@ -73,12 +80,13 @@ export class PayrollCutoff implements OnInit {
           totalDeduction:'1000',
           netPay:'90000',
           payrollCutoff:'January 1-15 2026',
-          remarks:'Payroll Ready',
+          remarks:'For Approval',
           status:2,
           actions:[1,2,3],
         },
         {
           fullName:'Ryan Kukulit',
+          id:'0003',
           detachment: 'Megabold',
           regularHours: '40',
           regularOvertime:'10',
@@ -94,12 +102,13 @@ export class PayrollCutoff implements OnInit {
           totalDeduction:'1000',
           netPay:'90000',
           payrollCutoff:'January 1-15 2026',
-          remarks:'Payroll Ready',
+          remarks:'Needs Attention',
           status:3,
           actions:[1,2,3],
         },
         {
           fullName:'Lea Babaet',
+          id:'0004',
           detachment: 'Bold of Asia',
           regularHours: '40',
           regularOvertime:'10',
@@ -115,7 +124,7 @@ export class PayrollCutoff implements OnInit {
           totalDeduction:'1000',
           netPay:'90000',
           payrollCutoff:'January 1-15 2026',
-          remarks:'Payroll Ready',
+          remarks:'Needs Attention',
           status:'3',
           actions:[1,2,3],
         },
@@ -126,7 +135,6 @@ export class PayrollCutoff implements OnInit {
         [{value: 1, isDisabled: true}, {value: 2, isDisabled: false}, {value: 3, isDisabled: false}],
         [{value: 1, isDisabled: false}, {value: 2, isDisabled: true}, {value: 3, isDisabled: false}],
       ],
-      rowsId: ['0001', '0002', '0003', '0004']
     }
     this.initializeFormGroup();
     this.initializeTableRows();
@@ -146,7 +154,11 @@ export class PayrollCutoff implements OnInit {
   }
 
   initializeTableRows(): void{
-    this.tableRows = this.mockData.tableRows;
+    this.tableRows = structuredClone(this.mockData.tableRows);
+    this.tableRows.forEach(row => {
+      this.tableRowsId.push(row.id)
+      delete row.id
+    })
   }
 
 
@@ -156,7 +168,7 @@ export class PayrollCutoff implements OnInit {
     const detachment = (this.filterFormGroup.value.detachment?.toLowerCase()) || '';
     const status = this.filterFormGroup.value.status ?? '';
   
-    this.tableRows = this.mockData.tableRows.filter((t: any) => {
+    let tableRows = this.mockData.tableRows.filter((t: any) => {
       const matchName = (t.fullName || '').toLowerCase().includes(name);
       const matchDetachment = (t.detachment || '').toLowerCase().includes(detachment);
       
@@ -166,14 +178,41 @@ export class PayrollCutoff implements OnInit {
   
       return matchName && matchDetachment && matchStatus;
     });
+    this.tableRowsId = []
+    this.tableRows = structuredClone(tableRows)
+    this.tableRows.forEach(row => {
+      this.tableRowsId.push(row.id)
+      delete row.id
+    })
+  }
+
+  onFinalize(): void {
+    let finalizeRow = [];
+    this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id)).map((row:any)=> {
+      row.status = 1;
+      row.remarks = 'Payroll Ready'
+    });
+    this.onPreview();
   }
 
   onDownload(): void{
-    debugger;
+    let downloadRow = [];
+    downloadRow = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id))
+    
   }
 
   //Table Output Listener
-  checkBoxOutputListener(message: {isChecked: boolean, id: string}[]): void {
-    debugger;
+  checkBoxOutputListener(message: string[]): void {
+    this.selectedRows = message;
+    this.finalizeChecker();
+    this.downloadChecker();
+  }
+
+  finalizeChecker(): void{
+    this.isFinalizeDisabled = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id) && row.status==2).length != this.selectedRows.length || this.selectedRows.length == 0;
+  }
+
+  downloadChecker(): void{
+    this.isDownloadDisabled = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id) && row.status==1).length != this.selectedRows.length || this.selectedRows.length == 0;
   }
 }

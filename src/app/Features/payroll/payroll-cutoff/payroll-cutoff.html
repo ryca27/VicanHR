@@ -9,13 +9,13 @@
                     ></app-textbox>
                 </div>
                 <div class="filter-component">
-                    <app-dropdown
+                    <app-dropdown formControlName="detachment"
                     [label]="'Detachment'"
                     [options]="detachmentOptions"
                     ></app-dropdown>
                 </div>
                 <div class="filter-component">
-                    <app-dropdown
+                    <app-dropdown formControlName="status"
                     [label]="'Status'"
                     [options]="statusOptions"
                     ></app-dropdown>
@@ -40,7 +40,8 @@
                 [label]="'Finalize'"
                 [color]="'black'"
                 [size]="'long'"
-                (click)="onPreview()"
+                (click)="onFinalize()"
+                [disabled]="isFinalizeDisabled"
                 ></app-button>
             </div>
     
@@ -50,6 +51,7 @@
                 [color]="'black'"
                 [size]="'long'"
                 (click)="onDownload()"
+                [disabled]="isDownloadDisabled"
                 ></app-button>
             </div>
     
@@ -104,7 +106,7 @@
         [columnsInput]="mockData.tableColumns"
         [rowsInput]="tableRows"
         [actionRowsInput]="mockData.tableActionRows"
-        [rowsIdInput]="mockData.rowsId"
+        [rowsIdInput]="tableRowsId"
         (checkBoxOutput)="checkBoxOutputListener($event)"></app-table>
     </div>
 </div>

@@ -7,19 +7,18 @@
             <div class="modal-body">
                 <div class="header-container">
                     <app-table-tab
-                        [tabNames]="tabNames"
+                        [tabNames]="tabNamesList"
                         (activeTabOutput)="activeTabOutputListener($event)"
                         ></app-table-tab>
                 </div>
                 <div class="body-container">
-                    @if(activeTab=='Attendance'){
                         <app-table
-                        [columnsInput]="attendanceData.tableColumns"
-                        [rowsInput]="attendanceData.tableRows"
+                        [columnsInput]="tableColumns"
+                        [rowsInput]="tableRows"
+                        [rowsIdInput]="tableRowsId"
                     ></app-table>
-                    }
     
-                    @if(activeTab=='Equipment'){
+                    <!-- @if(activeTab=='Equipment'){
                         <app-table
                         [columnsInput]="equipmentData.tableColumns"
                         [rowsInput]="equipmentData.tableRows"
@@ -31,7 +30,7 @@
                         [columnsInput]="trainingData.tableColumns"
                         [rowsInput]="trainingData.tableRows"
                     ></app-table>
-                    }
+                    } -->
                 </div>
 
                 <div class="button-container">

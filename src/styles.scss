@@ -55,10 +55,10 @@ input {
 }
 
 app-payroll .row-container.list app-table tbody tr:nth-child(even) td {
-  background-color: #ffffff;
+  background-color: #ffffff !important;
 }
 app-payroll .row-container.list app-table tbody tr:nth-child(odd) td {
-  background-color: #fafafa;
+  background-color: #fafafa !important;
 }
 
 

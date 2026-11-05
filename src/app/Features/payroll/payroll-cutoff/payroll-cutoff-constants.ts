@@ -8,7 +8,7 @@ export const detachmentList = [
 
 export const statusList = [
     {'value':'', 'label':''},
-    {'value':'3', 'label':'Payroll Ready'},
+    {'value':'1', 'label':'Payroll Ready'},
     {'value':'2', 'label':'For Approval'},
-    {'value':'smfairview', 'label':'Needs Attention'},
+    {'value':'3', 'label':'Needs Attention'},
 ]

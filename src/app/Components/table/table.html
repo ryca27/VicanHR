@@ -1,14 +1,12 @@
 
 <div class="table-wrapper">
-    <form [formGroup]="checkBoxFormGroup">
+    <form [formGroup]="tableFormGroup">
     <table>
         <thead>
             <tr>
                 @if(includeCheckBox){
                     <th class="check-box"><input type="checkbox" (click)= "onClickAllCheck(!allCheck.value)" [formControl]="allCheck"></th>
                 }
-
-                <th class='id'>ID</th>
                 
                 @for (column of columnsInput; track $index){
                     
@@ -16,13 +14,12 @@
                 }
             </tr>
         </thead>
-        <tbody [formArray]="checkBoxArray">
+        <tbody [formArray]="tableFormArray">
             
                 @for(row of tableRowsDisplay; track $index; let i = $index){
                     <tr [formGroupName]="i">
                         @if(includeCheckBox){
-                            <td class="check-box"><input type="checkbox" formControlName="isChecked"></td>
-                            <td class="action-td">{{rowsIdInput[i]}}</td>
+                            <td class="check-box"><input type="checkbox" formControlName="isChecked">{{i}}</td>
                         }
                         @for(value of row; track $index; let j = $index){
                             @if($index == actionColumnIndex){
@@ -57,12 +54,14 @@
     </table>
 </form>
 </div>
-<div class="pagination-wrapper">
-    <ul class="pagination">
-        <li><span (click)="decreasePageNumber()" >&laquo;</span></li>
-        @for(page of pageArray; track $index){
-            <li><span (click)="movePageNumber(page)"[ngClass]="{'active': currentPage == page}">{{page}}</span></li>
-        }
-        <li><span (click)="increasePageNumber()">&raquo;</span></li>
-      </ul>
-</div>
+@if(pageArray.length > 1){
+    <div class="pagination-wrapper">
+        <ul class="pagination">
+            <li><span (click)="decreasePageNumber()" >&laquo;</span></li>
+            @for(page of pageArray; track $index){
+                <li><span (click)="movePageNumber(page)"[ngClass]="{'active': currentPage == page}">{{page}}</span></li>
+            }
+            <li><span (click)="increasePageNumber()">&raquo;</span></li>
+          </ul>
+    </div>
+}

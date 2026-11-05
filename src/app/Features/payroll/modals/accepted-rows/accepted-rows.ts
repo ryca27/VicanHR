@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject, OnInit,DestroyRef,   } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { tabNamesList} from './accepted-rows-constants'
 
 //Components Import
 import { TableTabComponent } from './../../../../Components/table-tab/table-tab'
@@ -24,20 +25,24 @@ export class AcceptedRowsModal implements OnInit {
   @Output() closeModalOutput : EventEmitter<boolean> = new EventEmitter<boolean>();
   title: string = 'Validated Rows to Add';
   activeTab: string = 'Attendance' 
-  tabNames: {name: string, isActive: boolean}[] = [
-    {'name': 'Attendance', 'isActive': true,},
-    {'name': 'Training', 'isActive': false,},
-    {'name': 'Equipment', 'isActive': false,},
-  ]
   attendanceData: any = {}
   trainingData: any = {}
   equipmentData: any = {}
+  attendanceRowsId: Array<string> = [];
+  expensesRowsId: Array<string> = [];
+  allowanceRowsId: Array<string> = [];
+  tableRows!: Array<any>;
+  tableColumns!: Array<string>;
+  tableRowsId: Array<string> = [];
+
+  public tabNamesList = tabNamesList
 
   ngOnInit(){
     this.attendanceData = {
       tableColumns: ['Fullname', 'Detachment', 'Regular Hours', 'Overtime Hours', 'Total Hours'],
       tableRows:[
         {
+          id: '0001',
           fullName:'Lea Kukulet',
           detachment: 'SM Megabold',
           regularHours: 40,
@@ -45,6 +50,7 @@ export class AcceptedRowsModal implements OnInit {
           totalHours: 52
         },
         {
+          id: '0002',
           fullName:'Ryan Babaet',
           detachment: 'SM Fairview',
           regularHours: 30,
@@ -58,12 +64,14 @@ export class AcceptedRowsModal implements OnInit {
       tableColumns: ['Full Name', 'Amount'],
       tableRows:[
         {
+          id: '0002',
           fullName:'Lea uutot',
-          payrollReady: 500,
+          amouunt: 500,
         },
         {
+          id: '0002',
           fullName:'Ryan Babango',
-          payrollReady: 1000,
+          amount: 1000,
         },
       ]
     };
@@ -72,15 +80,56 @@ export class AcceptedRowsModal implements OnInit {
       tableColumns: ['Full Name', 'Amount'],
       tableRows:[
         {
+          id: '0009',
           fullName:'Lea Tatae',
-          payrollReady: 1000,
+          amount: 1000,
         },
         {
+          id: '0010',
           fullName:'Ryan skippy',
-          payrollReady: 3000,
+          amount: 3000,
         },
       ]
     }
+    this.initializeTableColumns(this.attendanceData.tableColumns);
+    this.initializeTableRows(this.attendanceData.tableRows);
+    debugger;
+  }
+
+  //Get functions
+
+  getActiveTabRows(tab: string): Array<any> {
+    switch(tab){
+      case 'Attendance':
+        this.initializeTableColumns(this.attendanceData.tableColumns);
+        this.initializeTableRows(this.attendanceData.tableRows);
+        break;
+      case 'Training':
+        this.initializeTableColumns(this.trainingData.tableColumns);
+        this.initializeTableRows(this.trainingData.tableRows);
+        break;
+      case 'Equipment':
+        this.initializeTableColumns(this.equipmentData.tableColumns);
+        this.initializeTableRows(this.equipmentData.tableRows);
+        break;
+      case 'Allowance':
+        this.initializeTableColumns(this.attendanceData.tableColumns);
+        this.initializeTableRows(this.attendanceData.tableRows);
+        break;
+    }
+    return []
+  }
+
+  initializeTableColumns(columns:any): void{
+    this.tableColumns = columns;
+  }
+
+  initializeTableRows(tableRows:any): void {
+    this.tableRows = structuredClone(tableRows);
+    this.tableRows.forEach(row => {
+      this.tableRowsId.push(row.id)
+      delete row.id
+    })
   }
 
   closeAcceptedRowsModal(){
@@ -92,8 +141,11 @@ export class AcceptedRowsModal implements OnInit {
     this.router.navigateByUrl('/cutoff/1')
   }
 
+
   //Output event Listener
   activeTabOutputListener(message: string) {
     this.activeTab = message;
+    this.getActiveTabRows(this.activeTab);
+
   }
 }
