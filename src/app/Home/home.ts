@@ -1,4 +1,4 @@
-import { Component, model, input, OnInit } from '@angular/core';
+import { Component, model, input, OnInit, inject } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import {TextboxComponent} from './../Components/textbox/textbox'
 import {DropdownComponent} from './../Components/dropdown/dropdown'
@@ -6,6 +6,7 @@ import {TableComponent} from './../Components/table/table'
 import {FormControl, ReactiveFormsModule, FormGroup, Validators} from '@angular/forms'
 import {FormValueControl } from '@angular/forms/signals'
 import { VicanHeader } from '../Components/vican-header/vican-header';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-home',
   imports: [RouterOutlet, RouterLink, ReactiveFormsModule, TextboxComponent, DropdownComponent, TableComponent, VicanHeader],
@@ -13,10 +14,8 @@ import { VicanHeader } from '../Components/vican-header/vican-header';
   styleUrl: './home.scss',
 })
 export class Home implements OnInit {
-  myForm = new FormGroup({
-    name: new FormControl(''),
-    gender: new FormControl('')
-  });
+  private router = inject(Router);
+
 
   genderOptions = [
     {label: "Boy", value: "Boy"},
@@ -42,5 +41,9 @@ export class Home implements OnInit {
   ]
 
   ngOnInit(){
+  }
+
+  navigate(path: string): void{
+    this.router.navigateByUrl(`/${path}`);
   }
 }

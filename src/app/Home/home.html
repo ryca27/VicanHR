@@ -1,6 +1,6 @@
 <div class="cards-container">
   <div class="row-container">
-    <div class="card-wrapper">
+    <div class="card-wrapper" (click)="navigate('employees')">
       <img src="assets/user-icon-simple.png" >
       <div>
         <h1>The Employees</h1>
@@ -8,7 +8,7 @@
       </div>
     </div>
   
-    <div class="card-wrapper">
+    <div class="card-wrapper" (click)="navigate('attendance')">
       <img src="assets/user-icon-simple.png" >
       <div>
         <h1>Attendance Records</h1>
@@ -19,7 +19,7 @@
     </div>
   </div>
   <div class="row-container">
-    <div class="card-wrapper">
+    <div class="card-wrapper" (click)="navigate('payroll')">
       <img src="assets/user-icon-simple.png" >
       <div>
         <h1>Payroll</h1>
@@ -27,7 +27,7 @@
       </div>
     </div>
   
-    <div class="card-wrapper">
+    <div class="card-wrapper" (click)="navigate('expandpay')">
       <img src="assets/user-icon-simple.png" >
       <div>
         <h1>Expenses And Payments</h1>
