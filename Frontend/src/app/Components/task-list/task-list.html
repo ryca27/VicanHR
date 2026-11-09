@@ -1,0 +1,29 @@
+<div class="task-container">
+    <h2>Django + Angular Task Tracker</h2>
+  
+    <!-- Error display block -->
+    @if (errorMessage) {
+      <div class="error-msg">
+        {{ errorMessage }}
+      </div>
+    }
+  
+    <!-- Task Listing & Empty State Fallback -->
+    @for (task of tasks; track task.id) {
+        <ul class="task-list">
+      
+      
+      <li [class.completed]="task.completed">
+        <span class="task-title">{{ task.title }}</span>
+        <span class="badge">{{ task.completed ? 'Done' : 'Pending' }}</span>
+      </li>
+  
+        </ul>
+    } @empty {
+      @if (!errorMessage) {
+        <div>
+          <p>No tasks found. Add some via the Django REST Framework admin panel!</p>
+        </div>
+      }
+    }
+  </div>
