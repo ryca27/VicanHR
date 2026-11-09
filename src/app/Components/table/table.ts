@@ -34,7 +34,7 @@ export class TableComponent implements OnInit {
   
 
   //Pagination Variables
-  pageSize: number = 3;
+  pageSize: number = 10;
   currentPage: number = 1;
   pageArray: number[] = [];
 

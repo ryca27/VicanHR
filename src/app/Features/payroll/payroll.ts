@@ -99,10 +99,6 @@ export class Payroll implements OnInit {
     this.isUploadModalVisible = true
   }
 
-  // onChangeDatePicker(): void {
-  //   this.createPayrollFormGroup.con
-  // }
-
   closeUploadModalListener(message: boolean){
     this.isUploadModalVisible = false;
     this.isAcceptedRowsModalVisible = message;

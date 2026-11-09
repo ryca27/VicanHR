@@ -59,11 +59,6 @@
                 <div class="circle-container"><div class="circle green"></div><span> Payroll Ready</span> <br></div>
                 <div class="circle-container"><div class="circle yellow"></div><span> For Approval</span> <br></div>
                 <div class="circle-container"><div class="circle red"></div><span> Needs Attention</span> <br></div>
-                <!-- <div class="circle"></div><span> For Approval</span> <br>
-                <div class="circle"></div><span> Needs Attention</span> <br>
-                 -->
-                <!-- <div class="circle container"><div class="circle"></div><span> For Approval</span> <br></div>
-                <div class="circle container"><div class="circle"></div><span> Needs Attention</span> <br></div> -->
             </div>
         </div>
 
@@ -109,4 +104,14 @@
         [rowsIdInput]="tableRowsId"
         (checkBoxOutput)="checkBoxOutputListener($event)"></app-table>
     </div>
+    <div class="plus-container" (click)="onUpload()">
+        <img src="assets/plus-icon.png" style="width:50px; height:50px;">
+      </div>
 </div>
+
+<upload-modal 
+  [isOpen]="isUploadModalVisible" 
+  [title]="'Upload File'" 
+  [startDate]="startDate ?? ''"
+  [endDate]="endDate ?? ''"
+  (isSubmit)="closeUloadModalListener($event)"> </upload-modal>

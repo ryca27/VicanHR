@@ -10,6 +10,7 @@
 
 .container{
     min-width: 1200px;
+    overflow: auto;
 }
 
 .wrapper{
@@ -86,6 +87,28 @@ span {
 
 .card-container{
     width: 20%;
+}
+
+.plus-container{
+    display: flex;
+    justify-content: end;
+    position: fixed;
+    padding: 5px;
+    right: 5%;
+    bottom:5%;
+    z-index: 20;
+    background-color: #1274b4;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+.plus-container:active{
+    opacity: 90%;
+    filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.plus-container :hover{
+    border-radius: 50px;
 }
 
 

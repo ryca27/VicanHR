@@ -9,11 +9,12 @@ import {ButtonComponent} from './../../../Components/button/button'
 import {CardComponent} from './../../../Components/card/card'
 import {TableComponent} from './../../../Components/table/table'
 import {CheckBoxOutputInterface} from './../../../Components/table/./table-constants'
+import {UploadModal} from './../modals/upload/upload';
 
 
 @Component({
   selector: 'app-payroll-cutoff',
-  imports: [TextboxComponent, DropdownComponent, ButtonComponent, CardComponent, TableComponent, ReactiveFormsModule],
+  imports: [TextboxComponent, DropdownComponent, ButtonComponent, CardComponent, TableComponent, UploadModal, ReactiveFormsModule],
   templateUrl: './payroll-cutoff.html',
   styleUrl: './payroll-cutoff.scss',
 })
@@ -34,6 +35,9 @@ export class PayrollCutoff implements OnInit {
   selectedRows!: Array<string>;
   isFinalizeDisabled: boolean = true;
   isDownloadDisabled: boolean = true;
+  isUploadModalVisible: boolean = false;
+  startDate: string = '';
+  endDate: string = '';
 
   ngOnInit(){
     this.mockData = {
@@ -155,6 +159,15 @@ export class PayrollCutoff implements OnInit {
 
   initializeTableRows(): void{
     this.tableRows = structuredClone(this.mockData.tableRows);
+    this.tableRows.push(structuredClone(this.mockData.tableRows));
+    this.tableRows.push(structuredClone(this.mockData.tableRows));
+    this.tableRows.push(structuredClone(this.mockData.tableRows));
+    this.tableRows.push(structuredClone(this.mockData.tableRows));
+    this.tableRows.push(structuredClone(this.mockData.tableRows));
+    this.tableRows.push(structuredClone(this.mockData.tableRows));
+    this.tableRows.push(structuredClone(this.mockData.tableRows));
+    this.tableRows.push(structuredClone(this.mockData.tableRows));
+    this.tableRows.push(structuredClone(this.mockData.tableRows));
     this.tableRows.forEach(row => {
       this.tableRowsId.push(row.id)
       delete row.id
@@ -182,6 +195,15 @@ export class PayrollCutoff implements OnInit {
     this.tableRows = structuredClone(tableRows)
     this.tableRows.forEach(row => {
       this.tableRowsId.push(row.id)
+      this.tableRowsId.push(row.id)
+      this.tableRowsId.push(row.id)
+      this.tableRowsId.push(row.id)
+      this.tableRowsId.push(row.id)
+      this.tableRowsId.push(row.id)
+      this.tableRowsId.push(row.id)
+      this.tableRowsId.push(row.id)
+      this.tableRowsId.push(row.id)
+      this.tableRowsId.push(row.id)
       delete row.id
     })
   }
@@ -201,12 +223,26 @@ export class PayrollCutoff implements OnInit {
     
   }
 
+  onUpload(): void {
+    this.isUploadModalVisible = true;
+  }
+
   //Table Output Listener
   checkBoxOutputListener(message: string[]): void {
     this.selectedRows = message;
     this.finalizeChecker();
     this.downloadChecker();
   }
+
+  //Upload Component Listenere
+  closeUloadModalListener(message: boolean): void {
+    debugger;
+    this.isUploadModalVisible = false;
+  };
+
+
+
+
 
   finalizeChecker(): void{
     this.isFinalizeDisabled = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id) && row.status==2).length != this.selectedRows.length || this.selectedRows.length == 0;

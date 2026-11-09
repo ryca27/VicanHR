@@ -93,7 +93,6 @@ export class AcceptedRowsModal implements OnInit {
     }
     this.initializeTableColumns(this.attendanceData.tableColumns);
     this.initializeTableRows(this.attendanceData.tableRows);
-    debugger;
   }
 
   //Get functions
