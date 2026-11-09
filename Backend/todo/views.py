@@ -16,7 +16,7 @@ def task_list(request):
     # Handle POST request: Create a new task
     elif request.method == 'POST':
         serializer = TaskSerializer(data=request.data)
-        if serializer.is_serializer_valid or serializer.is_valid():
+        if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -20,6 +20,7 @@ export class TaskListComponent implements OnInit {
   }
 
   fetchTasks(): void {
+    debugger;
     this.taskService.getTasks().subscribe({
       next: (data) => {
         this.tasks = data;
