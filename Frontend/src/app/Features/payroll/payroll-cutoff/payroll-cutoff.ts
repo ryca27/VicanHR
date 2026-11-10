@@ -1,6 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
 import {detachmentList, statusList} from './payroll-cutoff-constants';
 import {FormControl, ReactiveFormsModule, Validators, FormArray, FormGroup, FormBuilder,} from '@angular/forms'
+import { PdfService } from './../../../services/pdf-service'
 
 //Components Import
 import {TextboxComponent} from './../../../Components/textbox/textbox'
@@ -10,16 +11,19 @@ import {CardComponent} from './../../../Components/card/card'
 import {TableComponent} from './../../../Components/table/table'
 import {CheckBoxOutputInterface} from './../../../Components/table/./table-constants'
 import {UploadModal} from './../modals/upload/upload';
+import {Payslip } from './../payslip/payslip.model'
+import {PayslipComponent} from './../payslip/payslip'
 
 
 @Component({
   selector: 'app-payroll-cutoff',
-  imports: [TextboxComponent, DropdownComponent, ButtonComponent, CardComponent, TableComponent, UploadModal, ReactiveFormsModule],
+  imports: [TextboxComponent, DropdownComponent, ButtonComponent, CardComponent, TableComponent, UploadModal, PayslipComponent, ReactiveFormsModule],
   templateUrl: './payroll-cutoff.html',
   styleUrl: './payroll-cutoff.scss',
 })
 export class PayrollCutoff implements OnInit {
   private fb = inject(FormBuilder);
+  
   detachmentOptions = detachmentList;
   statusOptions = statusList;
   employeeCount : number = 0;
@@ -36,10 +40,47 @@ export class PayrollCutoff implements OnInit {
   isFinalizeDisabled: boolean = true;
   isDownloadDisabled: boolean = true;
   isUploadModalVisible: boolean = false;
+  isGeneratingPdf: boolean = false;
   startDate: string = '';
   endDate: string = '';
+  selectedPayslip: Payslip = {
+    employeeId: 'EMP-001',
+    employeeName: 'JOSELITO ANCHETA',
+    assignedPost: 'VSSC DRIVER',
+    detachment: 'VICAN',
+    cutoffStart: '2024-01-16',
+    cutoffEnd: '2024-01-31',
+    payDate: '2024-01-31',
+  
+    regularHours: 0,
+    overtimeHours: 0,
+    nightDifferentialHours: 0,
+  
+    earnings: [
+      { label: 'Regular Pay', amount: 4880 },
+      { label: 'Overtime Pay', amount: 3050 }
+    ],
+  
+    deductions: [
+      { label: 'SSS Contribution', amount: 225 },
+      { label: 'PhilHealth Contribution', amount: 97.60 },
+      { label: 'Pag-IBIG Contribution', amount: 100 },
+      { label: 'Cash Bond', amount: 350 }
+    ],
+  
+    grossPay: 7930,
+    totalDeductions: 772.60,
+    netPay: 7157.40
+  };
+
+  //services
+  private pdfService = inject(PdfService);
+  //ref elements
+  @ViewChild('payslipContent')
+  payslipContent!: ElementRef<HTMLElement>;
 
   ngOnInit(){
+    
     this.mockData = {
       tableColumns: ['Full Name', 'Detachment', 'Regular Hours', 'Regular Overtime', 'Regular ND Hours', 'Overtime ND Hours', 
       'Total Hours','Gross Pay', 'SSS','PAGIBIG', 'PhilHealth', 'Expense A', 'Expense B', 'Total Deduction', 'Net Pay', 'Payroll Cutoff', 'Remarks', 'Status', 'Actions'],
@@ -220,6 +261,7 @@ export class PayrollCutoff implements OnInit {
   onDownload(): void{
     let downloadRow = [];
     downloadRow = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id))
+    this.downloadPayslip();
     
   }
 
@@ -240,10 +282,6 @@ export class PayrollCutoff implements OnInit {
     this.isUploadModalVisible = false;
   };
 
-
-
-
-
   finalizeChecker(): void{
     this.isFinalizeDisabled = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id) && row.status==2).length != this.selectedRows.length || this.selectedRows.length == 0;
   }
@@ -251,4 +289,29 @@ export class PayrollCutoff implements OnInit {
   downloadChecker(): void{
     this.isDownloadDisabled = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id) && row.status==1).length != this.selectedRows.length || this.selectedRows.length == 0;
   }
+
+  //async service functions
+
+
+
+
+  async downloadPayslip(): Promise<void> {
+    if (this.isGeneratingPdf) return;
+
+    this.isGeneratingPdf = true;
+
+    try {
+      const filename =
+        `payslip_${this.selectedPayslip.employeeId}.pdf`;
+
+      await this.pdfService.download(
+        this.payslipContent.nativeElement,
+        filename
+      );
+    } catch (error) {
+      console.error('Payslip generation failed', error);
+    } finally {
+      this.isGeneratingPdf = false;
+    }
+}
 }

@@ -115,3 +115,9 @@
   [startDate]="startDate ?? ''"
   [endDate]="endDate ?? ''"
   (isSubmit)="closeUloadModalListener($event)"> </upload-modal>
+
+<div class="pdf-render-area" aria-hidden="true">
+    <div #payslipContent>
+      <app-payslip [payslip]="selectedPayslip"></app-payslip>
+    </div>
+  </div>

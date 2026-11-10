@@ -1,0 +1,143 @@
+<div class="payslip-page">
+
+    <!-- COMPANY HEADER -->
+    <header class="company-header">
+      <div class="company-details">
+        <h1>{{ company.name }}</h1>
+  
+        <p *ngFor="let line of company.address">
+          {{ line }}
+        </p>
+  
+        <p>Tel. Nos. {{ company.telephone }}</p>
+      </div>
+  
+      <div class="payslip-label">
+        <strong>PAYSLIP</strong>
+        <span>
+          {{ payslip.cutoffStart | date:'mediumDate' }}
+          -
+          {{ payslip.cutoffEnd | date:'mediumDate' }}
+        </span>
+      </div>
+    </header>
+  
+    <!-- EMPLOYEE INFORMATION -->
+    <section class="employee-info">
+      <div>
+        <label>EMPLOYEE NAME</label>
+        <strong>{{ payslip.employeeName }}</strong>
+      </div>
+  
+      <div>
+        <label>EMPLOYEE ID</label>
+        <strong>{{ payslip.employeeId }}</strong>
+      </div>
+  
+      <div>
+        <label>ASSIGNED POST</label>
+        <strong>{{ payslip.assignedPost }}</strong>
+      </div>
+  
+      <div>
+        <label>DETACHMENT</label>
+        <strong>{{ payslip.detachment }}</strong>
+      </div>
+  
+      <div>
+        <label>PAYROLL PERIOD</label>
+        <strong>
+          {{ payslip.cutoffStart | date:'mediumDate' }}
+          -
+          {{ payslip.cutoffEnd | date:'mediumDate' }}
+        </strong>
+      </div>
+  
+      <div>
+        <label>PAY DATE</label>
+        <strong>{{ payslip.payDate | date:'mediumDate' }}</strong>
+      </div>
+    </section>
+  
+    <!-- ATTENDANCE -->
+    <section class="payslip-section">
+      <h2>ATTENDANCE SUMMARY</h2>
+  
+      <div class="line-item">
+        <span>Regular Hours</span>
+        <span>{{ payslip.regularHours }}</span>
+      </div>
+  
+      <div class="line-item">
+        <span>Overtime Hours</span>
+        <span>{{ payslip.overtimeHours }}</span>
+      </div>
+  
+      <div class="line-item">
+        <span>Night Differential Hours</span>
+        <span>{{ payslip.nightDifferentialHours }}</span>
+      </div>
+    </section>
+  
+    <!-- EARNINGS -->
+    <section class="payslip-section">
+      <h2>EARNINGS</h2>
+  
+      <div class="line-item"
+           *ngFor="let item of payslip.earnings">
+        <span>{{ item.label }}</span>
+        <span>{{ formatMoney(item.amount) }}</span>
+      </div>
+  
+      <div class="line-item total">
+        <strong>GROSS PAY</strong>
+        <strong>{{ formatMoney(payslip.grossPay) }}</strong>
+      </div>
+    </section>
+  
+    <!-- DEDUCTIONS -->
+    <section class="payslip-section">
+      <h2>DEDUCTIONS</h2>
+  
+      <div class="line-item"
+           *ngFor="let item of payslip.deductions">
+        <span>{{ item.label }}</span>
+        <span>{{ formatMoney(item.amount) }}</span>
+      </div>
+  
+      <div class="line-item total">
+        <strong>TOTAL DEDUCTIONS</strong>
+        <strong>
+          {{ formatMoney(payslip.totalDeductions) }}
+        </strong>
+      </div>
+    </section>
+  
+    <!-- NET PAY -->
+    <section class="net-pay">
+      <strong>NET PAY</strong>
+      <strong>{{ formatMoney(payslip.netPay) }}</strong>
+    </section>
+  
+    <!-- ACKNOWLEDGMENT -->
+    <section class="acknowledgment">
+      <h3>ACKNOWLEDGMENT OF RECEIPT</h3>
+  
+      <p>
+        I hereby acknowledge receipt from VSSC of the
+        amount specified above as full compensation
+        for my services rendered.
+      </p>
+  
+      <div class="signature">
+        <div class="signature-line"></div>
+        <span>Employee Signature / Date</span>
+      </div>
+    </section>
+  
+    <footer>
+      VICAN Security Services Corp. |
+      Confidential Payroll Document
+    </footer>
+  
+  </div>

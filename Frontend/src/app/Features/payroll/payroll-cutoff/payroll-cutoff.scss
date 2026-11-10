@@ -111,4 +111,18 @@ span {
     border-radius: 50px;
 }
 
+.pdf-render-area {
+    position: fixed;
+    left: -10000px;
+    top: 0;
+    width: 794px;
+    overflow: visible;
+    pointer-events: none;
+  }
+  
+  .pdf-render-area .payslip-page {
+    width: 794px;
+    min-height: 1123px;
+    box-sizing: border-box;
+  }
 
