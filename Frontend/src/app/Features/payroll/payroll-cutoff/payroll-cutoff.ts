@@ -200,15 +200,6 @@ export class PayrollCutoff implements OnInit {
 
   initializeTableRows(): void{
     this.tableRows = structuredClone(this.mockData.tableRows);
-    this.tableRows.push(structuredClone(this.mockData.tableRows));
-    this.tableRows.push(structuredClone(this.mockData.tableRows));
-    this.tableRows.push(structuredClone(this.mockData.tableRows));
-    this.tableRows.push(structuredClone(this.mockData.tableRows));
-    this.tableRows.push(structuredClone(this.mockData.tableRows));
-    this.tableRows.push(structuredClone(this.mockData.tableRows));
-    this.tableRows.push(structuredClone(this.mockData.tableRows));
-    this.tableRows.push(structuredClone(this.mockData.tableRows));
-    this.tableRows.push(structuredClone(this.mockData.tableRows));
     this.tableRows.forEach(row => {
       this.tableRowsId.push(row.id)
       delete row.id
@@ -235,15 +226,6 @@ export class PayrollCutoff implements OnInit {
     this.tableRowsId = []
     this.tableRows = structuredClone(tableRows)
     this.tableRows.forEach(row => {
-      this.tableRowsId.push(row.id)
-      this.tableRowsId.push(row.id)
-      this.tableRowsId.push(row.id)
-      this.tableRowsId.push(row.id)
-      this.tableRowsId.push(row.id)
-      this.tableRowsId.push(row.id)
-      this.tableRowsId.push(row.id)
-      this.tableRowsId.push(row.id)
-      this.tableRowsId.push(row.id)
       this.tableRowsId.push(row.id)
       delete row.id
     })
@@ -278,7 +260,6 @@ export class PayrollCutoff implements OnInit {
 
   //Upload Component Listenere
   closeUloadModalListener(message: boolean): void {
-    debugger;
     this.isUploadModalVisible = false;
   };
 
@@ -291,9 +272,6 @@ export class PayrollCutoff implements OnInit {
   }
 
   //async service functions
-
-
-
 
   async downloadPayslip(): Promise<void> {
     if (this.isGeneratingPdf) return;
