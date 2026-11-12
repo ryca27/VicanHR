@@ -87,12 +87,12 @@ export class TableComponent implements OnInit {
   }
 
   initializeTableFormGroup(): void{
-    let formArray = []
+    let formArray: FormGroup[] = []
     const startingIndex = (this.currentPage-1)*this.pageSize;
     const endingIndex = (this.currentPage*this.pageSize) > this.rowsIdInput.length ? this.rowsIdInput.length: (this.currentPage*this.pageSize);
     if(this.includeCheckBox){
       for(const i of this.rowsIdInput.slice(startingIndex,endingIndex)){
-        let group = this.createCheckBoxFormGroup(i);
+        let group: FormGroup = this.createCheckBoxFormGroup(i);
         formArray.push(group);
       }
     }
@@ -127,7 +127,7 @@ export class TableComponent implements OnInit {
 
   getActionRows(){
     for (const rowArray of this.actionRowsInput){
-      let rowToAdd = [];
+      let rowToAdd: {imgSrc: string, isDisabled: boolean}[]  = [];
       for(const row of rowArray){
         let actionToAppend: {imgSrc: string, isDisabled: boolean} = {
           imgSrc : actionList.filter(a => a.value == row.value)[0].imgSrc,

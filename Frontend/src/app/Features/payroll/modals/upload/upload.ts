@@ -12,6 +12,7 @@ import { DoubleDatePickerComponent } from './../../../../Components/double-date-
 import { DropdownComponent } from './../../../../Components/dropdown/dropdown'
 import { FileBoxComponent } from './../../../../Components/file-box/file-box'
 import { ButtonComponent } from '../../../../Components/button/button';
+import { UploadService} from './upload.service'
 
 
 @Component({
@@ -25,6 +26,7 @@ export class UploadModal implements OnInit {
   }
   private fb = inject(FormBuilder)
   private destroyRef = inject(DestroyRef)
+  private uploadService = inject(UploadService);
 
   @Input() isOpen = false;
   @Input() title = '';
@@ -55,7 +57,8 @@ export class UploadModal implements OnInit {
       expenseType:['',],
       allowanceType: [''],
       fileName:['', Validators.required],
-      fileContent:['', Validators.required]
+      fileContent:['', Validators.required],
+      file: [File]
     })
     this.uploadFileGroupListener(group);
     return group
@@ -104,6 +107,9 @@ export class UploadModal implements OnInit {
     this.isSubmit.emit(true);
   }
   validateInput(){
+    debugger;
+    let x = this.uploadService.parseAttendace(this.uploadFileArray.controls[0].value.fileContent);
+    
     this.isDisabledUpload = false;
   }
 
