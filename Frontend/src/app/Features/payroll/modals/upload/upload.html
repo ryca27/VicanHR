@@ -34,17 +34,23 @@
                             formControlName="expenseType"
                           ></app-dropdown>
                         }
-                        <!-- @else if(uploadFileArray.controls[i].get('fileType')?.value == 'allowance' ){
-                          <app-dropdown
-                            [options]="allowanceOptions"
-                            [label]="allowanceTypeLabel"
-                            formControlName="allowanceType"
-                          ></app-dropdown>
-                        } -->
-                        <app-file-box [id]="i"
-                        (fileContentOutput)="fileContentOutputListener($event,i )"
-                        (fileNameOutput)="fileNameOutputListener($event,i )"
-                      ></app-file-box>
+                      <app-file-box [id]="i"
+                      (fileContentOutput)="fileContentOutputListener($event,i )"
+                      (fileNameOutput)="fileNameOutputListener($event,i )"
+                    ></app-file-box>
+                    @if(uploadValidationList[i].isShown){
+                      <div class="validation-message-container">
+                        <span class="validation-message"
+                        [ngClass]="{
+                          'green': uploadValidationList[i].isAccepted,
+                          'red': !uploadValidationList[i].isAccepted
+                        }"
+                        >{{uploadValidationList[i].message}}</span>
+                      </div>
+
+                    }
+                    
+
                       @if(i!=0){
                         <div class="button-container">
                           <button mat-icon-button (click)="removeFileGroup(i)" aria-label="Delete item">

@@ -73,3 +73,19 @@
   app-button :first-child{
     padding-bottom:20px
   }
+
+  .validation-message-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 5px
+  }
+  .validation-message{
+    font-size: 12px;
+  }
+
+  .validation-message.green{
+    color: #148f2f;
+  }
+  .validation-message.red{
+    color: #fa2847;
+  }

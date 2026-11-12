@@ -28,7 +28,6 @@ export interface AttendanceUpload {
   }
 
   export interface AttendanceRecord {
-    rowNumber: number;
     employeeNo: string | null;
     employeeName: string;
     regularHours: number | null;
@@ -50,4 +49,11 @@ export interface AttendanceUpload {
     totalEmployees: number;
     employees: AttendanceRecord[];
     errors: string[];
+    validationError: string;
+  }
+
+  export interface UploadValidation {
+    isShown: boolean;
+    isAccepted: boolean;
+    message: string;
   }

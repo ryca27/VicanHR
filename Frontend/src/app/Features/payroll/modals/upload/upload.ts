@@ -13,6 +13,7 @@ import { DropdownComponent } from './../../../../Components/dropdown/dropdown'
 import { FileBoxComponent } from './../../../../Components/file-box/file-box'
 import { ButtonComponent } from '../../../../Components/button/button';
 import { UploadService} from './upload.service'
+import { AttendanceParseResult, UploadValidation } from './upload.models';
 
 
 @Component({
@@ -40,6 +41,8 @@ export class UploadModal implements OnInit {
   public fileTypeLabel: string = fileTypeLabel;
   public expenseTypeLabel: string = expenseTypeLabel;
   public allowanceTypeLabel: string = allowanceTypeLabel;
+  public validatedInputList: AttendanceParseResult[] = [];
+  public uploadValidationList: UploadValidation[] = [];
   uploadFormGroup!: FormGroup
   isDisabledUpload: boolean = true;
 
@@ -49,6 +52,7 @@ export class UploadModal implements OnInit {
       endDate: this.endDate,
       uploadFileArray: this.fb.array([this.createUploadFileGroup()])
     })
+    this.addUploadValidation();
   }
 
   createUploadFileGroup(): FormGroup{
@@ -64,13 +68,26 @@ export class UploadModal implements OnInit {
     return group
   }
 
+  addUploadValidation(): void{
+    let uploadValidation: UploadValidation = {
+      isAccepted: false,
+      isShown: false,
+      message:''
+    }
+    this.uploadValidationList.push(uploadValidation);
+  }
+
   addUploadFileGroup(): void {
     let newForm = this.createUploadFileGroup();
     this.uploadFileArray.push(newForm);
+    this.addUploadValidation();
+    this.isDisabledUpload = true;
   }
 
   removeFileGroup(i: number){
-    this.uploadFileArray.removeAt(i)
+    this.uploadFileArray.removeAt(i);
+    this.uploadValidationList = this.uploadValidationList.filter((_, index) => index !== i);
+    this.isDisabledUpload = this.uploadValidationList.filter(u=> !u.isAccepted).length > 0 ? true: false;
   }
 
   uploadFileGroupListener(group: FormGroup) {
@@ -107,10 +124,40 @@ export class UploadModal implements OnInit {
     this.isSubmit.emit(true);
   }
   validateInput(){
-    debugger;
-    let x = this.uploadService.parseAttendace(this.uploadFileArray.controls[0].value.fileContent);
-    
-    this.isDisabledUpload = false;
+    this.uploadFileArray.controls.forEach((control, i) => {
+      let validatedInput;
+      switch (control.value.fileType){
+        case 'attendance':
+          validatedInput = this.uploadService.parseAttendace(control.value.fileContent);
+          break
+        case 'expense':
+          //do something
+          ''
+          break
+        case 'allowance':
+          ''
+          break
+      }
+      this.uploadValidationList[i].isShown = true;
+      if(validatedInput.validationError ==''){
+        this.uploadValidationList[i].isAccepted = true;
+        this.uploadValidationList[i].message = `File accepted. ${control.value.fileType.toUpperCase()} of ${validatedInput.totalEmployees} employees added.`
+        this.isDisabledUpload = false;
+      }
+      else{
+        this.uploadValidationList[i].isAccepted = false;
+        this.uploadValidationList[i].message = `File not accepted. ${validatedInput.validationError}`
+        this.isDisabledUpload = true;
+      }
+    })
+    let validatedInput = this.uploadService.parseAttendace(this.uploadFileArray.controls[0].value.fileContent);
+    let dateRange = this.uploadService.dateRangeConverter(validatedInput.period? validatedInput.period : '');
+    if(dateRange[0].toString() == this.startDate && dateRange[1].toString() == this.endDate && validatedInput.employees.length > 0){
+      // this.isDisabledUpload = false
+    }
+    else{
+
+    }
   }
 
   //Double date picker output listener

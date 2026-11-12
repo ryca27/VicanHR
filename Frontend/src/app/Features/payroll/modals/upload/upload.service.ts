@@ -1,6 +1,7 @@
 
 import { Injectable } from '@angular/core';
-import {AttendanceUpload, AttendanceRecord, AttendanceParseResult} from './upload.models'
+import {AttendanceUpload, AttendanceRecord, AttendanceParseResult,} from './upload.models'
+import { monthMap} from './upload-constants'
 import * as Papa from 'papaparse';
 
 @Injectable({
@@ -193,10 +194,28 @@ export class UploadService {
         // Find the actual attendance table header.
         const headerIndex = rows.findIndex(row =>
           row.some(cell => normalize(cell) === 'EMPLOYEE NAME') &&
-          row.some(cell => normalize(cell) === 'TOTAL REG HRS')
+          row.some(cell => normalize(cell) === 'TOTAL REG HRS') &&
+          row.some(cell => normalize(cell) === 'TOTAL OT HRS') 
+          // row.some(cell => normalize(cell) === 'TOTAL ND HRS') &&
+          // row.some(cell => normalize(cell) === 'TOTAL WDO') &&
+          // row.some(cell => normalize(cell) === 'BTR HRS') &&
+          // row.some(cell => normalize(cell) === 'TOTAL LH') &&
+          // row.some(cell => normalize(cell) === 'TOTAL LH OT') &&
+          // row.some(cell => normalize(cell) === 'TOTAL SH') &&
+          // row.some(cell => normalize(cell) === 'TOTAL SH OT')
         );
     
         if (headerIndex === -1) {
+          return {
+            agency,
+            branch,
+            address,
+            period,
+            totalEmployees: 0,
+            employees: [],
+            errors,
+            validationError: 'Attendance Header row not found'
+          }
           throw new Error('Attendance header row not found.');
         }
     
@@ -228,6 +247,16 @@ export class UploadService {
           const index = headers.indexOf(expectedHeaders[key]);
     
           if (index === -1) {
+            return {
+              agency,
+              branch,
+              address,
+              period,
+              totalEmployees: 0,
+              employees: [],
+              errors,
+              validationError: `Missing required column: ${expectedHeaders[key]}`
+            }
             throw new Error(
               `Missing required column: ${expectedHeaders[key]}`
             );
@@ -303,7 +332,6 @@ export class UploadService {
             toNumber(row[column], sourceRow, field);
     
           employees.push({
-            rowNumber: Number(rowNumberText),
             employeeNo,
             employeeName,
     
@@ -352,7 +380,22 @@ export class UploadService {
           period,
           totalEmployees: employees.length,
           employees,
-          errors
+          errors,
+          validationError: ''
         };
+      }
+
+      dateRangeConverter(dateStr: string): Date[]{
+        if (dateStr==''){
+          return [new Date('2000-01-01'), new Date('2000-01-01')];
+        }
+        let month = monthMap[dateStr.slice(0, dateStr.indexOf(' ')).trim().toLowerCase()];
+        let startDay = dateStr.slice(dateStr.indexOf(' ')+ 1, dateStr.indexOf('-'));
+        let endDay = dateStr.slice(dateStr.indexOf('-')+ 1, dateStr.indexOf(','));
+        let year = dateStr.slice(-4);
+
+        let startDate = new Date(`${year}-${month}-${startDay}`);
+        let endDate = new Date(`${year}-${month}-${endDay}`)
+        return [startDate, endDate];
       }
 }
