@@ -13,7 +13,7 @@ import { DropdownComponent } from './../../../../Components/dropdown/dropdown'
 import { FileBoxComponent } from './../../../../Components/file-box/file-box'
 import { ButtonComponent } from '../../../../Components/button/button';
 import { UploadService} from './upload.service'
-import { AttendanceParseResult, UploadValidation } from './upload.models';
+import { AttendanceParseResult, UploadValidation, Upload } from './upload.models';
 
 
 @Component({
@@ -34,6 +34,7 @@ export class UploadModal implements OnInit {
   @Input() startDate: string ='';
   @Input() endDate: string ='';
   @Output() isSubmit = new EventEmitter<boolean>();
+  @Output() dataUploadOutput: EventEmitter<Upload> = new EventEmitter<Upload>();
   
   public fileTypeOptions = fileTypeList; 
   public expenseTypeOptions = expenseTypeList;
@@ -43,6 +44,7 @@ export class UploadModal implements OnInit {
   public allowanceTypeLabel: string = allowanceTypeLabel;
   public validatedInputList: AttendanceParseResult[] = [];
   public uploadValidationList: UploadValidation[] = [];
+  public upload: Upload = {attendance: [], expense: [], allowance: []};
   uploadFormGroup!: FormGroup
   isDisabledUpload: boolean = true;
 
@@ -122,13 +124,17 @@ export class UploadModal implements OnInit {
   submitForm(){
     this.isOpen = false;
     this.isSubmit.emit(true);
+    this.dataUploadOutput.emit(this.upload)
   }
   validateInput(){
+    //Remove all data inside upload
+    this.upload = {attendance: [], expense: [], allowance: []}
     this.uploadFileArray.controls.forEach((control, i) => {
       let validatedInput;
       switch (control.value.fileType){
         case 'attendance':
           validatedInput = this.uploadService.parseAttendace(control.value.fileContent);
+          this.upload.attendance.push(validatedInput);
           break
         case 'expense':
           //do something

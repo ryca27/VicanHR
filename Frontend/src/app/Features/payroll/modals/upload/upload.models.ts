@@ -28,7 +28,7 @@ export interface AttendanceUpload {
   }
 
   export interface AttendanceRecord {
-    employeeNo: string | null;
+    employeeNo?: string | null;
     employeeName: string;
     regularHours: number | null;
     overtimeHours: number | null;
@@ -56,4 +56,10 @@ export interface AttendanceUpload {
     isShown: boolean;
     isAccepted: boolean;
     message: string;
+  }
+
+  export interface Upload {
+    attendance: AttendanceParseResult[];
+    expense: AttendanceParseResult[];
+    allowance: AttendanceParseResult[];
   }

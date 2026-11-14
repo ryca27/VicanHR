@@ -44,11 +44,14 @@
   [title]="'Upload File'" 
   [startDate]="createPayrollFormGroup.value.startDate ?? ''"
   [endDate]="createPayrollFormGroup.value.endDate ?? ''"
+  (dataUploadOutput)="dataUploadOutputListener($event)"
   (isSubmit)="closeUploadModalListener($event)"> </upload-modal>
 
-<accepted-rows-modal
-[isOpen]="isAcceptedRowsModalVisible"
-(closeModalOutput)="closeAcceptedRowsListener($event)"
->
-
-</accepted-rows-modal>
+@if(dataUpload){
+  <accepted-rows-modal
+  [isOpen]="isAcceptedRowsModalVisible"
+  [dataUploadInput]="dataUpload"
+  (closeModalOutput)="closeAcceptedRowsListener($event)"
+  >
+  </accepted-rows-modal>
+}

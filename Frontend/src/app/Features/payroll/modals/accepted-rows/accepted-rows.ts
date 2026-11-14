@@ -1,12 +1,13 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit,DestroyRef,   } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit,DestroyRef, OnChanges  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { tabNamesList} from './accepted-rows-constants'
+import { tabNamesList, attendanceColumnsList} from './accepted-rows-constants'
 
 //Components Import
 import { TableTabComponent } from './../../../../Components/table-tab/table-tab'
 import {TableComponent} from './../../../../Components/table/table'
 import { ButtonComponent } from '../../../../Components/button/button';
+import { AttendanceParseResult, Upload } from './../upload/upload.models';
 
 
 @Component({
@@ -15,13 +16,14 @@ import { ButtonComponent } from '../../../../Components/button/button';
   styleUrl: './accepted-rows.scss',
   templateUrl: './accepted-rows.html',
 })
-export class AcceptedRowsModal implements OnInit {
+export class AcceptedRowsModal implements OnInit, OnChanges {
 
   private router = inject(Router);
 
   constructor(){
   }
   @Input() isOpen = false;
+  @Input() dataUploadInput: Upload = {attendance: [], expense: [], allowance: []}
   @Output() closeModalOutput : EventEmitter<boolean> = new EventEmitter<boolean>();
   title: string = 'Validated Rows to Add';
   activeTab: string = 'Attendance' 
@@ -31,9 +33,10 @@ export class AcceptedRowsModal implements OnInit {
   attendanceRowsId: Array<string> = [];
   expensesRowsId: Array<string> = [];
   allowanceRowsId: Array<string> = [];
-  tableRows!: Array<any>;
+  tableRows: Array<any> = []
   tableColumns!: Array<string>;
   tableRowsId: Array<string> = [];
+  attendanceColumns = attendanceColumnsList;
 
   public tabNamesList = tabNamesList
 
@@ -91,8 +94,12 @@ export class AcceptedRowsModal implements OnInit {
         },
       ]
     }
-    this.initializeTableColumns(this.attendanceData.tableColumns);
-    this.initializeTableRows(this.attendanceData.tableRows);
+    this.initializeTableColumns(this.attendanceColumns);
+    // this.initializeTableRows(this.attendanceData.tableRows);
+  }
+
+  ngOnChanges(){
+    this.initializeTableRows(this.dataUploadInput.attendance);
   }
 
   //Get functions
@@ -100,8 +107,8 @@ export class AcceptedRowsModal implements OnInit {
   getActiveTabRows(tab: string): Array<any> {
     switch(tab){
       case 'Attendance':
-        this.initializeTableColumns(this.attendanceData.tableColumns);
-        this.initializeTableRows(this.attendanceData.tableRows);
+        this.initializeTableColumns(this.attendanceColumns);
+        this.initializeTableRows(this.dataUploadInput.attendance);
         break;
       case 'Training':
         this.initializeTableColumns(this.trainingData.tableColumns);
@@ -124,11 +131,15 @@ export class AcceptedRowsModal implements OnInit {
   }
 
   initializeTableRows(tableRows:any): void {
-    this.tableRows = structuredClone(tableRows);
-    this.tableRows.forEach(row => {
-      this.tableRowsId.push(row.id)
-      delete row.id
-    })
+    this.tableRows = [];
+    tableRows.forEach( (ar: AttendanceParseResult) => {
+      ar.employees.forEach(e => {
+        let employeeNo = e.employeeNo ? e.employeeNo : '0';
+        this.tableRowsId.push(employeeNo);
+        delete e.employeeNo;
+        this.tableRows.push(e);
+      })
+    });
   }
 
   closeAcceptedRowsModal(){

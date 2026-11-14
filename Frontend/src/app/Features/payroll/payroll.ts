@@ -14,6 +14,7 @@ import {TableComponent} from './../../Components/table/table'
 import {DoubleDatePickerComponent} from './../../Components/double-date-picker/double-date-picker'
 import {UploadModal} from './modals/upload/upload';
 import {AcceptedRowsModal} from './modals/accepted-rows/accepted-rows';
+import { AttendanceParseResult, Upload } from './modals/upload/upload.models'
 
 
 @Component({
@@ -41,6 +42,7 @@ export class Payroll implements OnInit {
   tableRows!: Array<any>;
   tableColumns!: Array<string>;
   tableRowsId: Array<string> = [];
+  dataUpload: Upload= {attendance: [], expense: [], allowance: []};
   createPayrollFormGroup = new FormGroup({
     startDate: new FormControl('', {
       validators: [Validators.required, Validators.minLength(2)]
@@ -106,6 +108,10 @@ export class Payroll implements OnInit {
 
   closeAcceptedRowsListener(message: boolean){
     this.isAcceptedRowsModalVisible = message
+  }
+
+  dataUploadOutputListener(message: Upload){
+    this.dataUpload = message;
   }
 
   //Double date picker output listener
