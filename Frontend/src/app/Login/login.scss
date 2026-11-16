@@ -1,0 +1,367 @@
+
+:host {
+    display: block;
+    min-height: 100dvh;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #0b254b;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  /* PAGE BACKGROUND */
+  .login-page {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  
+    background-color: #c8ddfa;
+    background-image:
+      url('/assets/login-background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  /* LOGIN CARD */
+  .login-card {
+    width: min(100%, 755px);
+    min-height: 725px;
+    padding: 38px 70px 48px;
+  
+    background: #fff;
+    border-radius: 25px;
+  
+    box-shadow:
+      0 24px 55px rgba(36, 78, 147, .12);
+  
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  /* COMPANY LOGO */
+  .brand {
+    min-height: 114px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .brand-logo {
+    display: block;
+    width: min(100%, 418px);
+    height: auto;
+    object-fit: contain;
+  }
+  
+  /* DIVIDER */
+  .brand-divider {
+    width: 100%;
+    height: 2px;
+    background: #e1e7f0;
+    margin: 10px 0 28px;
+  }
+  
+  /* PAGE TITLE */
+  .card-heading {
+    text-align: center;
+    margin-bottom: 41px;
+  }
+  
+  .card-heading h1 {
+    font-size: clamp(36px, 4.5vw, 60px);
+    line-height: 1.12;
+    letter-spacing: -1.7px;
+    font-weight: 750;
+    margin: 0 0 10px;
+    color: #09234a;
+  }
+  
+  .card-heading p {
+    margin: 0;
+    color: #5b6c87;
+    font-size: clamp(18px, 2.5vw, 29px);
+    line-height: 1.35;
+  }
+  
+  /* LOGIN FORM */
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  /* INPUT CONTAINER */
+  .input-shell {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 17px;
+  
+    border: 2px solid #cbd3df;
+    border-radius: 12px;
+    padding: 0 20px;
+  
+    transition:
+      border-color .15s ease,
+      box-shadow .15s ease;
+  
+    background: #fff;
+  }
+  
+  .input-shell:focus-within {
+    border-color: #1a57c8;
+    box-shadow:
+      0 0 0 3px rgba(26, 87, 200, .11);
+  }
+  
+  .input-shell.invalid {
+    border-color: #b42318;
+  }
+  
+  /* INPUT ICON */
+  .field-icon {
+    width: 29px;
+    height: 29px;
+    flex: none;
+    color: #1d2d49;
+  }
+  
+  /* INPUT FIELD */
+  .input-shell input {
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+  
+    border: 0;
+    outline: 0;
+  
+    font: inherit;
+    font-size: 23px;
+    color: #0b254b;
+  
+    background: transparent;
+  }
+  
+  .input-shell input::placeholder {
+    color: #7d8799;
+    opacity: 1;
+  }
+  
+  /* PASSWORD VISIBILITY BUTTON */
+  .visibility-button {
+    flex: none;
+    width: 35px;
+    height: 35px;
+    padding: 5px;
+  
+    border: 0;
+    background: transparent;
+    color: #7b8598;
+    cursor: pointer;
+  }
+  
+  .visibility-button svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .visibility-button:hover {
+    color: #1645a0;
+  }
+  
+  /* VALIDATION ERRORS */
+  .field-error {
+    color: #b42318;
+    font-size: 13px;
+  }
+  
+  /* REMEMBER ME AND FORGOT PASSWORD */
+  .form-options {
+    margin-top: 11px;
+    margin-bottom: 12px;
+  
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  
+  .remember-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  
+    font-size: 19px;
+    color: #435470;
+    cursor: pointer;
+  }
+  
+  .remember-option input {
+    width: 23px;
+    height: 23px;
+    margin: 0;
+    accent-color: #0b4ac4;
+  }
+  
+  .forgot-link {
+    padding: 0;
+    border: 0;
+    background: none;
+  
+    color: #0648c6;
+    font-size: 19px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+  .forgot-link:hover {
+    color: #062e82;
+  }
+  
+  /* SERVER ERROR */
+  .server-error {
+    margin: -6px 0 0;
+    color: #b42318;
+    font-size: 14px;
+  }
+  
+  /* LOGIN BUTTON */
+  .login-button {
+    width: 100%;
+    min-height: 73px;
+    margin-top: 2px;
+  
+    border: 0;
+    border-radius: 12px;
+  
+    background:
+      linear-gradient(180deg, #1455d4, #063db8);
+  
+    color: white;
+    font: inherit;
+    font-size: 28px;
+    font-weight: 700;
+  
+    cursor: pointer;
+  
+    box-shadow:
+      0 3px 8px rgba(11, 66, 180, .12);
+  }
+  
+  .login-button:hover:not(:disabled) {
+    background:
+      linear-gradient(180deg, #0b4ac4, #06349b);
+  }
+  
+  .login-button:disabled {
+    opacity: .65;
+    cursor: wait;
+  }
+  
+  /* KEYBOARD FOCUS */
+  .login-button:focus-visible,
+  .forgot-link:focus-visible,
+  .visibility-button:focus-visible {
+    outline: 3px solid #e6a726;
+    outline-offset: 3px;
+  }
+  
+  /* SCREEN READER ONLY */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  
+  /* MOBILE RESPONSIVE */
+  @media (max-width: 700px) {
+  
+    .login-page {
+      padding: 24px 14px;
+      background-position: center;
+    }
+  
+    .login-card {
+      min-height: auto;
+      padding: 28px 24px 36px;
+      border-radius: 20px;
+    }
+  
+    .brand {
+      min-height: 85px;
+    }
+  
+    .brand-logo {
+      width: min(100%, 315px);
+    }
+  
+    .brand-divider {
+      margin: 6px 0 25px;
+    }
+  
+    .card-heading {
+      margin-bottom: 32px;
+    }
+  
+    .card-heading h1 {
+      font-size: 42px;
+    }
+  
+    .card-heading p {
+      font-size: 21px;
+    }
+  
+    .input-shell {
+      height: 58px;
+      padding: 0 15px;
+      gap: 12px;
+    }
+  
+    .input-shell input {
+      font-size: 18px;
+    }
+  
+    .field-icon {
+      width: 24px;
+      height: 24px;
+    }
+  
+    .form-options {
+      flex-wrap: wrap;
+    }
+  
+    .remember-option,
+    .forgot-link {
+      font-size: 15px;
+    }
+  
+    .login-button {
+      min-height: 62px;
+      font-size: 22px;
+    }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .input-shell {
+      transition: none;
+    }
+  }
+  

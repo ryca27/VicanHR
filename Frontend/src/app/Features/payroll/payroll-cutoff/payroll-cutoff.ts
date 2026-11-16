@@ -45,9 +45,9 @@ export class PayrollCutoff implements OnInit {
   endDate: string = '';
   selectedPayslip: Payslip = {
     employeeId: 'EMP-001',
-    employeeName: 'JOSELITO ANCHETA',
-    assignedPost: 'VSSC DRIVER',
-    detachment: 'VICAN',
+    employeeName: 'Skippy Panda Palaman',
+    assignedPost: 'Catio Dowy',
+    detachment: 'Ligase',
     cutoffStart: '2024-01-16',
     cutoffEnd: '2024-01-31',
     payDate: '2024-01-31',
@@ -108,7 +108,7 @@ export class PayrollCutoff implements OnInit {
           actions:[1,2,3],
         },
         {
-          fullName:'Lea Taihen',
+          fullName:'Lea Ganda',
           id:'0002',
           detachment: 'Bold of Asia',
           regularHours: '0',
@@ -280,7 +280,7 @@ export class PayrollCutoff implements OnInit {
 
     try {
       const filename =
-        `payslip_${this.selectedPayslip.employeeId}.pdf`;
+        `payslip_${this.selectedPayslip.employeeId}_${this.selectedPayslip.cutoffStart}_${this.selectedPayslip.cutoffEnd}.pdf`;
 
       await this.pdfService.download(
         this.payslipContent.nativeElement,

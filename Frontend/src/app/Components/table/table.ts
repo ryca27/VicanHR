@@ -90,7 +90,6 @@ export class TableComponent implements OnInit, OnChanges {
     let formArray: FormGroup[] = []
     const startingIndex = (this.currentPage-1)*this.pageSize;
     const endingIndex = (this.currentPage*this.pageSize) > this.rowsIdInput.length ? this.rowsIdInput.length: (this.currentPage*this.pageSize);
-    debugger;
     if(this.includeCheckBox){
       for(const i of this.rowsIdInput.slice(startingIndex,endingIndex)){
         let group: FormGroup = this.createCheckBoxFormGroup(i);
@@ -189,7 +188,6 @@ export class TableComponent implements OnInit, OnChanges {
   //End of CheckBox functions
 
   onChangePageSize(event: any ){
-    debugger;
     this.pageSize = event.target.value;
     this.ngOnChanges();
   }

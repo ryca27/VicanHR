@@ -1,38 +1,40 @@
-<div class="cards-container">
-  <div class="row-container">
-    <div class="card-wrapper" (click)="navigate('employees')">
-      <img src="assets/user-icon-simple.png" >
-      <div>
-        <h1>The Employees</h1>
-        <h2>View Existing Employees</h2>
+<div class="container">
+  <div class="cards-container">
+    <div class="row-container">
+      <div class="card-wrapper" (click)="navigate('employees')">
+        <img src="assets/user-icon-simple.png" >
+        <div>
+          <h1>The Employees</h1>
+          <h2>View Existing Employees</h2>
+        </div>
+      </div>
+    
+      <div class="card-wrapper" (click)="navigate('attendance')">
+        <img src="assets/user-icon-simple.png" >
+        <div>
+          <h1>Attendance Records</h1>
+          <h2>View all employee attendance.
+            Upload and edit attendance.
+          </h2>
+        </div>
       </div>
     </div>
-  
-    <div class="card-wrapper" (click)="navigate('attendance')">
-      <img src="assets/user-icon-simple.png" >
-      <div>
-        <h1>Attendance Records</h1>
-        <h2>View all employee attendance.
-          Upload and edit attendance.
-        </h2>
+    <div class="row-container">
+      <div class="card-wrapper" (click)="navigate('payroll')">
+        <img src="assets/user-icon-simple.png" >
+        <div>
+          <h1>Payroll</h1>
+          <h2>Payroll creation. Initialize payroll for cutoff. View payroll cutoff history</h2>
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="row-container">
-    <div class="card-wrapper" (click)="navigate('payroll')">
-      <img src="assets/user-icon-simple.png" >
-      <div>
-        <h1>Payroll</h1>
-        <h2>Payroll creation. Initialize payroll for cutoff. View payroll cutoff history</h2>
-      </div>
-    </div>
-  
-    <div class="card-wrapper" (click)="navigate('expandpay')">
-      <img src="assets/user-icon-simple.png" >
-      <div>
-        <h1>Expenses And Payments</h1>
-        <h2>Create employee expenses and attach payments.
-        </h2>
+    
+      <div class="card-wrapper" (click)="navigate('expandpay')">
+        <img src="assets/user-icon-simple.png" >
+        <div>
+          <h1>Expenses And Payments</h1>
+          <h2>Create employee expenses and attach payments.
+          </h2>
+        </div>
       </div>
     </div>
   </div>
