@@ -1,18 +1,8 @@
 
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  inject
-} from '@angular/core';
+import {  Component, EventEmitter, Input, Output, inject } from '@angular/core';
 
-import {
-  FormBuilder,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 export interface VicanLoginCredentials {
   username: string;
