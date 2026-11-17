@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
-import {detachmentList, statusList} from './payroll-cutoff-constants';
+import {detachmentList, statusList, payrollColumns, payrollCutoffEmployees} from './payroll-cutoff-constants';
 import {FormControl, ReactiveFormsModule, Validators, FormArray, FormGroup, FormBuilder,} from '@angular/forms'
 import { PdfService } from './../../../services/pdf-service'
 
@@ -9,20 +9,23 @@ import {DropdownComponent} from './../../../Components/dropdown/dropdown'
 import {ButtonComponent} from './../../../Components/button/button'
 import {CardComponent} from './../../../Components/card/card'
 import {TableComponent} from './../../../Components/table/table'
-import {CheckBoxOutputInterface} from './../../../Components/table/./table-constants'
+import {CheckBoxOutputInterface, } from './../../../Components/table/./table-constants'
 import {UploadModal} from './../modals/upload/upload';
 import {Payslip } from './../payslip/payslip.model'
+import { PayrollCutoffEmployee } from './payroll-cutoff.models'
 import {PayslipComponent} from './../payslip/payslip'
+import { employeeTablePreparation, employeeTableActionPreparation } from './payroll-cutoff.mapper'
 
 
 @Component({
   selector: 'app-payroll-cutoff',
-  imports: [TextboxComponent, DropdownComponent, ButtonComponent, CardComponent, TableComponent, UploadModal, PayslipComponent, ReactiveFormsModule],
+  imports: [TextboxComponent, DropdownComponent, ButtonComponent, CardComponent, TableComponent, UploadModal, PayslipComponent, ReactiveFormsModule,],
   templateUrl: './payroll-cutoff.html',
   styleUrl: './payroll-cutoff.scss',
 })
 export class PayrollCutoff implements OnInit {
   private fb = inject(FormBuilder);
+  
   
   detachmentOptions = detachmentList;
   statusOptions = statusList;
@@ -32,8 +35,9 @@ export class PayrollCutoff implements OnInit {
   netPay: number = 0;
   mockData:any ={} ;
   tableRows!: Array<any>;
-  tableColumns!: Array<string>;
+  tableColumns: Array<string> = payrollColumns;
   tableRowsId: Array<string> = [];
+  tableActionsRows: Array<any> = [];
   filters!: Array<{key: string, value: string}>;
   filterFormGroup!: FormGroup;
   selectedRows!: Array<string>;
@@ -43,6 +47,7 @@ export class PayrollCutoff implements OnInit {
   isGeneratingPdf: boolean = false;
   startDate: string = '';
   endDate: string = '';
+  samplePayrollCutoffEmployeeList: Array<PayrollCutoffEmployee> = payrollCutoffEmployees;
   selectedPayslip: Payslip = {
     employeeId: 'EMP-001',
     employeeName: 'Skippy Panda Palaman',
@@ -80,7 +85,7 @@ export class PayrollCutoff implements OnInit {
   payslipContent!: ElementRef<HTMLElement>;
 
   ngOnInit(){
-    
+
     this.mockData = {
       tableColumns: ['Full Name', 'Detachment', 'Regular Hours', 'Regular Overtime', 'Regular ND Hours', 'Overtime ND Hours', 
       'Total Hours','Gross Pay', 'SSS','PAGIBIG', 'PhilHealth', 'Expense A', 'Expense B', 'Total Deduction', 'Net Pay', 'Payroll Cutoff', 'Remarks', 'Status', 'Actions'],
@@ -183,11 +188,12 @@ export class PayrollCutoff implements OnInit {
     }
     this.initializeFormGroup();
     this.initializeTableRows();
+    this.initializeTableActionRows();
+    this.getGrossPay();
+    this.getDeductions();
+    this.getNumberOfEmployees();
+    this.getNetPay();
 
-  }
-
-  createObject<T extends object>(obj: T): T{
-    return obj;
   }
 
   initializeFormGroup(): void{
@@ -199,13 +205,16 @@ export class PayrollCutoff implements OnInit {
   }
 
   initializeTableRows(): void{
-    this.tableRows = structuredClone(this.mockData.tableRows);
+    this.tableRows = employeeTablePreparation(this.samplePayrollCutoffEmployeeList);
     this.tableRows.forEach(row => {
       this.tableRowsId.push(row.id)
       delete row.id
     })
   }
 
+  initializeTableActionRows(): void{
+    this.tableActionsRows = employeeTableActionPreparation(this.tableRows.length);
+  }
 
   onPreview(): void {
     // Use optional chaining and fallbacks to prevent crashes
@@ -213,7 +222,7 @@ export class PayrollCutoff implements OnInit {
     const detachment = (this.filterFormGroup.value.detachment?.toLowerCase()) || '';
     const status = this.filterFormGroup.value.status ?? '';
   
-    let tableRows = this.mockData.tableRows.filter((t: any) => {
+    let tableRows = employeeTablePreparation(this.samplePayrollCutoffEmployeeList).filter((t: any) => {
       const matchName = (t.fullName || '').toLowerCase().includes(name);
       const matchDetachment = (t.detachment || '').toLowerCase().includes(detachment);
       
@@ -258,7 +267,7 @@ export class PayrollCutoff implements OnInit {
     this.downloadChecker();
   }
 
-  //Upload Component Listenere
+  //Upload Component Listener
   closeUloadModalListener(message: boolean): void {
     this.isUploadModalVisible = false;
   };
@@ -269,6 +278,30 @@ export class PayrollCutoff implements OnInit {
 
   downloadChecker(): void{
     this.isDownloadDisabled = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id) && row.status==1).length != this.selectedRows.length || this.selectedRows.length == 0;
+  }
+
+  //Card Functions:
+
+  getGrossPay(): void{
+    this.grossPay = 0;
+    this.tableRows.map(r => {
+      this.grossPay+= r.grossPay;
+    })
+  }
+
+  getNumberOfEmployees(): void{
+    this.employeeCount = this.tableRows.length
+  }
+
+  getDeductions(): void {
+    this.deductions = 0;
+    this.tableRows.map(r => {
+      this.deductions += r.totalDeductions;
+    })
+  }
+
+  getNetPay(): void {
+    this.netPay = this.grossPay - this.netPay;
   }
 
   //async service functions
