@@ -4,9 +4,10 @@ export interface PayrollCutoffEmployee{
     detachment: string;
     incomeSource: payrollCutoffIncome;
     deductionSource: payrolCutoffDeduction;
+    grossPay: number;
+    totalDeductions: number;
     netPay:number;
     payrollPeriod: string;
-    remarks: string;
     status: number;
     actions: number[];
     isFinalized: boolean;
@@ -29,7 +30,6 @@ export interface payrollCutoffIncome{
     sSSLoanRefund?: number | null;
     cBRefund?: number | null;
     sSSContRefund?: number | null;
-    grossPay: number
 }
 
 export interface payrolCutoffDeduction{
@@ -46,6 +46,7 @@ export interface payrolCutoffDeduction{
     paraphernalia?: number | null;
     training?: number | null;
     additionalPhicContribution?: number | null;
+    additionalSSSContribution?: number | null;
     pagibigContribution?: number | null;
     sSSCondonation?: number | null;
     familySupport?: number | null;
@@ -53,5 +54,4 @@ export interface payrolCutoffDeduction{
     license?: number | null;
     sogcc1creditcoop?: number | null;
     sogcc2creditcoop?: number | null;
-    totalDeductions: number;
 }

@@ -11,7 +11,18 @@ export function employeeTablePreparation(employees: Array<PayrollCutoffEmployee>
     employees.forEach(e=>{
         let status = e.isFinalized ? 1 : (incomeSourceKeys.every((key) => e.incomeSource[key] !== undefined && e.incomeSource[key] !== null) &&
          deductionSourceKeys.every((key) => e.deductionSource[key] !== undefined && e.deductionSource[key] !== null)) ? 2 : 3
-        let rowToAdd = { id: e.employeeNo, fullName: e.employeeName, detachment: e.detachment, ...e.incomeSource, ...e.deductionSource, netPay: e.netPay, remarks: e.remarks, status: e.status};
+        let rowToAdd = { 
+            id: e.employeeNo, 
+            fullName: e.employeeName, 
+            detachment: e.detachment, 
+            ...e.incomeSource, 
+            ...e.deductionSource,
+            grossPay:e.grossPay, 
+            totalDeductions:e.totalDeductions,
+            netPay: e.netPay, 
+            status: e.status,
+            actions: e.actions
+        };
         tableReadyRows.push(rowToAdd);
     })
     return tableReadyRows

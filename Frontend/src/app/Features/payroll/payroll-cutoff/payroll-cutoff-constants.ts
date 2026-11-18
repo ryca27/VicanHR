@@ -17,14 +17,14 @@ export const statusList = [
 
 export const payrollColumns = [
     'Employee Name', 'Detachment', 'Regular Hours', 'Regular Pay', 'Allowance', 'OT Hours', 'OT Pay', 'LH OT Hours', 'LH OT Pay', 'SH OT Hours', 'SH OT Pay', 'ND Hours',
-    'ND Pay', 'Uniform Allowance', 'WDO Pay', 'SSS Loan Refund', 'CB Refund', 'SSS Cont. Refund', 'Gross Pay', 'SSS EYEE', 'SSS EYER',
+    'ND Pay', 'Uniform Allowance', 'WDO Pay', 'SSS Loan Refund', 'CB Refund', 'SSS Cont. Refund', 'SSS EYEE', 'SSS EYER',
     'PhilHealth EYEE', 'PhilHealth EYER', 'SSS Loan Salary', 'SSS Loan Calamity', 'Cash Bond', 'Benlife Insurance', 'Group Insurance', 'Uniform Paraphernalia',
     'Paraphernalia', 'Training', 'Additional PHIC Contribution', 'Additional SSS Contribution', 'Pagibig Contribution', 'SSS Condonation', 'Family Support', 'Training School',
-    'License', 'SOGCC-1 Credit Coop', 'SOGCC-2 Credit Coop', 'Total Deductions', 'Net Pay', 'Actions'
+    'License', 'SOGCC-1 Credit Coop', 'SOGCC-2 Credit Coop',  'Gross Pay', 'Total Deductions', 'Net Pay', 'Status', 'Actions'
 ]
 
 export const incomeSourceKeys: (keyof payrollCutoffIncome)[] = ['regularHours', 'regularPay', 'allowance', 'oTHours', 'oTPay','lHOTHours', 'lHOTPay', 'sHOTHours', 'sHOTPay', 'nDHours',
-'nDPay', 'uniformAllowance', 'wDOPay', 'sSSLoanRefund', 'cBRefund', 'sSSContRefund', 'grossPay'];
+'nDPay', 'uniformAllowance', 'wDOPay', 'sSSLoanRefund', 'cBRefund', 'sSSContRefund'];
 
 export const deductionSourceKeys: (keyof payrolCutoffDeduction)[] = ['sSSEyee', 'sSSEyer', 'philHealthEyee', 'philHealthEyer', 'sSSLoanSalary',
 'sSSLoanCalamity', 'cashBond', 'benlifeInsurance', 'groupInsurance', 'uniformParaphernalia', 'paraphernalia', 'training', 'additionalPhicContribution', 'pagibigContribution',
@@ -56,7 +56,6 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         sSSLoanRefund: 0,
         cBRefund: 0,
         sSSContRefund: 0,
-        grossPay: 12288.60
       },
       deductionSource: {
         sSSEyee: 0,
@@ -72,6 +71,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         paraphernalia: 130,
         training: 0,
         additionalPhicContribution: 0,
+        additionalSSSContribution: 0,
         pagibigContribution: 0,
         sSSCondonation: 0,
         familySupport: 0,
@@ -79,11 +79,11 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         license: 0,
         sogcc1creditcoop: 0,
         sogcc2creditcoop: 0,
-        totalDeductions: 0
       },
+      grossPay: 12288.60,
+      totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      remarks: '',
       status: 1,
       actions: [1,2,3],
       isFinalized: true
@@ -109,7 +109,6 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         sSSLoanRefund: 0,
         cBRefund: 0,
         sSSContRefund: 0,
-        grossPay: 17319.39
       },
       deductionSource: {
         sSSEyee: 0,
@@ -125,6 +124,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         paraphernalia: 130,
         training: 0,
         additionalPhicContribution: 0,
+        additionalSSSContribution: 0,
         pagibigContribution: 0,
         sSSCondonation: 0,
         familySupport: 0,
@@ -132,11 +132,11 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         license: 0,
         sogcc1creditcoop: 2838,
         sogcc2creditcoop: 0,
-        totalDeductions: 0
       },
+      grossPay: 17319.39,
+      totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      remarks: '',
       status: 1,
       actions: [1,2,3],
       isFinalized: true
@@ -162,7 +162,6 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         sSSLoanRefund: 0,
         cBRefund: 0,
         sSSContRefund: 0,
-        grossPay: 14799.38
       },
       deductionSource: {
         sSSEyee: 0,
@@ -178,6 +177,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         paraphernalia: 130,
         training: 0,
         additionalPhicContribution: 0,
+        additionalSSSContribution: 0,
         pagibigContribution: 0,
         sSSCondonation: 0,
         familySupport: 0,
@@ -185,11 +185,11 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         license: 0,
         sogcc1creditcoop: 0,
         sogcc2creditcoop: 2725,
-        totalDeductions: 0
       },
+      grossPay: 14799.38,
+      totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      remarks: '',
       status: 1,
       actions: [1,2,3],
       isFinalized: true
@@ -215,7 +215,6 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         sSSLoanRefund: 0,
         cBRefund: 0,
         sSSContRefund: 0,
-        grossPay: 15240.35
       },
       deductionSource: {
         sSSEyee: 0,
@@ -231,6 +230,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         paraphernalia: 130,
         training: 0,
         additionalPhicContribution: 0,
+        additionalSSSContribution: 0,
         pagibigContribution: 0,
         sSSCondonation: 0,
         familySupport: 0,
@@ -238,11 +238,12 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         license: 0,
         sogcc1creditcoop: 2330,
         sogcc2creditcoop: 0,
-        totalDeductions: 0
+
       },
+      grossPay: 15240.35,
+      totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      remarks: '',
       status: 1,
       actions: [1,2,3],
       isFinalized: true
@@ -268,7 +269,6 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         sSSLoanRefund: 0,
         cBRefund: 0,
         sSSContRefund: 0,
-        grossPay: 16493.96
       },
       deductionSource: {
         sSSEyee: 0,
@@ -284,6 +284,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         paraphernalia: 130,
         training: 0,
         additionalPhicContribution: 0,
+        additionalSSSContribution: 0,
         pagibigContribution: 0,
         sSSCondonation: 0,
         familySupport: 0,
@@ -291,11 +292,11 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         license: 0,
         sogcc1creditcoop: 0,
         sogcc2creditcoop: 1817,
-        totalDeductions: 0
       },
+      grossPay: 16493.96,
+      totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      remarks: '',
       status: 1,
       actions: [1,2,3],
       isFinalized: true
@@ -321,7 +322,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         sSSLoanRefund: 0,
         cBRefund: 0,
         sSSContRefund: 0,
-        grossPay: 16203.12
+
       },
       deductionSource: {
         sSSEyee: 0,
@@ -337,6 +338,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         paraphernalia: 130,
         training: 0,
         additionalPhicContribution: 0,
+        additionalSSSContribution: 0,
         pagibigContribution: 0,
         sSSCondonation: 0,
         familySupport: 0,
@@ -344,11 +346,11 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         license: 0,
         sogcc1creditcoop: 2800,
         sogcc2creditcoop: 0,
-        totalDeductions: 0
       },
+      grossPay: 16203.12,
+      totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      remarks: '',
       status: 1,
       actions: [1,2,3],
       isFinalized: true
@@ -374,7 +376,6 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         sSSLoanRefund: 0,
         cBRefund: 0,
         sSSContRefund: 0,
-        grossPay: 15387.12
       },
       deductionSource: {
         sSSEyee: 0,
@@ -390,6 +391,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         paraphernalia: 130,
         training: 0,
         additionalPhicContribution: 0,
+        additionalSSSContribution: 0,
         pagibigContribution: 0,
         sSSCondonation: 0,
         familySupport: 0,
@@ -397,11 +399,11 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         license: 0,
         sogcc1creditcoop: 0,
         sogcc2creditcoop: 0,
-        totalDeductions: 0
       },
+      grossPay: 15387.12,
+      totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      remarks: '',
       status: 1,
       actions: [1,2,3],
       isFinalized: true
@@ -427,7 +429,6 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         sSSLoanRefund: 0,
         cBRefund: 0,
         sSSContRefund: 0,
-        grossPay: 13164.56
       },
       deductionSource: {
         sSSEyee: 0,
@@ -443,6 +444,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         paraphernalia: 130,
         training: 0,
         additionalPhicContribution: 0,
+        additionalSSSContribution: 0,
         pagibigContribution: 0,
         sSSCondonation: 0,
         familySupport: 0,
@@ -450,11 +452,11 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         license: 0,
         sogcc1creditcoop: 0,
         sogcc2creditcoop: 0,
-        totalDeductions: 0
       },
+      grossPay: 13164.56,
+      totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      remarks: '',
       status: 1,
       actions: [1,2,3],
       isFinalized: true
@@ -480,7 +482,6 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         sSSLoanRefund: 0,
         cBRefund: 0,
         sSSContRefund: 0,
-        grossPay: 13266.39
       },
       deductionSource: {
         sSSEyee: 0,
@@ -496,6 +497,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         paraphernalia: 130,
         training: 0,
         additionalPhicContribution: 0,
+        additionalSSSContribution: 0,
         pagibigContribution: 0,
         sSSCondonation: 0,
         familySupport: 0,
@@ -503,11 +505,11 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         license: 0,
         sogcc1creditcoop: 0,
         sogcc2creditcoop: 0,
-        totalDeductions: 0
       },
+      grossPay: 13266.39,
+      totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      remarks: '',
       status: 1,
       actions: [1,2,3],
       isFinalized: true
@@ -533,7 +535,6 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         sSSLoanRefund: 0,
         cBRefund: 0,
         sSSContRefund: 0,
-        grossPay: 14536.47
       },
       deductionSource: {
         sSSEyee: 0,
@@ -549,6 +550,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         paraphernalia: 130,
         training: 0,
         additionalPhicContribution: 0,
+        additionalSSSContribution: 0,
         pagibigContribution: 0,
         sSSCondonation: 0,
         familySupport: 0,
@@ -556,11 +558,11 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         license: 0,
         sogcc1creditcoop: 0,
         sogcc2creditcoop: 0,
-        totalDeductions: 0
       },
+      grossPay: 14536.47,
+      totalDeductions: 0,
       netPay: 0,
-      payrollPeriod: 'September 1-15, 2026',
-      remarks: '',
+      payrollPeriod: 'September 1-15, 2026', 
       status: 1,
       actions: [1,2,3],
       isFinalized: true
