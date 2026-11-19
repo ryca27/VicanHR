@@ -1,6 +1,8 @@
 import { Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
 import {detachmentList, statusList, payrollColumns, payrollCutoffEmployees} from './payroll-cutoff-constants';
 import {FormControl, ReactiveFormsModule, Validators, FormArray, FormGroup, FormBuilder,} from '@angular/forms'
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import { PdfService } from './../../../services/pdf-service'
 
 //Components Import
@@ -14,7 +16,7 @@ import {UploadModal} from './../modals/upload/upload';
 import {Payslip } from './../payslip/payslip.model'
 import { PayrollCutoffEmployee } from './payroll-cutoff.models'
 import {PayslipComponent} from './../payslip/payslip'
-import { employeeTablePreparation, employeeTableActionPreparation } from './payroll-cutoff.mapper'
+import { employeeTablePreparation, employeeTableActionPreparation, payslipToGeneratePreparation } from './payroll-cutoff.mapper'
 
 
 @Component({
@@ -48,41 +50,45 @@ export class PayrollCutoff implements OnInit {
   startDate: string = '';
   endDate: string = '';
   samplePayrollCutoffEmployeeList: Array<PayrollCutoffEmployee> = payrollCutoffEmployees;
-  selectedPayslip: Payslip = {
-    employeeId: 'EMP-001',
-    employeeName: 'Skippy Panda Palaman',
-    assignedPost: 'Catio Dowy',
-    detachment: 'Ligase',
-    cutoffStart: '2024-01-16',
-    cutoffEnd: '2024-01-31',
-    payDate: '2024-01-31',
+  downloading: boolean = false;
+  // selectedPayslip: Payslip = {
+  //   employeeId: 'EMP-001',
+  //   employeeName: 'Skippy Panda Palaman',
+  //   assignedPost: 'Catio Dowy',
+  //   detachment: 'Ligase',
+  //   cutoffStart: '2024-01-16',
+  //   cutoffEnd: '2024-01-31',
+  //   payDate: '2024-01-31',
   
-    regularHours: 0,
-    overtimeHours: 0,
-    nightDifferentialHours: 0,
+  //   regularHours: 0,
+  //   overtimeHours: 0,
+  //   nightDifferentialHours: 0,
   
-    earnings: [
-      { label: 'Regular Pay', amount: 4880 },
-      { label: 'Overtime Pay', amount: 3050 }
-    ],
+  //   earnings: [
+  //     { label: 'Regular Pay', amount: 4880 },
+  //     { label: 'Overtime Pay', amount: 3050 }
+  //   ],
   
-    deductions: [
-      { label: 'SSS Contribution', amount: 225 },
-      { label: 'PhilHealth Contribution', amount: 97.60 },
-      { label: 'Pag-IBIG Contribution', amount: 100 },
-      { label: 'Cash Bond', amount: 350 }
-    ],
+  //   deductions: [
+  //     { label: 'SSS Contribution', amount: 225 },
+  //     { label: 'PhilHealth Contribution', amount: 97.60 },
+  //     { label: 'Pag-IBIG Contribution', amount: 100 },
+  //     { label: 'Cash Bond', amount: 350 }
+  //   ],
+
+    
   
-    grossPay: 7930,
-    totalDeductions: 772.60,
-    netPay: 7157.40
-  };
+  //   grossPay: 7930,
+  //   totalDeductions: 772.60,
+  //   netPay: 7157.40
+  // };
+  payslipToGenerate: Payslip = payslipToGeneratePreparation(this.samplePayrollCutoffEmployeeList[0]);
 
   //services
   private pdfService = inject(PdfService);
   //ref elements
-  @ViewChild('payslipContent')
-  payslipContent!: ElementRef<HTMLElement>;
+  @ViewChild(PayslipComponent)
+  payslipComponent?: PayslipComponent;
 
   ngOnInit(){
 
@@ -250,9 +256,13 @@ export class PayrollCutoff implements OnInit {
   }
 
   onDownload(): void{
-    let downloadRow = [];
-    downloadRow = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id))
-    this.downloadPayslip();
+    let downloadRow: any[] = [];
+    downloadRow = this.samplePayrollCutoffEmployeeList.filter((row:any) => this.selectedRows.includes(row.employeeNo));
+    downloadRow.forEach(d => {
+      this.payslipToGenerate = payslipToGeneratePreparation(d)
+      this.downloadPayslip();
+    })
+    
     
   }
 
@@ -277,7 +287,7 @@ export class PayrollCutoff implements OnInit {
   }
 
   downloadChecker(): void{
-    this.isDownloadDisabled = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id) && row.status==1).length != this.selectedRows.length || this.selectedRows.length == 0;
+    this.isDownloadDisabled = this.samplePayrollCutoffEmployeeList.filter((row:any) => this.selectedRows.includes(row.employeeNo) && row.status==1).length != this.selectedRows.length || this.selectedRows.length == 0;
   }
 
   //Card Functions:
@@ -306,23 +316,93 @@ export class PayrollCutoff implements OnInit {
 
   //async service functions
 
-  async downloadPayslip(): Promise<void> {
-    if (this.isGeneratingPdf) return;
+  
+// async downloadPayslip(): Promise<void> {
+//   const element = this.payslipComponent?.nativeElement;
 
-    this.isGeneratingPdf = true;
+//   if (!element) {
+//     console.error('Payslip element not found.');
+//     return;
+//   }
 
-    try {
-      const filename =
-        `payslip_${this.selectedPayslip.employeeId}_${this.selectedPayslip.cutoffStart}_${this.selectedPayslip.cutoffEnd}.pdf`;
+//   if (this.downloading) {
+//     return;
+//   }
 
-      await this.pdfService.download(
-        this.payslipContent.nativeElement,
-        filename
-      );
-    } catch (error) {
-      console.error('Payslip generation failed', error);
-    } finally {
-      this.isGeneratingPdf = false;
-    }
+//   this.downloading = true;
+
+//   try {
+//     // Allow web fonts to finish loading.
+//     await document.fonts.ready;
+
+//     // Confirm the content fits within the page.
+//     if (element.scrollHeight > element.clientHeight + 1) {
+//       throw new Error(
+//         'Payslip content exceeds one A4 page. ' +
+//         'Reduce spacing or use multiple pages.'
+//       );
+//     }
+
+//     const canvas = await html2canvas(element, {
+//       scale: 2,
+//       useCORS: true,
+//       backgroundColor: '#ffffff',
+//       width: 794,
+//       height: 1123,
+//       windowWidth: 794,
+//       scrollX: 0,
+//       scrollY: 0,
+//       onclone: (clonedDocument) => {
+//         const clonedElement =
+//           clonedDocument.querySelector(
+//             '.payslip-paper'
+//           ) as HTMLElement | null;
+
+//         if (clonedElement) {
+//           clonedElement.style.backgroundColor = '#ffffff';
+//           clonedElement.style.boxShadow = 'none';
+//           clonedElement.style.margin = '0';
+//           clonedElement.style.transform = 'none';
+//         }
+//       }
+//     });
+
+//     const imageData = canvas.toDataURL('image/png');
+
+//     const pdf = new jsPDF({
+//       orientation: 'portrait',
+//       unit: 'mm',
+//       format: 'a4',
+//       compress: true
+//     });
+
+//     const pageWidth = pdf.internal.pageSize.getWidth();
+//     const pageHeight = pdf.internal.pageSize.getHeight();
+
+//     // Fill exactly one A4 page.
+//     pdf.addImage(
+//       imageData,
+//       'PNG',
+//       0,
+//       0,
+//       pageWidth,
+//       pageHeight
+//     );
+
+//     const filename =
+//       `Payslip_${this.payslipToGenerate.employeeId}_` +
+//       `${this.payslipToGenerate.payrollPeriod}.pdf`;
+
+//     pdf.save(filename);
+
+//   } catch (error) {
+//     console.error('Payslip generation failed:', error);
+//   } finally {
+//     this.downloading = false;
+//   }
+// }
+async downloadPayslip(): Promise<void> {
+  await this.payslipComponent?.downloadPayslip();
 }
+
 }
