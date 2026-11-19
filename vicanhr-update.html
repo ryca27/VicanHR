@@ -21,6 +21,11 @@
     code { overflow-wrap: anywhere; }
     pre { overflow-x: auto; padding: 12px; background: #f4f7fa; border-radius: 6px; }
     .changes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+    nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    nav a { padding: 8px 16px; border: 1px solid #dce5ed; border-radius: 8px 8px 0 0; background: white; text-decoration: none; }
+    main:not(:has(#troubleshooting:target)) nav a[href="#summary"],
+    main:has(#troubleshooting:target) nav a[href="#troubleshooting"] { background: #193850; color: white; }
+    #troubleshooting:not(:target), #troubleshooting:target ~ #summary { display: none; }
   </style>
 </head>
 <body>
@@ -30,6 +35,42 @@
     <p>Local payroll and attendance workflow · November 19, 2026</p>
     <p><a href="vicanhr-frontend-handoff.html">Frontend developer handoff</a></p>
   </header>
+  <nav aria-label="Development summary">
+    <a href="#summary">Summary</a>
+    <a href="#troubleshooting">Troubleshooting</a>
+  </nav>
+  <section id="troubleshooting">
+    <h2>Troubleshooting local access</h2>
+    <p>Start from the VicanHR repository root. If the documentation server is down, open <code>vicanhr-update.html</code> directly in your browser and select Troubleshooting.</p>
+
+    <h3>1. The documentation page won’t open</h3>
+    <pre><code>python3 -m http.server 8765 --bind 127.0.0.1 --directory Frontend/.angular/local-docs</code></pre>
+    <p>Keep the terminal tab open. If you see <code>Address already in use</code>, try opening the pages first. The documentation server may already be running.</p>
+    <ul>
+      <li><a href="http://127.0.0.1:8765/vicanhr-update.html#troubleshooting">VicanHR update</a></li>
+      <li><a href="http://127.0.0.1:8765/vicanhr-frontend-handoff.html">Frontend developer handoff</a></li>
+    </ul>
+
+    <h3>2. The payroll page won’t open</h3>
+    <p>Start Angular in a separate terminal tab.</p>
+    <pre><code>cd Frontend
+npm start -- --host 127.0.0.1 --port 4200</code></pre>
+    <p>If Angular reports missing dependencies, run <code>npm ci</code> from <code>Frontend</code> and retry. Once the build finishes, open the <a href="http://127.0.0.1:4200/cutoff/demo">payroll cutoff demo</a>.</p>
+
+    <h3>3. Payroll opens but sign-in or data loading fails</h3>
+    <p>Check whether Django responds through Angular.</p>
+    <pre><code>curl -i http://127.0.0.1:4200/api/auth/csrf/</code></pre>
+    <p>If the request fails, return to the repository root, check Colima, and start it if it’s stopped. Then start the backend.</p>
+    <pre><code>colima status
+# Run the next command if Colima is stopped.
+colima start
+
+docker-compose -f Backend/compose.yaml up --build -d</code></pre>
+    <p>Retry the <code>curl</code> command. HTTP 200 confirms Angular can reach Django. If it still fails, check the backend logs.</p>
+    <pre><code>docker-compose -f Backend/compose.yaml logs --tail=80</code></pre>
+    <p>Use <code>127.0.0.1</code> consistently when signing in and opening payroll pages so your browser uses the same session cookies.</p>
+  </section>
+  <div id="summary">
   <div class="changes">
     <section>
       <h2>Backend</h2>
@@ -61,15 +102,15 @@
   </section>
   <section>
     <h2>Local pages</h2>
-    <p>Open these links in a browser on the Mac running VicanHR. Use localhost:4200 for Angular, Django, and the project documentation. Sign in through Angular to access saved attendance and payroll pages.</p>
+    <p>Open these links in a browser on the Mac running VicanHR. Angular serves the app and proxies Django on port 4200. The documentation server uses port 8765. Sign in through Angular to access saved attendance and payroll pages.</p>
     <ul>
-      <li><a href="http://localhost:4200/login">Sign in</a></li>
-      <li><a href="http://localhost:4200/cutoff/demo">Demo payroll cutoff</a> (try Finalize, Undo Finalize, and Download Selected with sample data)</li>
-      <li><a href="http://localhost:4200/payroll">Payroll dashboard</a></li>
-      <li><a href="http://localhost:4200/cutoff/1">SMCO payroll cutoff</a></li>
-      <li><a href="http://localhost:4200/attendance/1">Saved SMCO attendance</a></li>
-      <li><a href="http://localhost:4200/attendance/upload/">Django attendance uploader</a></li>
-      <li><a href="http://localhost:4200/admin/">Django admin</a> (staff login)</li>
+      <li><a href="http://127.0.0.1:4200/login">Sign in</a></li>
+      <li><a href="http://127.0.0.1:4200/cutoff/demo">Demo payroll cutoff</a> (try Finalize, Undo Finalize, and Download Selected with sample data)</li>
+      <li><a href="http://127.0.0.1:4200/payroll">Payroll dashboard</a></li>
+      <li><a href="http://127.0.0.1:4200/cutoff/1">SMCO payroll cutoff</a></li>
+      <li><a href="http://127.0.0.1:4200/attendance/1">Saved SMCO attendance</a></li>
+      <li><a href="http://127.0.0.1:4200/attendance/upload/">Django attendance uploader</a></li>
+      <li><a href="http://127.0.0.1:4200/admin/">Django admin</a> (staff login)</li>
     </ul>
   </section>
   <section>
@@ -77,22 +118,23 @@
     <p>Django registers eight API routes with ten GET and POST operations. See <a href="Backend/config/urls.py">the main URL configuration</a> and <a href="Backend/todo/urls.py">the tasks URL configuration</a>.</p>
     <p>Attendance and payroll drafts require an authorized session. Send the session cookie and CSRF token with authenticated POST requests.</p>
     <dl>
-      <dt>GET <a href="http://localhost:4200/api/auth/csrf/"><code>/api/auth/csrf/</code></a></dt><dd>Get a CSRF token.</dd>
+      <dt>GET <a href="http://127.0.0.1:4200/api/auth/csrf/"><code>/api/auth/csrf/</code></a></dt><dd>Get a CSRF token.</dd>
       <dt>POST <code>/api/auth/login/</code></dt><dd>Sign in and start a Django session.</dd>
       <dt>POST <code>/api/attendance/preview/</code></dt><dd>Preview Summary rows from a multipart upload in the <code>file</code> field.</dd>
-      <dt>GET <a href="http://localhost:4200/api/attendance/"><code>/api/attendance/</code></a></dt><dd>List saved attendance cutoffs.</dd>
+      <dt>GET <a href="http://127.0.0.1:4200/api/attendance/"><code>/api/attendance/</code></a></dt><dd>List saved attendance cutoffs.</dd>
       <dt>POST <code>/api/attendance/</code></dt><dd>Submit attendance JSON to save or revise a cutoff.</dd>
-      <dt>GET <code>/api/attendance/&lt;cutoffId&gt;/</code></dt><dd>Retrieve a saved cutoff and its employee rows. <a href="http://localhost:4200/api/attendance/1/">Open the SMCO sample</a>.</dd>
+      <dt>GET <code>/api/attendance/&lt;cutoffId&gt;/</code></dt><dd>Retrieve a saved cutoff and its employee rows. <a href="http://127.0.0.1:4200/api/attendance/1/">Open the SMCO sample</a>.</dd>
       <dt>POST <code>/api/payroll/drafts/</code></dt><dd>Calculate and save a payroll draft from multipart uploads in the <code>register</code> and <code>deductions</code> fields.</dd>
       <dt>GET <code>/api/payroll/drafts/&lt;draftId&gt;/</code></dt><dd>Retrieve a saved payroll draft with totals, warnings, and per-employee issues. Each issue includes a reason and next action.</dd>
-      <dt>GET <a href="http://localhost:4200/api/tasks/"><code>/api/tasks/</code></a></dt><dd>List demo tasks.</dd>
+      <dt>GET <a href="http://127.0.0.1:4200/api/tasks/"><code>/api/tasks/</code></a></dt><dd>List demo tasks.</dd>
       <dt>POST <code>/api/tasks/</code></dt><dd>Create a demo task.</dd>
     </dl>
     <p>Run this command to query the demo tasks API while Django and Angular are running.</p>
-    <pre><code>curl -fsS -H 'Accept: application/json' http://localhost:4200/api/tasks/</code></pre>
+    <pre><code>curl -fsS -H 'Accept: application/json' http://127.0.0.1:4200/api/tasks/</code></pre>
     <p>View the handlers for <a href="Backend/config/login.py">session authentication</a>, <a href="Backend/attendance/api.py">attendance</a>, <a href="Backend/attendance/payroll_api.py">payroll drafts</a>, and <a href="Backend/todo/views.py">demo tasks</a>.</p>
     <p>GCP deployment is planned. <a href="Backend/README.md">Backend setup and API instructions</a></p>
   </section>
+  </div>
 </main>
 </body>
 </html>
