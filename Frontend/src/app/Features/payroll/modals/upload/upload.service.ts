@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import {AttendanceUpload, AttendanceRecord, AttendanceParseResult,} from './upload.models'
 import { monthMap} from './upload-constants'
-import * as Papa from 'papaparse';
+import Papa from 'papaparse';
 
 @Injectable({
   providedIn: 'root'
@@ -141,34 +141,30 @@ export class UploadService {
       }
 
     
-      parseAttendace(csvText: string): AttendanceParseResult {
+      parseAttendace(input: string | string[][]): AttendanceParseResult {
 
-        // Detect CSV or tab-separated input.
-        const headerLine = csvText.split(/\r?\n/).find(line =>
-          line.includes('EMPLOYEE NO.') &&
-          line.includes('EMPLOYEE NAME')
-        );
-    
-        const delimiter = headerLine?.includes('\t')
-          ? '\t'
-          : ',';
-    
-        const parsed = Papa.parse<string[]>(csvText, {
-          delimiter,
-          skipEmptyLines: 'greedy',
-          dynamicTyping: false
-        });
-    
-        const rows = parsed.data;
-    
-        const errors: string[] = parsed.errors.map(error =>
-          `CSV row ${error.row !== undefined ? error.row + 1 : 'Unknown'}: ${error.message}`
-        );
-    
-        // Normalize headers, including multiline headers.
         const normalize = (value: string): string =>
           value.trim().replace(/\s+/g, ' ').toUpperCase();
-    
+        const headerRow = (row: string[]) =>
+          row.some(cell => normalize(cell) === 'EMPLOYEE NAME') &&
+          row.some(cell => normalize(cell) === 'TOTAL REG HRS');
+        let rows: string[][];
+        const errors: string[] = [];
+        if (Array.isArray(input)) {
+          rows = input;
+        } else {
+          const parse = (delimiter: string) => Papa.parse<string[]>(input, {
+            delimiter, skipEmptyLines: 'greedy', dynamicTyping: false
+          });
+          let parsed = parse(',');
+          for (const delimiter of ['\t', ';']) {
+            if (parsed.data.some(headerRow)) break;
+            parsed = parse(delimiter);
+          }
+          rows = parsed.data;
+          errors.push(...parsed.errors.map(error => error.message));
+        }
+
         // Extract metadata from the top section.
         const getMetadata = (label: string): string | null => {
           for (const row of rows) {
@@ -192,19 +188,8 @@ export class UploadService {
         const period = getMetadata('PERIOD');
     
         // Find the actual attendance table header.
-        const headerIndex = rows.findIndex(row =>
-          row.some(cell => normalize(cell) === 'EMPLOYEE NAME') &&
-          row.some(cell => normalize(cell) === 'TOTAL REG HRS') &&
-          row.some(cell => normalize(cell) === 'TOTAL OT HRS') 
-          // row.some(cell => normalize(cell) === 'TOTAL ND HRS') &&
-          // row.some(cell => normalize(cell) === 'TOTAL WDO') &&
-          // row.some(cell => normalize(cell) === 'BTR HRS') &&
-          // row.some(cell => normalize(cell) === 'TOTAL LH') &&
-          // row.some(cell => normalize(cell) === 'TOTAL LH OT') &&
-          // row.some(cell => normalize(cell) === 'TOTAL SH') &&
-          // row.some(cell => normalize(cell) === 'TOTAL SH OT')
-        );
-    
+        const headerIndex = rows.findIndex(headerRow);
+
         if (headerIndex === -1) {
           return {
             agency,
@@ -214,7 +199,7 @@ export class UploadService {
             totalEmployees: 0,
             employees: [],
             errors,
-            validationError: 'Attendance Header row not found'
+            validationError: 'Could not find EMPLOYEE NAME and TOTAL REG HRS on the same row. Select the DTR workbook or export its SUMMARY sheet as CSV.'
           }
           throw new Error('Attendance header row not found.');
         }
@@ -310,6 +295,8 @@ export class UploadService {
             (row[columns.employeeName] ?? '').trim();
     
           if (!employeeName) {
+            const hasHours = Object.values(columns).slice(2).some(col => Number(row[col] || 0) !== 0);
+            if (!hasHours) return;
             errors.push(
               `Row ${sourceRow}: Missing employee name`
             );

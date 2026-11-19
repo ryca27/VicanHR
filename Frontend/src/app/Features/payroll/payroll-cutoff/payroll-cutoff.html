@@ -4,18 +4,19 @@
         <div class="wrapper left">
             
                 <div class="filter-component">
-                    <app-textbox formControlName="name"
+                    <app-dropdown class="cutoff-filter" formControlName="name"
+                    [options]="nameOptions"
                     [label]="'Name'"
-                    ></app-textbox>
+                    ></app-dropdown>
                 </div>
                 <div class="filter-component">
-                    <app-dropdown formControlName="detachment"
+                    <app-dropdown class="cutoff-filter" formControlName="detachment"
                     [label]="'Detachment'"
                     [options]="detachmentOptions"
                     ></app-dropdown>
                 </div>
                 <div class="filter-component">
-                    <app-dropdown formControlName="status"
+                    <app-dropdown class="cutoff-filter" formControlName="status"
                     [label]="'Status'"
                     [options]="statusOptions"
                     ></app-dropdown>
@@ -27,43 +28,54 @@
 
         <div class="wrapper right">
             <div class="filter-component button-container">
-                <app-button
+                <app-button class="cutoff-toolbar-button"
                 [label]="'Preview'"
                 [color]="'black'"
                 [size]="'long'"
                 (click)="onPreview()"
                 ></app-button>
             </div>
-    
             <div class="filter-component button-container">
-                <app-button
-                [label]="'Finalize'"
+                <app-button class="cutoff-toolbar-button"
+                    label="Reset Filters"
+                    color="black"
+                    size="long"
+                    (click)="resetFilters()"
+                ></app-button>
+            </div>
+
+            <div class="filter-component button-container">
+                <app-button class="cutoff-toolbar-button"
+                [label]="demoMode && !isDownloadDisabled ? 'Undo Finalize' : 'Finalize'"
                 [color]="'black'"
                 [size]="'long'"
-                (click)="onFinalize()"
-                [disabled]="isFinalizeDisabled"
+                (click)="onToggleFinalize()"
+                [disabled]="!demoMode || (isFinalizeDisabled && isDownloadDisabled) || isGeneratingPdf"
                 ></app-button>
             </div>
     
             <div class="filter-component button-container">
-                <app-button
-                [label]="'Download'"
+                <app-button class="cutoff-toolbar-button"
+                label="Download Selected"
                 [color]="'black'"
                 [size]="'long'"
                 (click)="onDownload()"
-                [disabled]="isDownloadDisabled"
+                [disabled]="isDownloadDisabled || isGeneratingPdf"
                 ></app-button>
             </div>
     
             <div class="status-container">
-                <div class="circle-container"><div class="circle green"></div><span> Payroll Ready</span> <br></div>
-                <div class="circle-container"><div class="circle yellow"></div><span> For Approval</span> <br></div>
-                <div class="circle-container"><div class="circle red"></div><span> Needs Attention</span> <br></div>
+                <div class="circle-container"><div class="circle green"></div><span> Payroll Ready</span></div>
+                <div class="circle-container"><div class="circle yellow"></div><span> For Approval</span></div>
+                <div class="circle-container"><div class="circle red"></div><span> Needs Attention</span></div>
             </div>
         </div>
 
        
     </div>
+    @if (mixedStatuses) {
+        <p class="selection-hint" role="status">Select employees with the same status to finalize or undo.</p>
+    }
     <div class="statistics-container">
         <div class="card-container">
             <app-card 
@@ -72,41 +84,69 @@
             [color]="'blue'"
             ></app-card>
         </div>
+        <div class="card-container" title="Regular hours + regular overtime + night differential + WDO for the filtered employees">
+            <app-card header="Total Hours" [display]="totalHoursDisplay" color="blue"></app-card>
+        </div>
         <div class="card-container">
             <app-card 
             [header]="'Gross Pay'"
-            [display]="grossPay.toString()"
+            [display]="grossPayTotal"
             [color]="'green'"
             ></app-card>
         </div>
         <div class="card-container">
             <app-card 
             [header]="'Deductions'"
-            [display]="'PHP' + deductions.toString()"
+            [display]="deductionsTotal"
             [color]="'yellow'"
             ></app-card>
         </div>
         <div class="card-container">
             <app-card 
             [header]="'Net Pay'"
-            [display]="'PHP ' + netPay.toString()"
+            [display]="netPayTotal"
             [color]="'red'"
             ></app-card>
         </div>
         
     </div>
     <div class="table-container">
-        <app-table
+        @if (demoMode) { <p>Demo payroll · Fictional employees and sample amounts</p> }
+        @if (loadError) { <p class="cutoff-error" role="alert">{{ loadError }}</p> }
+        <app-table class="cutoff-register"
         [includeCheckBox]="true"
         [columnsInput]="mockData.tableColumns"
         [rowsInput]="tableRows"
         [actionRowsInput]="mockData.tableActionRows"
         [rowsIdInput]="tableRowsId"
         (checkBoxOutput)="checkBoxOutputListener($event)"></app-table>
+        @let issues = visibleAttentionIssues;
+        @if (issues.length) {
+            <details class="attention-panel">
+                <summary class="attention-heading">
+                    <span class="attention-title">Needs Attention</span>
+                    <span>{{ issues.length }} {{ issues.length === 1 ? 'employee' : 'employees' }}</span>
+                </summary>
+                <div class="attention-list">
+                    @for (issue of issues; track issue.id) {
+                        <details class="attention-details">
+                            <summary>
+                                <span class="attention-employee">{{ issue.employeeName }}</span>
+                                <span class="attention-reason">{{ issue.reason }}</span>
+                            </summary>
+                            <div class="attention-content">
+                                <p>{{ issue.details }}</p>
+                                <p class="attention-action"><strong>Next action</strong>{{ issue.action }}</p>
+                            </div>
+                        </details>
+                    }
+                </div>
+            </details>
+        }
     </div>
-    <div class="plus-container" (click)="onUpload()">
+    @if (!demoMode) { <div class="plus-container" (click)="onUpload()">
         <img src="assets/plus-icon.png" style="width:50px; height:50px;">
-      </div>
+      </div> }
 </div>
 
 <upload-modal 
@@ -114,10 +154,11 @@
   [title]="'Upload File'" 
   [startDate]="startDate ?? ''"
   [endDate]="endDate ?? ''"
+  (cutoffSaved)="refreshCurrentCutoff($event)"
   (isSubmit)="closeUloadModalListener($event)"> </upload-modal>
 
 <div class="pdf-render-area" aria-hidden="true">
     <div #payslipContent>
-      <app-payslip [payslip]="selectedPayslip"></app-payslip>
+      @if (selectedPayslip; as payslip) { <app-payslip [payslip]="payslip"></app-payslip> }
     </div>
   </div>

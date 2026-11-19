@@ -184,3 +184,32 @@ td .circle-container{
     display: flex;
     align-items: center;
 }
+:host(.cutoff-register) {
+  th, td {
+    white-space: nowrap;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  thead tr { height: 44px; }
+  thead th { min-width: auto; }
+  .check-box { box-sizing: border-box; min-width: 40px !important; width: 40px; padding: 0; }
+
+  tr:has(> .check-box:first-child) > :nth-child(2) {
+    left: 40px;
+    text-align: left;
+  }
+
+  tr > :nth-child(3) { text-align: left; }
+}
+
+:host(.cutoff-register) .status-td .circle-container {
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+:host(.cutoff-register) .status-td .circle {
+    margin: 0;
+}

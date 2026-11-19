@@ -1,15 +1,24 @@
 <div class="upload-container">
     <!-- Hidden native file input bound to Angular (change) event -->
-    <input [disabled]="isDisabled"
+    <input #picker [disabled]="isDisabled"
+      [attr.aria-invalid]="readError ? 'true' : null"
+      [attr.aria-describedby]="readError ? 'file-error-' + id : null"
       type="file" 
       [id]="'file-upload-' + id" 
       class="upload-input" 
       (change)="onFileSelected($event)" />
     
     <!-- Styled textbox wrapper using Angular class binding for state -->
-    <label [for]="'file-upload-' + id" class="upload-box" [class.has-file]="hasFile" [ngClass]="isDisabled ? 'disabled' : ''">
+    <label [for]="'file-upload-' + id" class="upload-box" [class.invalid]="!!readError" [class.has-file]="hasFile" [ngClass]="isDisabled ? 'disabled' : ''">
       <span class="floating-label" >Upload Document</span>
       <span class="file-name">{{ fileName || 'No file chosen...' }}</span>
     </label>
 
   </div>
+  @if (reading) { <p role="status">Reading selected file…</p> }
+  @if (readError) { <div class="file-error" role="alert" [id]="'file-error-' + id">
+    <span class="error-icon" aria-hidden="true">!</span>
+    <div><strong>Couldn’t load {{ fileName }}</strong><p>{{ readError }}</p>
+      <button type="button" (click)="picker.click()">Choose another file</button>
+    </div>
+  </div> }

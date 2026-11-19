@@ -72,10 +72,14 @@ app-payroll .row-container.list app-table tbody tr td:last-child {
   cursor: pointer;
 }
 
+body:has(.login-layout) {
+  margin: 0;
+}
+
 .container.login-layout {
   width: 100%;
   max-width: none;
   margin: 0;
   padding: 0;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
