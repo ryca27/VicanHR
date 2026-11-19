@@ -20,15 +20,15 @@ export const demoEmployees = [
     { name: 'Cruz, Morgan', detachment: 'Demo Detachment', status: 2 },
     { name: 'Tabernilla, Ryan', detachment: 'SM Megamall', status: 1 },
     { name: 'Viernes, Lea', detachment: 'Mall of Asia', status: 2 },
-    { name: 'Regalado, Jeremy', detachment: 'SM Megamall', status: 3 },
+    { name: 'Escobar, Pablo', detachment: 'SM Megamall', status: 3 },
     { name: 'Lopez, Rusty', detachment: 'Mall of Asia', status: 3 },
     { name: 'Raymundo, Carlo', detachment: 'Mall of Asia', status: 2 },
 ];
 
 export const demoAttentionIssues: Record<string, { reason: string; details: string; action: string }> = {
-    'Regalado, Jeremy': {
+    'Escobar, Pablo': {
         reason: 'Duplicate attendance name',
-        details: 'Demo DTR rows 12 and 18 both contain “Regalado, Jeremy” under SM Megamall.',
+        details: 'Demo DTR rows 12 and 18 both contain “Escobar, Pablo” under SM Megamall.',
         action: 'Compare both source rows with the payroll register and confirm which attendance row belongs to this employee.',
     },
     'Lopez, Rusty': {
