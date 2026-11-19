@@ -18,12 +18,12 @@ npm ci
 npm start -- --host 127.0.0.1 --port 4200
 ```
 
-Keep the Angular process running and open the [local login page](http://127.0.0.1:4200/login) in your browser. The development server automatically reloads when source files change.
+Keep the Angular process running and open the [local login page](http://localhost:4200/login) in your browser. The development server automatically reloads when source files change. Open the [project summary](http://localhost:4200/vicanhr-update.html) or [Django admin](http://localhost:4200/admin/) on the same port. Restart Angular to refresh the local documentation snapshot.
 
-Angular forwards `/api/` requests to Django at `http://127.0.0.1:8080` through [proxy.conf.json](proxy.conf.json). In another terminal, verify that the frontend can reach Django through the proxy. A successful request returns JSON containing a `csrfToken`.
+Angular forwards API, Django admin, and Django attendance uploader requests to Django at `http://127.0.0.1:8080` through [proxy.conf.json](proxy.conf.json). In another terminal, verify that the frontend can reach Django through the proxy. A successful request returns JSON containing a `csrfToken`.
 
 ```bash
-curl -fsS http://127.0.0.1:4200/api/auth/csrf/
+curl -fsS http://localhost:4200/api/auth/csrf/
 ```
 
 ## Code scaffolding

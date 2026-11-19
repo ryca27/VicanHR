@@ -61,15 +61,15 @@
   </section>
   <section>
     <h2>Local pages</h2>
-    <p>Open these links in a browser on the Mac running VicanHR. Angular uses 127.0.0.1:4200 and Django uses 127.0.0.1:8080. Sign in through Angular to access saved attendance and payroll pages.</p>
+    <p>Open these links in a browser on the Mac running VicanHR. Use localhost:4200 for Angular, Django, and the project documentation. Sign in through Angular to access saved attendance and payroll pages.</p>
     <ul>
-      <li><a href="http://127.0.0.1:4200/login">Sign in</a></li>
-      <li><a href="http://127.0.0.1:4200/cutoff/demo">Demo payroll cutoff</a> (try Finalize, Undo Finalize, and Download Selected with sample data)</li>
-      <li><a href="http://127.0.0.1:4200/payroll">Payroll dashboard</a></li>
-      <li><a href="http://127.0.0.1:4200/cutoff/1">SMCO payroll cutoff</a></li>
-      <li><a href="http://127.0.0.1:4200/attendance/1">Saved SMCO attendance</a></li>
-      <li><a href="http://127.0.0.1:8080/attendance/upload/">Django attendance uploader</a></li>
-      <li><a href="http://127.0.0.1:8080/admin/">Django admin</a> (staff login)</li>
+      <li><a href="http://localhost:4200/login">Sign in</a></li>
+      <li><a href="http://localhost:4200/cutoff/demo">Demo payroll cutoff</a> (try Finalize, Undo Finalize, and Download Selected with sample data)</li>
+      <li><a href="http://localhost:4200/payroll">Payroll dashboard</a></li>
+      <li><a href="http://localhost:4200/cutoff/1">SMCO payroll cutoff</a></li>
+      <li><a href="http://localhost:4200/attendance/1">Saved SMCO attendance</a></li>
+      <li><a href="http://localhost:4200/attendance/upload/">Django attendance uploader</a></li>
+      <li><a href="http://localhost:4200/admin/">Django admin</a> (staff login)</li>
     </ul>
   </section>
   <section>
@@ -77,19 +77,19 @@
     <p>Django registers eight API routes with ten GET and POST operations. See <a href="Backend/config/urls.py">the main URL configuration</a> and <a href="Backend/todo/urls.py">the tasks URL configuration</a>.</p>
     <p>Attendance and payroll drafts require an authorized session. Send the session cookie and CSRF token with authenticated POST requests.</p>
     <dl>
-      <dt>GET <a href="http://127.0.0.1:8080/api/auth/csrf/"><code>/api/auth/csrf/</code></a></dt><dd>Get a CSRF token.</dd>
+      <dt>GET <a href="http://localhost:4200/api/auth/csrf/"><code>/api/auth/csrf/</code></a></dt><dd>Get a CSRF token.</dd>
       <dt>POST <code>/api/auth/login/</code></dt><dd>Sign in and start a Django session.</dd>
       <dt>POST <code>/api/attendance/preview/</code></dt><dd>Preview Summary rows from a multipart upload in the <code>file</code> field.</dd>
-      <dt>GET <a href="http://127.0.0.1:8080/api/attendance/"><code>/api/attendance/</code></a></dt><dd>List saved attendance cutoffs.</dd>
+      <dt>GET <a href="http://localhost:4200/api/attendance/"><code>/api/attendance/</code></a></dt><dd>List saved attendance cutoffs.</dd>
       <dt>POST <code>/api/attendance/</code></dt><dd>Submit attendance JSON to save or revise a cutoff.</dd>
-      <dt>GET <code>/api/attendance/&lt;cutoffId&gt;/</code></dt><dd>Retrieve a saved cutoff and its employee rows. <a href="http://127.0.0.1:8080/api/attendance/1/">Open the SMCO sample</a>.</dd>
+      <dt>GET <code>/api/attendance/&lt;cutoffId&gt;/</code></dt><dd>Retrieve a saved cutoff and its employee rows. <a href="http://localhost:4200/api/attendance/1/">Open the SMCO sample</a>.</dd>
       <dt>POST <code>/api/payroll/drafts/</code></dt><dd>Calculate and save a payroll draft from multipart uploads in the <code>register</code> and <code>deductions</code> fields.</dd>
       <dt>GET <code>/api/payroll/drafts/&lt;draftId&gt;/</code></dt><dd>Retrieve a saved payroll draft with totals, warnings, and per-employee issues. Each issue includes a reason and next action.</dd>
-      <dt>GET <a href="http://127.0.0.1:8080/api/tasks/"><code>/api/tasks/</code></a></dt><dd>List demo tasks.</dd>
+      <dt>GET <a href="http://localhost:4200/api/tasks/"><code>/api/tasks/</code></a></dt><dd>List demo tasks.</dd>
       <dt>POST <code>/api/tasks/</code></dt><dd>Create a demo task.</dd>
     </dl>
-    <p>Run this command to query the demo tasks API while Docker Compose is running.</p>
-    <pre><code>curl -fsS -H 'Accept: application/json' http://localhost:8080/api/tasks/</code></pre>
+    <p>Run this command to query the demo tasks API while Django and Angular are running.</p>
+    <pre><code>curl -fsS -H 'Accept: application/json' http://localhost:4200/api/tasks/</code></pre>
     <p>View the handlers for <a href="Backend/config/login.py">session authentication</a>, <a href="Backend/attendance/api.py">attendance</a>, <a href="Backend/attendance/payroll_api.py">payroll drafts</a>, and <a href="Backend/todo/views.py">demo tasks</a>.</p>
     <p>GCP deployment is planned. <a href="Backend/README.md">Backend setup and API instructions</a></p>
   </section>

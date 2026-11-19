@@ -15,7 +15,7 @@ From the repository root:
 ```sh
 docker-compose -f Backend/compose.yaml up --build -d
 docker-compose -f Backend/compose.yaml ps
-curl -fsS -H 'Accept: application/json' http://127.0.0.1:8080/api/tasks/
+curl -fsS -H 'Accept: application/json' http://localhost:8080/api/tasks/
 ```
 
 If Compose is installed as a Docker CLI plugin, use `docker compose` in place of `docker-compose` throughout this guide. Compose starts PostgreSQL, runs the Django migrations, and serves the API on port 8080. The tasks endpoint returns `[]` on an empty database.
@@ -43,7 +43,7 @@ npm ci
 npm start -- --host 127.0.0.1 --port 4200
 ```
 
-Leave this terminal running and open the [Angular sign-in page](http://127.0.0.1:4200/login). Angular forwards `/api/` requests to Django using the [development proxy](Frontend/proxy.conf.json). Use `127.0.0.1` consistently for both apps so browser session cookies use the same hostname.
+Leave this terminal running and open the [Angular sign-in page](http://localhost:4200/login). Use port 4200 for all browser links below. Angular serves the project documentation and proxies the Django API, admin, and attendance uploader to port 8080 using the [development proxy](Frontend/proxy.conf.json). Restart Angular to refresh its documentation snapshot.
 
 ## Local pages
 
@@ -51,13 +51,14 @@ Open these links in a browser on the machine running the services.
 
 | Page | Local URL | What to try |
 | --- | --- | --- |
-| Angular sign-in | [127.0.0.1:4200/login](http://127.0.0.1:4200/login) | Sign in with your local finance account. |
-| Payroll dashboard | [127.0.0.1:4200/payroll](http://127.0.0.1:4200/payroll) | Upload an attendance Summary CSV or Excel workbook and open the saved cutoff. |
-| Demo payroll cutoff | [127.0.0.1:4200/cutoff/demo](http://127.0.0.1:4200/cutoff/demo) | Try Finalize, Undo Finalize, and PDF payslips using fictional data. |
-| Saved attendance and cutoff | [Attendance example](http://127.0.0.1:4200/attendance/1) · [Cutoff example](http://127.0.0.1:4200/cutoff/1) | Replace `1` with the cutoff ID returned after an upload. A fresh database has no saved cutoffs. |
-| Django attendance uploader | [127.0.0.1:8080/attendance/upload/](http://127.0.0.1:8080/attendance/upload/) | Sign in with the finance or admin application role and upload an attendance workbook. |
-| Django admin | [127.0.0.1:8080/admin/](http://127.0.0.1:8080/admin/) | Sign in with a Django staff account. |
-| Django tasks API | [127.0.0.1:8080/api/tasks/](http://127.0.0.1:8080/api/tasks/) | Check whether Django is responding. |
+| Angular sign-in | [localhost:4200/login](http://localhost:4200/login) | Sign in with your local finance account. |
+| Payroll dashboard | [localhost:4200/payroll](http://localhost:4200/payroll) | Upload an attendance Summary CSV or Excel workbook and open the saved cutoff. |
+| Demo payroll cutoff | [localhost:4200/cutoff/demo](http://localhost:4200/cutoff/demo) | Try Finalize, Undo Finalize, and PDF payslips using fictional data. |
+| Saved attendance and cutoff | [Attendance example](http://localhost:4200/attendance/1) · [Cutoff example](http://localhost:4200/cutoff/1) | Replace `1` with the cutoff ID returned after an upload. A fresh database has no saved cutoffs. |
+| Django attendance uploader | [localhost:4200/attendance/upload/](http://localhost:4200/attendance/upload/) | Sign in with the finance or admin application role and upload an attendance workbook. |
+| Django admin | [localhost:4200/admin/](http://localhost:4200/admin/) | Sign in with a Django staff account. |
+| Django tasks API | [localhost:4200/api/tasks/](http://localhost:4200/api/tasks/) | Check whether Django is responding. |
+| Project summary and handoff | [Summary](http://localhost:4200/vicanhr-update.html) · [Frontend handoff](http://localhost:4200/vicanhr-frontend-handoff.html) | Review the current workflow and API contracts. |
 
 ## Backend API
 
@@ -80,9 +81,9 @@ If you have the SMCO sample workbooks, use the **DTR** file for attendance and t
 
 | Symptom | Check |
 | --- | --- |
-| Port 4200 won’t open | Check that `npm start` is still running in the frontend terminal. Open [the sign-in page](http://127.0.0.1:4200/login) on the machine running Angular. |
+| Port 4200 won’t open | Check that `npm start` is still running in the frontend terminal. Open [the sign-in page](http://localhost:4200/login) on the machine running Angular. |
 | Port 8080 won’t open | Run `docker-compose -f Backend/compose.yaml ps` and `docker-compose -f Backend/compose.yaml logs --tail=50 api db`. Check that the Docker engine is running. |
-| Angular opens but API calls fail | Run `curl -fsS http://127.0.0.1:4200/api/auth/csrf/`. A JSON response containing `csrfToken` verifies the proxy connection. For a 403 on attendance or payroll, also check your session and application role. |
+| Angular opens but API calls fail | Run `curl -fsS http://localhost:4200/api/auth/csrf/`. A JSON response containing `csrfToken` verifies the proxy connection. For a 403 on attendance or payroll, also check your session and application role. |
 | Backend changes haven’t appeared | Run `docker-compose -f Backend/compose.yaml up --build -d api`. The container image includes a copy of the Django source. |
 
 See the [frontend README](Frontend/README.md) for Angular commands and the [backend README](Backend/README.md) for Django and database commands. Open `vicanhr-update.html` from your checkout in a browser to view the [development summary](vicanhr-update.html) and its local page links.
