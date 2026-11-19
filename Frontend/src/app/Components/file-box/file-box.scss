@@ -79,3 +79,45 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+.upload-box.invalid { border-color: #b45349; }
+.upload-box.invalid .floating-label { color: #8b352d; }
+
+.file-error {
+  display: flex;
+  align-items: flex-start;
+  gap: .65rem;
+  box-sizing: border-box;
+  max-width: 400px;
+  margin: .65rem 0;
+  padding: .8rem 1rem;
+  border: 1px solid #edc9c4;
+  border-radius: 8px;
+  color: #752e29;
+  background: #fff6f4;
+  font-size: .875rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+
+  p { margin: .2rem 0 .45rem; }
+  button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: .18em;
+    cursor: pointer;
+  }
+}
+.error-icon {
+  flex: 0 0 1.2rem;
+  border-radius: 50%;
+  background: #843e35;
+  color: white;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2rem;
+}

@@ -72,11 +72,12 @@
                   <app-button [label]="'Validate'" (click)="validateInput()"
                     [color]="'blue'"
                     [size]="'long'"
-                    [disabled]="!uploadFormGroup.valid"
+                    [disabled]="saving"
                   ></app-button>
+                  @if (submitError) { <p role="alert">{{ submitError }}</p> }
                   <app-button [label]="'Upload'" (click)="submitForm()"
                   [color]="'gray'"
-                  [disabled]="isDisabledUpload"
+                  [disabled]="isDisabledUpload || saving"
                   [size]="'long'"
                 ></app-button>
                 <app-button [label]="'Cancel'" (click)="closeUploadModal()"

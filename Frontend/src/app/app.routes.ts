@@ -1,3 +1,4 @@
+import { SavedAttendance } from './Features/payroll/saved-attendance';
 import { Routes } from '@angular/router';
 import { Home} from './Home/home';
 import {Payroll} from './Features/payroll/payroll'
@@ -7,6 +8,7 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 import { App } from './app'
 
 export const routes: Routes = [
+    { path: 'attendance/:id', component: SavedAttendance },
 
 
     {

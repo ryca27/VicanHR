@@ -4,13 +4,27 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## Development server
 
-To start a local development server, run:
+In a terminal at the repository root, start the Django backend on port 8080. See the [backend setup guide](../Backend/README.md) for Docker and Colima setup.
 
 ```bash
-ng serve
+docker-compose -f Backend/compose.yaml up -d
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+From the repository root, install the frontend dependencies on first setup and start Angular.
+
+```bash
+cd Frontend
+npm ci
+npm start -- --host 127.0.0.1 --port 4200
+```
+
+Keep the Angular process running and open the [local login page](http://127.0.0.1:4200/login) in your browser. The development server automatically reloads when source files change.
+
+Angular forwards `/api/` requests to Django at `http://127.0.0.1:8080` through [proxy.conf.json](proxy.conf.json). In another terminal, verify that the frontend can reach Django through the proxy. A successful request returns JSON containing a `csrfToken`.
+
+```bash
+curl -fsS http://127.0.0.1:4200/api/auth/csrf/
+```
 
 ## Code scaffolding
 

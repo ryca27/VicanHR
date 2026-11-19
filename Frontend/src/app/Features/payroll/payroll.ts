@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { Component, OnInit, signal, afterNextRender } from '@angular/core';
 import {FormControl, ReactiveFormsModule, Validators, FormGroup, FormBuilder} from '@angular/forms'
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,12 +15,12 @@ import {TableComponent} from './../../Components/table/table'
 import {DoubleDatePickerComponent} from './../../Components/double-date-picker/double-date-picker'
 import {UploadModal} from './modals/upload/upload';
 import {AcceptedRowsModal} from './modals/accepted-rows/accepted-rows';
-import { AttendanceParseResult, Upload } from './modals/upload/upload.models'
+import { AttendancePost, Upload } from './modals/upload/upload.models'
 
 
 @Component({
   selector: 'app-payroll',
-  imports: [TextboxComponent,
+  imports: [RouterLink, TextboxComponent,
     DropdownComponent,
     TableComponent,
     DoubleDatePickerComponent,
@@ -35,6 +36,23 @@ import { AttendanceParseResult, Upload } from './modals/upload/upload.models'
   styleUrl: './payroll.scss',
 })
 export class Payroll implements OnInit {
+  savedCutoffs = signal<{cutoffId: number; period: string; detachment: string}[]>([]);
+  readError = signal('');
+
+  constructor() {
+    afterNextRender(() => this.loadCutoffs());
+  }
+
+  async loadCutoffs() {
+    try {
+      const response = await fetch('/api/attendance/');
+      if (!response.ok) throw new Error('Sign in with an admin or finance account to view saved attendance.');
+      this.savedCutoffs.set(await response.json());
+    } catch (error) {
+      this.readError.set(error instanceof Error ? error.message : 'Could not load attendance.');
+    }
+  }
+
   mockData: any = {}
   isUploadModalVisible: boolean = false;
   isAcceptedRowsModalVisible: boolean = false;
@@ -103,7 +121,7 @@ export class Payroll implements OnInit {
 
   closeUploadModalListener(message: boolean){
     this.isUploadModalVisible = false;
-    this.isAcceptedRowsModalVisible = message;
+    this.isAcceptedRowsModalVisible = false;
   }
 
   closeAcceptedRowsListener(message: boolean){

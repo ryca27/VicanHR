@@ -1,40 +1,34 @@
-.card-wrapper{
-    border: 1px solid #d4d4d4;
+:host {
+    display: block;
+    height: 100%;
+}
+
+.card-wrapper {
+    --accent: #3778b5;
+    display: grid;
+    align-content: space-between;
+    gap: 12px;
+    box-sizing: border-box;
+    min-height: 104px;
+    height: 100%;
+    padding: 16px 18px;
+    background: #fff;
+    border: 1px solid #dce3ea;
+    border-top: 3px solid var(--accent);
     border-radius: 10px;
-    box-shadow: 0px 3px 5px 0px #999999;
-    min-width: 250px;
-}
-
-h4 {
-    color: #747474;
+    box-shadow: 0 2px 6px rgb(27 48 69 / 7%);
     font-family: Helvetica, Arial, sans-serif;
-    margin: 10px 0px;
 }
 
+.green  { --accent: #348165; }
+.yellow { --accent: #b58930; }
+.red    { --accent: #b36167; }
+
+h4, h2 { margin: 0; }
+h4 { color: #536377; font-size: .875rem; font-weight: 600; }
 h2 {
-    color: #0f0f0f;
-    font-family: Helvetica, Arial, sans-serif;
-    margin: 10px 0px;
-}
-
-.header, .body{
-    padding: 0px 20px;
-}
-
-
-
-.blue{
-    border-top: 3px solid #369af7;
-}
-
-.green{
-    border-top: 3px solid #3dfc86;
-}
-
-.yellow{
-    border-top: 3px solid #fcef3d;
-}
-
-.red{
-    border-top: 3px solid #f73434;
+    color: #1e3045;
+    font-size: clamp(1.5rem, 2.2vw, 2rem);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
 }

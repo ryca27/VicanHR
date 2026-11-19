@@ -55,3 +55,12 @@
   >
   </accepted-rows-modal>
 }
+
+<section aria-label="Saved attendance">
+  <h2>Saved attendance</h2>
+  <p><a routerLink="/cutoff/demo">Open demo payroll cutoff</a></p>
+  @if (readError()) { <p role="alert">{{ readError() }}</p> }
+  @for (cutoff of savedCutoffs(); track cutoff.cutoffId) {
+    <a [routerLink]="['/attendance', cutoff.cutoffId]">{{ cutoff.detachment }} · {{ cutoff.period }}</a><br>
+  } @empty { @if (!readError()) { <p>No saved cutoffs.</p> } }
+</section>

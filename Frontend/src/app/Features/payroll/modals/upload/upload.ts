@@ -1,3 +1,6 @@
+import { Router } from '@angular/router';
+import { postToBackend } from '../../../../backend';
+import { ChangeDetectorRef } from '@angular/core';
 import { Component, Input, Output, EventEmitter, inject, OnInit,DestroyRef  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, FormControl  } from '@angular/forms';
@@ -59,12 +62,11 @@ export class UploadModal implements OnInit {
 
   createUploadFileGroup(): FormGroup{
     let group = this.fb.group({
-      fileType:['', Validators.required],
+      fileType:['attendance', Validators.required],
       expenseType:['',],
       allowanceType: [''],
       fileName:['', Validators.required],
       fileContent:['', Validators.required],
-      file: [File]
     })
     this.uploadFileGroupListener(group);
     return group
@@ -121,49 +123,59 @@ export class UploadModal implements OnInit {
     return this.uploadFileArray
   }
 
-  submitForm(){
-    this.isOpen = false;
-    this.isSubmit.emit(true);
-    this.dataUploadOutput.emit(this.upload)
-  }
-  validateInput(){
-    //Remove all data inside upload
-    this.upload = {attendance: [], expense: [], allowance: []}
-    this.uploadFileArray.controls.forEach((control, i) => {
-      let validatedInput;
-      switch (control.value.fileType){
-        case 'attendance':
-          validatedInput = this.uploadService.parseAttendace(control.value.fileContent);
-          this.upload.attendance.push(validatedInput);
-          break
-        case 'expense':
-          //do something
-          ''
-          break
-        case 'allowance':
-          ''
-          break
-      }
-      this.uploadValidationList[i].isShown = true;
-      if(validatedInput.validationError ==''){
-        this.uploadValidationList[i].isAccepted = true;
-        this.uploadValidationList[i].message = `File accepted. ${control.value.fileType.toUpperCase()} of ${validatedInput.totalEmployees} employees added.`
-        this.isDisabledUpload = false;
-      }
-      else{
-        this.uploadValidationList[i].isAccepted = false;
-        this.uploadValidationList[i].message = `File not accepted. ${validatedInput.validationError}`
-        this.isDisabledUpload = true;
-      }
-    })
-    let validatedInput = this.uploadService.parseAttendace(this.uploadFileArray.controls[0].value.fileContent);
-    let dateRange = this.uploadService.dateRangeConverter(validatedInput.period? validatedInput.period : '');
-    if(dateRange[0].toString() == this.startDate && dateRange[1].toString() == this.endDate && validatedInput.employees.length > 0){
-      // this.isDisabledUpload = false
-    }
-    else{
+  private router = inject(Router);
+  @Output() cutoffSaved = new EventEmitter<number>();
+  saving = false;
+  submitError = '';
+  private changes = inject(ChangeDetectorRef);
 
+  async submitForm() {
+    if (this.saving || this.isDisabledUpload) return;
+    this.validateInput();
+    if (this.isDisabledUpload) return;
+    this.saving = true;
+    this.submitError = '';
+    try {
+      let lastCutoffId: number | undefined;
+      for (const summary of this.upload.attendance) {
+        const saved = await postToBackend('/api/attendance/', {
+          period: summary.period, detachment: summary.branch,
+          employees: summary.employees.map(row => ({ ...row, detachment: summary.branch })),
+        });
+        lastCutoffId = saved.cutoffId;
+      }
+      this.isOpen = false;
+      this.isSubmit.emit(true);
+      this.dataUploadOutput.emit(this.upload);
+      if (lastCutoffId !== undefined) {
+        this.cutoffSaved.emit(lastCutoffId);
+        await this.router.navigate(['/cutoff', lastCutoffId]);
+      }
+    } catch (error) {
+      this.submitError = error instanceof Error ? error.message : 'Upload failed.';
+    } finally {
+      this.saving = false;
+      this.changes.markForCheck();
     }
+  }
+
+  validateInput() {
+    this.upload = { attendance: [], expense: [], allowance: [] };
+    this.submitError = '';
+    this.uploadValidationList = this.uploadFileArray.controls.map(control => {
+      if (control.value.fileType !== 'attendance') {
+        return { isShown: true, isAccepted: false, message: 'Choose Attendance as the file type.' };
+      }
+      if (!control.value.fileContent) {
+        return { isShown: true, isAccepted: false, message: control.value.fileName ? 'File content is unavailable. Check the status below the filename.' : 'Choose a summary CSV or Excel workbook.' };
+      }
+      const result = this.uploadService.parseAttendace(control.value.fileContent || '');
+      const error = result.validationError || result.errors.join(' ') ||
+        (!result.period || !result.branch || !result.employees.length ? 'Missing cutoff, branch, or employee rows.' : '');
+      if (!error) this.upload.attendance.push(result);
+      return { isShown: true, isAccepted: !error, message: error || `Validated ${result.employees.length} employees.` };
+    });
+    this.isDisabledUpload = !this.upload.attendance.length || this.uploadValidationList.some(item => !item.isAccepted);
   }
 
   //Double date picker output listener
@@ -175,8 +187,11 @@ export class UploadModal implements OnInit {
   }
 
   //File box output listener
-  fileContentOutputListener(message:string, i:number){
-    this.uploadFileArray.at(i).get('fileContent')?.setValue(message)
+  fileContentOutputListener(message:string | string[][], i:number){
+    this.isDisabledUpload = true;
+    this.uploadValidationList[i] = { isShown: false, isAccepted: false, message: '' };
+    this.uploadFileArray.at(i).get('fileContent')?.setValue(message);
+    this.changes.markForCheck();
   }
   fileNameOutputListener(message:string, i:number){
     this.uploadFileArray.at(i).get('fileName')?.setValue(message)

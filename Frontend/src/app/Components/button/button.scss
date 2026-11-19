@@ -48,3 +48,13 @@ button:active{
 .black{
     background-color: #2C2C2C;
 }
+:host(.cutoff-toolbar-button) button {
+    width: auto;
+    height: 40px;
+    margin: 0;
+    padding: 0 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 600;
+}
