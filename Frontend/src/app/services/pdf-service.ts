@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PdfService {
   async download(element: HTMLElement, filename: string): Promise<void> {
+    const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+      import('html2canvas'),
+      import('jspdf'),
+    ]);
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,

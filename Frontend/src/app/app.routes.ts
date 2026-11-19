@@ -6,6 +6,7 @@ import {PayrollCutoff} from './Features/payroll/payroll-cutoff/payroll-cutoff'
 import {LoginComponent} from './Login/login'
 import { RenderMode, ServerRoute } from '@angular/ssr';
 import { App } from './app'
+import { roleGuard } from './Login/authentication/role.guard';
 
 export const routes: Routes = [
     { path: 'attendance/:id', component: SavedAttendance },
@@ -18,10 +19,10 @@ export const routes: Routes = [
     {
         path:'payroll',
         component: Payroll,
-        children:[{
-            path: 'sdsd',
-            component: PayrollCutoff
-        }]
+        // canActivate: [roleGuard],
+        data: {
+            roles:['admin','hr']
+        }
     },
     {
         path:'cutoff/:id',

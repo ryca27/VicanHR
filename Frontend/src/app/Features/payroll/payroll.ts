@@ -73,11 +73,12 @@ export class Payroll implements OnInit {
 
   ngOnInit(){
     this.mockData = {
-      tableColumns: ['Period', 'Payroll Ready Employees', 'Payroll Status', 'Action'],
+      tableColumns: ['Period', 'Detachment', 'Payroll Ready Employees', 'Payroll Status', 'Action'],
       tableRows:[
         {
           id: '1',
           cutoffDate:'2026 Jan 1-15',
+          detachment: 'HQ',
           payrollReady: '10 out of 100',
           payrollStatus: 'Draft',
           action:'Continue'
@@ -85,6 +86,7 @@ export class Payroll implements OnInit {
         {
           id: '2',
           cutoffDate:'2025 Dec 16-31',
+          detachment: 'HQ',
           payrollReady: '100 out of 100',
           payrollStatus: 'Draft',
           action:'Continue'
@@ -92,6 +94,7 @@ export class Payroll implements OnInit {
         {
           id: '3',
           cutoffDate:'2025 Dec 1-15',
+          detachment: 'HQ',
           payrollReady: '50 out of 50',
           payrollStatus: 'Draft',
           action:'Continue'

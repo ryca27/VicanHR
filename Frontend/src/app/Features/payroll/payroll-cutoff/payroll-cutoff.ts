@@ -66,6 +66,9 @@ export class PayrollCutoff implements OnInit {
     });
   }
   private demoPayslips = new Map<string, Payslip>();
+  private readonly demoCutoffStart = '2026-09-01';
+  private readonly demoCutoffEnd = '2026-09-15';
+  private readonly demoPayrollPeriod = 'September 1–15, 2026';
 
   private loadDemo() {
     ++this.requestVersion;
@@ -82,29 +85,39 @@ export class PayrollCutoff implements OnInit {
       if (issue) this.attentionIssues.set(employeeId, issue);
       const regularHours = 72 + index * 4;
       const overtimeHours = 4 + index * 2;
-      const earnings = [
-        { label: 'Regular Pay', amount: regularHours * 100 },
-        { label: 'Overtime Pay', amount: overtimeHours * 125 },
-      ];
-      const deductions = [
-        { label: 'SSS Contribution', amount: 225 },
-        { label: 'PhilHealth Contribution', amount: 100 },
-        { label: 'Pag-IBIG Contribution', amount: 100 },
-      ];
-      const grossPay = earnings.reduce((sum, item) => sum + item.amount, 0);
-      const totalDeductions = deductions.reduce((sum, item) => sum + item.amount, 0);
+      const regularPay = regularHours * 100;
+      const overtimePay = overtimeHours * 125;
+      const grossPay = regularPay + overtimePay;
+      const totalDeductions = 225 + 100 + 100;
       const netPay = grossPay - totalDeductions;
       this.demoPayslips.set(employeeId, {
         employeeId, employeeName, assignedPost: 'Demo post', detachment,
-        cutoffStart: '2026-09-01', cutoffEnd: '2026-09-15', payDate: '2026-09-18',
-        regularHours, overtimeHours, nightDifferentialHours: 0,
-        earnings, deductions, grossPay, totalDeductions, netPay,
+        payrollPeriod: this.demoPayrollPeriod, payDate: '2026-09-18',
+        earning: {
+          regularPay: { label: 'Regular Pay', hours: regularHours, rate: 100, pay: regularPay },
+          otPay: { label: 'Overtime Pay', hours: overtimeHours, rate: 125, pay: overtimePay },
+          allowance: { label: 'Allowance' },
+          lHOTPay: { label: 'Legal Holiday Overtime' },
+          sHOTPay: { label: 'Special Holiday Overtime' },
+          ndPay: { label: 'Night Differential', hours: 0 },
+          uniformAllowance: { label: 'Uniform Allowance' },
+          wDOPay: { label: 'Worked Day Off' },
+          sSSLoanRefund: { label: 'SSS Loan Refund' },
+          cBRRefund: { label: 'Cash Bond Refund' },
+          sSSContRefund: { label: 'SSS Contribution Refund' },
+        },
+        deduction: {
+          sSSEyee: { label: 'SSS Contribution', amount: 225 },
+          philHealthEyee: { label: 'PhilHealth Contribution', amount: 100 },
+          pagibigContribution: { label: 'Pag-IBIG Contribution', amount: 100 },
+        },
+        grossPay, totalDeductions, netPay,
       });
       return {
         id: employeeId, fullName: employeeName, detachment, regularHours, regularOvertime: overtimeHours,
         nightDifferentialHours: 0, btrHours: 0, wdoHours: 0, totalHours: regularHours + overtimeHours, grossPay,
         sss: 225, pagibig: 100, philHealth: 100, expenseA: 0, expenseB: 0, totalDeduction: totalDeductions,
-        netPay, payrollCutoff: 'September 1–15, 2026',
+        netPay, payrollCutoff: this.demoPayrollPeriod,
         remarks: issue?.reason
           ?? `Demo · ${this.statusOptions.find(option => Number(option.value) === status)?.label}`,
         status, actions: [],
@@ -308,9 +321,11 @@ export class PayrollCutoff implements OnInit {
         this.selectedPayslip = payslip;
         this.changes.detectChanges();
         const name = payslip.employeeName.replace(/[^\p{L}\p{N}]+/gu, '_');
-        const cutoff = `${payslip.cutoffStart}_to_${payslip.cutoffEnd}`;
+        const cutoff = `${this.demoCutoffStart}_to_${this.demoCutoffEnd}`;
         const filename = `Demo_Payslip_${payslip.employeeId}_${name}_${cutoff}.pdf`;
-        await this.pdfService.download(this.payslipContent.nativeElement, filename);
+        const paper = this.payslipContent.nativeElement.querySelector<HTMLElement>('.payslip-paper');
+        if (!paper) throw new Error('Could not render the demo payslip.');
+        await this.pdfService.download(paper, filename);
       }
     } catch {
       this.loadError = 'Could not generate the demo payslip PDF.';
