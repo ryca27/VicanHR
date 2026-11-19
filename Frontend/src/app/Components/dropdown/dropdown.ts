@@ -1,5 +1,5 @@
 import { Component, Input, forwardRef  } from '@angular/core';
-import { ReactiveFormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
+import { ReactiveFormsModule, ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms'
 
 @Component({
   selector: 'app-dropdown',
@@ -19,14 +19,13 @@ export class DropdownComponent implements ControlValueAccessor {
   @Input() label: string = "";
   @Input() isRequired: boolean = false;
   
-  value: any = '';
-  disabled = false;
+  readonly selectControl = new FormControl('', { nonNullable: true });
   
   onChange: any = () => {};
   onTouched: any = () => {};
 
   writeValue(value: any): void {
-    this.value = value;
+    this.selectControl.setValue(value == null ? '' : String(value), { emitEvent: false });
   }
 
   registerOnChange(fn: any): void {
@@ -38,11 +37,11 @@ export class DropdownComponent implements ControlValueAccessor {
   }
 
   setDisabledState?(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    if (isDisabled) this.selectControl.disable({ emitEvent: false });
+    else this.selectControl.enable({ emitEvent: false });
   }
 
-  onChanged(event: any) {
-    this.value = event.target.value;
-    this.onChange(this.value);
+  onChanged(event: Event) {
+    this.onChange((event.target as HTMLSelectElement).value);
   }
 }

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VicanHR development summary</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f4f7fa; color: #172e43; font: 16px/1.55 system-ui, sans-serif; }
+    main { width: min(100% - 32px, 960px); margin: 32px auto; }
+    header, section { border-radius: 12px; padding: 20px 24px; }
+    header { color: white; background: #193850; }
+    header a { color: #d3eaff; }
+    section { background: white; border: 1px solid #dce5ed; margin-top: 16px; }
+    h1, h2 { margin: 0 0 8px; line-height: 1.2; }
+    p, ul, dl { margin: 8px 0; }
+    li + li, dd + dt { margin-top: 8px; }
+    a { color: #16598a; text-underline-offset: 3px; }
+    dt { font-weight: 600; overflow-wrap: anywhere; }
+    dd { margin: 0; }
+    code { overflow-wrap: anywhere; }
+    pre { overflow-x: auto; padding: 12px; background: #f4f7fa; border-radius: 6px; }
+    .changes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+    nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    nav a { padding: 8px 16px; border: 1px solid #dce5ed; border-radius: 8px 8px 0 0; background: white; text-decoration: none; }
+    main:not(:has(#troubleshooting:target)) nav a[href="#summary"],
+    main:has(#troubleshooting:target) nav a[href="#troubleshooting"] { background: #193850; color: white; }
+    #troubleshooting:not(:target), #troubleshooting:target ~ #summary { display: none; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>VicanHR development summary</h1>
+    <p>Local payroll and attendance workflow · November 19, 2026</p>
+    <p><a href="vicanhr-frontend-handoff.html">Frontend developer handoff</a></p>
+  </header>
+  <nav aria-label="Development summary">
+    <a href="#summary">Summary</a>
+    <a href="#troubleshooting">Troubleshooting</a>
+  </nav>
+  <section id="troubleshooting">
+    <h2>Troubleshooting local access</h2>
+    <p>Start from the VicanHR repository root. If the documentation server is down, open <code>vicanhr-update.html</code> directly in your browser and select Troubleshooting.</p>
+
+    <h3>1. The documentation page won’t open</h3>
+    <pre><code>python3 -m http.server 8765 --bind 127.0.0.1 --directory Frontend/.angular/local-docs</code></pre>
+    <p>Keep the terminal tab open. If you see <code>Address already in use</code>, try opening the pages first. The documentation server may already be running.</p>
+    <ul>
+      <li><a href="http://127.0.0.1:8765/vicanhr-update.html#troubleshooting">VicanHR update</a></li>
+      <li><a href="http://127.0.0.1:8765/vicanhr-frontend-handoff.html">Frontend developer handoff</a></li>
+    </ul>
+
+    <h3>2. The payroll page won’t open</h3>
+    <p>Start Angular in a separate terminal tab.</p>
+    <pre><code>cd Frontend
+npm start -- --host 127.0.0.1 --port 4200</code></pre>
+    <p>If Angular reports missing dependencies, run <code>npm ci</code> from <code>Frontend</code> and retry. Once the build finishes, open the <a href="http://127.0.0.1:4200/cutoff/demo">payroll cutoff demo</a>.</p>
+
+    <h3>3. Payroll opens but sign-in or data loading fails</h3>
+    <p>Check whether Django responds through Angular.</p>
+    <pre><code>curl -i http://127.0.0.1:4200/api/auth/csrf/</code></pre>
+    <p>If the request fails, return to the repository root, check Colima, and start it if it’s stopped. Then start the backend.</p>
+    <pre><code>colima status
+# Run the next command if Colima is stopped.
+colima start
+
+docker-compose -f Backend/compose.yaml up --build -d</code></pre>
+    <p>Retry the <code>curl</code> command. HTTP 200 confirms Angular can reach Django. If it still fails, check the backend logs.</p>
+    <pre><code>docker-compose -f Backend/compose.yaml logs --tail=80</code></pre>
+    <p>Use <code>127.0.0.1</code> consistently when signing in and opening payroll pages so your browser uses the same session cookies.</p>
+  </section>
+  <div id="summary">
+  <div class="changes">
+    <section>
+      <h2>Backend</h2>
+      <ul>
+        <li>Django and PostgreSQL run locally through Docker Compose.</li>
+        <li>Session login supports admin, finance, HR, and operations. Admin and finance can submit attendance and access payroll drafts.</li>
+        <li>Attendance uploads use the Excel Summary tab or structured JSON. Revisions update matching employees in the same detachment and cutoff.</li>
+        <li>The SMCO draft API calculates gross pay, deductions, and net pay from uploaded workbooks. See the payroll calculation status below for the sample results and remaining work.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Frontend</h2>
+      <ul>
+        <li>The login screen fits the browser viewport and connects to Django.</li>
+        <li>Upload a Summary CSV or a multi-tab Excel workbook. Successful uploads open the saved cutoff.</li>
+        <li>The cutoff displays names as Last name, First name. Preview applies filters to the table and KPI cards. Reset Filters sits next to Preview and returns all three dropdowns to Choose option while restoring all rows.</li>
+        <li>The demo cutoff has eight fictional employees, including five restored from earlier test data. Select finalized rows and choose Download Selected to save one PDF per checked employee using the updated payslip layout. Each filename includes the employee ID, name, and cutoff dates.</li>
+        <li>The Remarks column shows why a row needs attention. The panel below the table starts collapsed with the affected employee count. Expand it to review a scrollable list of reasons and next actions. Saved attendance flags missing regular hours, and the demo also shows a duplicate-name example.</li>
+      </ul>
+    </section>
+  </div>
+  <section>
+    <h2>Payroll calculation status</h2>
+    <ul>
+      <li><strong>Available now.</strong> Upload the SMCO payroll register and deductions workbook through the draft API. Django uses the register’s hours and rates to calculate gross pay, deductions, and net pay, then compares those amounts with the register. In the 16-row sample, gross pay and deductions matched. Two rows differed by ₱0.01 each in net pay.</li>
+      <li><strong>Attendance-to-payroll is pending.</strong> Uploading a DTR or attendance Summary saves employee hours for the cutoff screen. The proposed first phase will compare normalized names within a cutoff, with reviewer confirmation for duplicates or unresolved rows. The current draft API uses hours and rates from the separate payroll register.</li>
+      <li><strong>Frontend and production workflow.</strong> The draft review screen, production approval, and real payslips are pending. Finalize and Download Selected on the demo cutoff use sample data.</li>
+    </ul>
+  </section>
+  <section>
+    <h2>Local pages</h2>
+    <p>Open these links in a browser on the Mac running VicanHR. Angular serves the app and proxies Django on port 4200. The documentation server uses port 8765. Sign in through Angular to access saved attendance and payroll pages.</p>
+    <ul>
+      <li><a href="http://127.0.0.1:4200/login">Sign in</a></li>
+      <li><a href="http://127.0.0.1:4200/cutoff/demo">Demo payroll cutoff</a> (try Finalize, Undo Finalize, and Download Selected with sample data)</li>
+      <li><a href="http://127.0.0.1:4200/payroll">Payroll dashboard</a></li>
+      <li><a href="http://127.0.0.1:4200/cutoff/1">SMCO payroll cutoff</a></li>
+      <li><a href="http://127.0.0.1:4200/attendance/1">Saved SMCO attendance</a></li>
+      <li><a href="http://127.0.0.1:4200/attendance/upload/">Django attendance uploader</a></li>
+      <li><a href="http://127.0.0.1:4200/admin/">Django admin</a> (staff login)</li>
+    </ul>
+  </section>
+  <section>
+    <h2>API routes</h2>
+    <p>Django registers eight API routes with ten GET and POST operations. See <a href="Backend/config/urls.py">the main URL configuration</a> and <a href="Backend/todo/urls.py">the tasks URL configuration</a>.</p>
+    <p>Attendance and payroll drafts require an authorized session. Send the session cookie and CSRF token with authenticated POST requests.</p>
+    <dl>
+      <dt>GET <a href="http://127.0.0.1:4200/api/auth/csrf/"><code>/api/auth/csrf/</code></a></dt><dd>Get a CSRF token.</dd>
+      <dt>POST <code>/api/auth/login/</code></dt><dd>Sign in and start a Django session.</dd>
+      <dt>POST <code>/api/attendance/preview/</code></dt><dd>Preview Summary rows from a multipart upload in the <code>file</code> field.</dd>
+      <dt>GET <a href="http://127.0.0.1:4200/api/attendance/"><code>/api/attendance/</code></a></dt><dd>List saved attendance cutoffs.</dd>
+      <dt>POST <code>/api/attendance/</code></dt><dd>Submit attendance JSON to save or revise a cutoff.</dd>
+      <dt>GET <code>/api/attendance/&lt;cutoffId&gt;/</code></dt><dd>Retrieve a saved cutoff and its employee rows. <a href="http://127.0.0.1:4200/api/attendance/1/">Open the SMCO sample</a>.</dd>
+      <dt>POST <code>/api/payroll/drafts/</code></dt><dd>Calculate and save a payroll draft from multipart uploads in the <code>register</code> and <code>deductions</code> fields.</dd>
+      <dt>GET <code>/api/payroll/drafts/&lt;draftId&gt;/</code></dt><dd>Retrieve a saved payroll draft with totals, warnings, and per-employee issues. Each issue includes a reason and next action.</dd>
+      <dt>GET <a href="http://127.0.0.1:4200/api/tasks/"><code>/api/tasks/</code></a></dt><dd>List demo tasks.</dd>
+      <dt>POST <code>/api/tasks/</code></dt><dd>Create a demo task.</dd>
+    </dl>
+    <p>Run this command to query the demo tasks API while Django and Angular are running.</p>
+    <pre><code>curl -fsS -H 'Accept: application/json' http://127.0.0.1:4200/api/tasks/</code></pre>
+    <p>View the handlers for <a href="Backend/config/login.py">session authentication</a>, <a href="Backend/attendance/api.py">attendance</a>, <a href="Backend/attendance/payroll_api.py">payroll drafts</a>, and <a href="Backend/todo/views.py">demo tasks</a>.</p>
+    <p>GCP deployment is planned. <a href="Backend/README.md">Backend setup and API instructions</a></p>
+  </section>
+  </div>
+</main>
+</body>
+</html>

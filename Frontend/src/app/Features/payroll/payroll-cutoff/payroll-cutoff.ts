@@ -1,45 +1,51 @@
+import { ActivatedRoute } from '@angular/router';
+import { ChangeDetectorRef, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AttendancePost } from '../modals/upload/upload.models';
 import { Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
-import {detachmentList, statusList, payrollColumns, payrollCutoffEmployees} from './payroll-cutoff-constants';
+import {demoAttentionIssues, demoEmployees, statusList} from './payroll-cutoff-constants';
 import {FormControl, ReactiveFormsModule, Validators, FormArray, FormGroup, FormBuilder,} from '@angular/forms'
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 import { PdfService } from './../../../services/pdf-service'
 
 //Components Import
-import {TextboxComponent} from './../../../Components/textbox/textbox'
 import {DropdownComponent} from './../../../Components/dropdown/dropdown'
 import {ButtonComponent} from './../../../Components/button/button'
 import {CardComponent} from './../../../Components/card/card'
 import {TableComponent} from './../../../Components/table/table'
-import {CheckBoxOutputInterface, } from './../../../Components/table/./table-constants'
+import {CheckBoxOutputInterface} from './../../../Components/table/./table-constants'
 import {UploadModal} from './../modals/upload/upload';
 import {Payslip } from './../payslip/payslip.model'
-import { PayrollCutoffEmployee } from './payroll-cutoff.models'
 import {PayslipComponent} from './../payslip/payslip'
-import { employeeTablePreparation, employeeTableActionPreparation, payslipToGeneratePreparation } from './payroll-cutoff.mapper'
 
 
 @Component({
   selector: 'app-payroll-cutoff',
-  imports: [TextboxComponent, DropdownComponent, ButtonComponent, CardComponent, TableComponent, UploadModal, PayslipComponent, ReactiveFormsModule,],
+  imports: [DropdownComponent, ButtonComponent, CardComponent, TableComponent, UploadModal, PayslipComponent, ReactiveFormsModule],
   templateUrl: './payroll-cutoff.html',
   styleUrl: './payroll-cutoff.scss',
 })
 export class PayrollCutoff implements OnInit {
+  private route = inject(ActivatedRoute);
+  private changes = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
+  private requestVersion = 0;
+  loadError = '';
   private fb = inject(FormBuilder);
   
-  
-  detachmentOptions = detachmentList;
+  nameOptions: { value: string; label: string }[] = [];
+  detachmentOptions: { value: string; label: string }[] = [];
   statusOptions = statusList;
   employeeCount : number = 0;
-  grossPay: number = 0;
-  deductions: number = 0;
-  netPay: number = 0;
+  totalHoursDisplay = '—';
+  grossPayTotal = '—';
+  deductionsTotal = '—';
+  netPayTotal = '—';
+  mixedStatuses = false;
+
   mockData:any ={} ;
   tableRows!: Array<any>;
-  tableColumns: Array<string> = payrollColumns;
+  tableColumns!: Array<string>;
   tableRowsId: Array<string> = [];
-  tableActionsRows: Array<any> = [];
   filters!: Array<{key: string, value: string}>;
   filterFormGroup!: FormGroup;
   selectedRows!: Array<string>;
@@ -49,161 +55,152 @@ export class PayrollCutoff implements OnInit {
   isGeneratingPdf: boolean = false;
   startDate: string = '';
   endDate: string = '';
-  samplePayrollCutoffEmployeeList: Array<PayrollCutoffEmployee> = payrollCutoffEmployees;
-  downloading: boolean = false;
-  // selectedPayslip: Payslip = {
-  //   employeeId: 'EMP-001',
-  //   employeeName: 'Skippy Panda Palaman',
-  //   assignedPost: 'Catio Dowy',
-  //   detachment: 'Ligase',
-  //   cutoffStart: '2024-01-16',
-  //   cutoffEnd: '2024-01-31',
-  //   payDate: '2024-01-31',
-  
-  //   regularHours: 0,
-  //   overtimeHours: 0,
-  //   nightDifferentialHours: 0,
-  
-  //   earnings: [
-  //     { label: 'Regular Pay', amount: 4880 },
-  //     { label: 'Overtime Pay', amount: 3050 }
-  //   ],
-  
-  //   deductions: [
-  //     { label: 'SSS Contribution', amount: 225 },
-  //     { label: 'PhilHealth Contribution', amount: 97.60 },
-  //     { label: 'Pag-IBIG Contribution', amount: 100 },
-  //     { label: 'Cash Bond', amount: 350 }
-  //   ],
+  selectedPayslip?: Payslip;
+  demoMode = false;
+  private readonly attentionIssues = new Map<string, { reason: string; details: string; action: string }>();
 
-    
-  
-  //   grossPay: 7930,
-  //   totalDeductions: 772.60,
-  //   netPay: 7157.40
-  // };
-  payslipToGenerate: Payslip = payslipToGeneratePreparation(this.samplePayrollCutoffEmployeeList[0]);
+  get visibleAttentionIssues() {
+    return this.tableRowsId.flatMap((id, index) => {
+      const issue = this.attentionIssues.get(id);
+      return issue ? [{ id, employeeName: this.tableRows[index].fullName as string, ...issue }] : [];
+    });
+  }
+  private demoPayslips = new Map<string, Payslip>();
+  private readonly demoCutoffStart = '2026-09-01';
+  private readonly demoCutoffEnd = '2026-09-15';
+  private readonly demoPayrollPeriod = 'September 1–15, 2026';
+
+  private loadDemo() {
+    ++this.requestVersion;
+    this.demoMode = true;
+    this.loadError = '';
+    this.selectedRows = [];
+    this.mixedStatuses = false;
+    this.isDownloadDisabled = this.isFinalizeDisabled = true;
+    this.demoPayslips.clear();
+    this.attentionIssues.clear();
+    this.mockData.tableRows = demoEmployees.map(({ name: employeeName, detachment, status }, index) => {
+      const employeeId = `DEMO-${String(index + 1).padStart(3, '0')}`;
+      const issue = demoAttentionIssues[employeeName];
+      if (issue) this.attentionIssues.set(employeeId, issue);
+      const regularHours = 72 + index * 4;
+      const overtimeHours = 4 + index * 2;
+      const regularPay = regularHours * 100;
+      const overtimePay = overtimeHours * 125;
+      const grossPay = regularPay + overtimePay;
+      const totalDeductions = 225 + 100 + 100;
+      const netPay = grossPay - totalDeductions;
+      this.demoPayslips.set(employeeId, {
+        employeeId, employeeName, assignedPost: 'Demo post', detachment,
+        payrollPeriod: this.demoPayrollPeriod, payDate: '2026-09-18',
+        earning: {
+          regularPay: { label: 'Regular Pay', hours: regularHours, rate: 100, pay: regularPay },
+          otPay: { label: 'Overtime Pay', hours: overtimeHours, rate: 125, pay: overtimePay },
+          allowance: { label: 'Allowance' },
+          lHOTPay: { label: 'Legal Holiday Overtime' },
+          sHOTPay: { label: 'Special Holiday Overtime' },
+          ndPay: { label: 'Night Differential', hours: 0 },
+          uniformAllowance: { label: 'Uniform Allowance' },
+          wDOPay: { label: 'Worked Day Off' },
+          sSSLoanRefund: { label: 'SSS Loan Refund' },
+          cBRRefund: { label: 'Cash Bond Refund' },
+          sSSContRefund: { label: 'SSS Contribution Refund' },
+        },
+        deduction: {
+          sSSEyee: { label: 'SSS Contribution', amount: 225 },
+          philHealthEyee: { label: 'PhilHealth Contribution', amount: 100 },
+          pagibigContribution: { label: 'Pag-IBIG Contribution', amount: 100 },
+        },
+        grossPay, totalDeductions, netPay,
+      });
+      return {
+        id: employeeId, fullName: employeeName, detachment, regularHours, regularOvertime: overtimeHours,
+        nightDifferentialHours: 0, btrHours: 0, wdoHours: 0, totalHours: regularHours + overtimeHours, grossPay,
+        sss: 225, pagibig: 100, philHealth: 100, expenseA: 0, expenseB: 0, totalDeduction: totalDeductions,
+        netPay, payrollCutoff: this.demoPayrollPeriod,
+        remarks: issue?.reason
+          ?? `Demo · ${this.statusOptions.find(option => Number(option.value) === status)?.label}`,
+        status, actions: [],
+      };
+    });
+    this.filterFormGroup.reset();
+    this.initializeTableRows();
+  }
 
   //services
   private pdfService = inject(PdfService);
   //ref elements
-  @ViewChild(PayslipComponent)
-  payslipComponent?: PayslipComponent;
+  @ViewChild('payslipContent')
+  payslipContent!: ElementRef<HTMLElement>;
 
   ngOnInit(){
-
+    
     this.mockData = {
-      tableColumns: ['Full Name', 'Detachment', 'Regular Hours', 'Regular Overtime', 'Regular ND Hours', 'Overtime ND Hours', 
+      tableColumns: ['Full Name', 'Detachment', 'Regular Hours', 'Regular Overtime', 'Night Diff. Hours', 'Breaktime Hours', 'WDO Hours',
       'Total Hours','Gross Pay', 'SSS','PAGIBIG', 'PhilHealth', 'Expense A', 'Expense B', 'Total Deduction', 'Net Pay', 'Payroll Cutoff', 'Remarks', 'Status', 'Actions'],
-      tableRows:[
-        {
-          fullName:'Ryan Tabernilla',
-          id:'0001',
-          detachment: 'Megabold',
-          regularHours: '40',
-          regularOvertime:'10',
-          regularNDHours:'0',
-          overtimeNDHours:'6',
-          totalHours:'56',
-          grossPay:'10000',
-          sss:'100',
-          pagibig:'100',
-          philHealth:'100',
-          expenseA:'200',
-          expenseB:'500',
-          totalDeduction:'1000',
-          netPay:'90000',
-          payrollCutoff:'January 1-15 2026',
-          remarks:'Payroll Ready',
-          status:1,
-          actions:[1,2,3],
-        },
-        {
-          fullName:'Lea Ganda',
-          id:'0002',
-          detachment: 'Bold of Asia',
-          regularHours: '0',
-          regularOvertime:'2',
-          regularNDHours:'10',
-          overtimeNDHours:'6',
-          totalHours:'56',
-          grossPay:'10000',
-          sss:'100',
-          pagibig:'100',
-          philHealth:'100',
-          expenseA:'200',
-          expenseB:'500',
-          totalDeduction:'1000',
-          netPay:'90000',
-          payrollCutoff:'January 1-15 2026',
-          remarks:'For Approval',
-          status:2,
-          actions:[1,2,3],
-        },
-        {
-          fullName:'Ryan Kukulit',
-          id:'0003',
-          detachment: 'Megabold',
-          regularHours: '40',
-          regularOvertime:'10',
-          regularNDHours:'0',
-          overtimeNDHours:'6',
-          totalHours:'56',
-          grossPay:'10000',
-          sss:'100',
-          pagibig:'100',
-          philHealth:'100',
-          expenseA:'200',
-          expenseB:'500',
-          totalDeduction:'1000',
-          netPay:'90000',
-          payrollCutoff:'January 1-15 2026',
-          remarks:'Needs Attention',
-          status:3,
-          actions:[1,2,3],
-        },
-        {
-          fullName:'Lea Babaet',
-          id:'0004',
-          detachment: 'Bold of Asia',
-          regularHours: '40',
-          regularOvertime:'10',
-          regularNDHours:'0',
-          overtimeNDHours:'6',
-          totalHours:'56',
-          grossPay:'10000',
-          sss:'100',
-          pagibig:'100',
-          philHealth:'100',
-          expenseA:'200',
-          expenseB:'500',
-          totalDeduction:'1000',
-          netPay:'90000',
-          payrollCutoff:'January 1-15 2026',
-          remarks:'Needs Attention',
-          status:'3',
-          actions:[1,2,3],
-        },
-      ],
-      tableActionRows:[
-        [{value: 1, isDisabled: true}, {value: 2, isDisabled: true}, {value: 3, isDisabled: false}],
-        [{value: 1, isDisabled: true}, {value: 2, isDisabled: false}, {value: 3, isDisabled: false}],
-        [{value: 1, isDisabled: true}, {value: 2, isDisabled: false}, {value: 3, isDisabled: false}],
-        [{value: 1, isDisabled: false}, {value: 2, isDisabled: true}, {value: 3, isDisabled: false}],
-      ],
-    }
+      tableRows: [],
+      tableActionRows: [],
+    };
     this.initializeFormGroup();
     this.initializeTableRows();
-    this.initializeTableActionRows();
-    this.getGrossPay();
-    this.getDeductions();
-    this.getNumberOfEmployees();
-    this.getNetPay();
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      const id = params.get('id');
+      if (id === 'demo') this.loadDemo();
+      else if (id) void this.loadCutoff(id);
+    });
+  }
 
+  async loadCutoff(id: string) {
+    const version = ++this.requestVersion;
+    this.loadError = '';
+    this.demoMode = false;
+    this.demoPayslips.clear();
+    this.attentionIssues.clear();
+    this.mockData.tableRows = [];
+    this.filterFormGroup.reset();
+    this.employeeCount = 0;
+    this.totalHoursDisplay = '—';
+    this.selectedRows = [];
+    this.mixedStatuses = false;
+    this.isFinalizeDisabled = this.isDownloadDisabled = true;
+    this.initializeTableRows();
+    try {
+      const response = await fetch(`/api/attendance/${encodeURIComponent(id)}/`);
+      if (!response.ok) throw new Error(response.status === 403
+        ? 'Sign in as admin or finance to view this cutoff.' : 'Could not load this attendance cutoff.');
+      const saved: AttendancePost = await response.json();
+      if (version !== this.requestVersion) return;
+      this.mockData.tableRows = saved.employees.map((row, index) => {
+        if (row.regularHours == null) {
+          this.attentionIssues.set(String(index), {
+            reason: 'Missing regular hours',
+            details: 'The saved attendance has no regular hours for this employee.',
+            action: 'Confirm the regular hours in the source DTR, update the Summary, and re-upload it.',
+          });
+        }
+        return {
+          id: String(index), fullName: this.formatEmployeeName(row.employeeName), detachment: row.detachment ?? saved.detachment,
+          regularHours: row.regularHours ?? '—', regularOvertime: row.overtimeHours ?? 0,
+          nightDifferentialHours: row.nightDifferentialHours ?? 0,
+          btrHours: row.btrHours ?? 0, wdoHours: row.wdoHours ?? 0,
+          totalHours: this.sumAttendanceHours(row), grossPay: '—',
+          sss: '—', pagibig: '—', philHealth: '—', expenseA: '—', expenseB: '—',
+          totalDeduction: '—', netPay: '—', payrollCutoff: saved.period,
+          remarks: row.regularHours == null ? 'Missing regular hours' : 'Attendance uploaded',
+          status: row.regularHours == null ? 3 : null, actions: [],
+        };
+      });
+      this.updateFilterOptions();
+      this.onPreview();
+    } catch (error) {
+      if (version === this.requestVersion) this.loadError = error instanceof Error ? error.message : 'Could not load attendance.';
+    } finally {
+      this.changes.markForCheck();
+    }
   }
 
   initializeFormGroup(): void{
-    this.filterFormGroup = this.fb.group({
+    this.filterFormGroup = this.fb.nonNullable.group({
       name: '',
       detachment: '',
       status: ''
@@ -211,59 +208,136 @@ export class PayrollCutoff implements OnInit {
   }
 
   initializeTableRows(): void{
-    this.tableRows = employeeTablePreparation(this.samplePayrollCutoffEmployeeList);
+    this.tableRowsId = [];
+    this.updateFilterOptions();
+    this.tableRows = structuredClone(this.mockData.tableRows);
+    this.updateKpis();
     this.tableRows.forEach(row => {
       this.tableRowsId.push(row.id)
       delete row.id
+      if (typeof row.totalHours === 'number') {
+        row.totalHours = row.totalHours.toLocaleString('en-PH', { maximumFractionDigits: 2 });
+      }
     })
   }
 
-  initializeTableActionRows(): void{
-    this.tableActionsRows = employeeTableActionPreparation(this.tableRows.length);
-  }
 
-  onPreview(): void {
-    // Use optional chaining and fallbacks to prevent crashes
-    const name = (this.filterFormGroup.value.name?.toLowerCase()) || '';
-    const detachment = (this.filterFormGroup.value.detachment?.toLowerCase()) || '';
-    const status = this.filterFormGroup.value.status ?? '';
-  
-    let tableRows = employeeTablePreparation(this.samplePayrollCutoffEmployeeList).filter((t: any) => {
-      const matchName = (t.fullName || '').toLowerCase().includes(name);
-      const matchDetachment = (t.detachment || '').toLowerCase().includes(detachment);
-      
-      // Fallback if status is an object or primitive
-      const statusString = typeof t.status === 'object' ? JSON.stringify(t.status) : String(t.status || '');
-      const matchStatus = statusString.includes(status);
-  
-      return matchName && matchDetachment && matchStatus;
-    });
-    this.tableRowsId = []
-    this.tableRows = structuredClone(tableRows)
-    this.tableRows.forEach(row => {
-      this.tableRowsId.push(row.id)
-      delete row.id
-    })
-  }
-
-  onFinalize(): void {
-    let finalizeRow = [];
-    this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id)).map((row:any)=> {
-      row.status = 1;
-      row.remarks = 'Payroll Ready'
-    });
+  resetFilters(): void {
+    this.filterFormGroup.reset();
     this.onPreview();
   }
 
-  onDownload(): void{
-    let downloadRow: any[] = [];
-    downloadRow = this.samplePayrollCutoffEmployeeList.filter((row:any) => this.selectedRows.includes(row.employeeNo));
-    downloadRow.forEach(d => {
-      this.payslipToGenerate = payslipToGeneratePreparation(d)
-      this.downloadPayslip();
+  onPreview(): void {
+    const { name, detachment, status } = this.filterFormGroup.value;
+    const tableRows = this.mockData.tableRows.filter((row: any) =>
+      (!name || row.fullName === name) &&
+      (!detachment || row.detachment === detachment) &&
+      (!status || String(row.status) === status)
+    );
+    this.tableRowsId = []
+    this.checkBoxOutputListener([]);
+    this.tableRows = structuredClone(tableRows)
+    this.updateKpis();
+    this.tableRows.forEach(row => {
+      this.tableRowsId.push(row.id)
+      delete row.id
+      if (typeof row.totalHours === 'number') {
+        row.totalHours = row.totalHours.toLocaleString('en-PH', { maximumFractionDigits: 2 });
+      }
     })
-    
-    
+  }
+
+  private sumAttendanceHours(row: AttendancePost['employees'][number]): number {
+    return (row.regularHours ?? 0) + (row.overtimeHours ?? 0)
+      + (row.nightDifferentialHours ?? 0) + (row.wdoHours ?? 0);
+  }
+
+  private formatEmployeeName(name: string): string {
+    const trimmed = name.trim().replace(/\s+/g, ' ');
+    if (trimmed.includes(',')) return trimmed.replace(/\s*,\s*/g, ', ');
+    const parts = trimmed.split(' ');
+    if (parts.length < 2) return trimmed;
+    const surname = parts.pop();
+    return `${surname}, ${parts.join(' ')}`;
+  }
+
+  private updateFilterOptions(): void {
+    const optionsFor = (field: 'fullName' | 'detachment') => {
+      const values = new Set<string>(this.mockData.tableRows.map((row: Record<typeof field, string>) => row[field]));
+      values.delete('');
+      return [...values].sort((a, b) => a.localeCompare(b)).map(value => ({ value, label: value }));
+    };
+    this.nameOptions = optionsFor('fullName');
+    this.detachmentOptions = optionsFor('detachment');
+  }
+
+  private updateKpis(): void {
+    this.employeeCount = this.tableRows.length;
+    const sum = (field: string, currency = false) => {
+      const values = this.tableRows.map(row => row[field]);
+      if (!values.length || values.some(value => typeof value !== 'number')) return '—';
+      return values.reduce((total, value) => total + value, 0).toLocaleString('en-PH',
+        currency ? { style: 'currency', currency: 'PHP' } : { maximumFractionDigits: 2 });
+    };
+    this.totalHoursDisplay = sum('totalHours');
+    this.grossPayTotal = sum('grossPay', true);
+    this.deductionsTotal = sum('totalDeduction', true);
+    this.netPayTotal = sum('netPay', true);
+  }
+
+  onToggleFinalize(): void {
+    if (!this.demoMode || this.isGeneratingPdf) return;
+    if (!this.isFinalizeDisabled) {
+      this.updateDemoStatus(1);
+    } else if (!this.isDownloadDisabled) {
+      this.updateDemoStatus(2);
+    }
+  }
+
+  private updateDemoStatus(status: 1 | 2): void {
+    for (const row of this.mockData.tableRows) {
+      if (this.selectedRows.includes(row.id)) {
+        row.status = status;
+        row.remarks = status === 1 ? 'Demo · Payroll Ready' : 'Demo · For Approval';
+      }
+    }
+    this.selectedRows = [];
+    this.mixedStatuses = false;
+    this.finalizeChecker();
+    this.downloadChecker();
+    this.onPreview();
+  }
+
+  async onDownload(): Promise<void> {
+    if (!this.demoMode || this.isGeneratingPdf || this.isDownloadDisabled) return;
+    const payslips = this.mockData.tableRows
+      .filter((row: { id: string; status: number }) =>
+        row.status === 1 && this.selectedRows.includes(row.id))
+      .map((row: { id: string }) => this.demoPayslips.get(row.id)!) as Payslip[];
+    this.isGeneratingPdf = true;
+    this.loadError = '';
+    try {
+      for (const payslip of payslips) {
+        this.selectedPayslip = payslip;
+        this.changes.detectChanges();
+        const name = payslip.employeeName.replace(/[^\p{L}\p{N}]+/gu, '_');
+        const cutoff = `${this.demoCutoffStart}_to_${this.demoCutoffEnd}`;
+        const filename = `Demo_Payslip_${payslip.employeeId}_${name}_${cutoff}.pdf`;
+        const paper = this.payslipContent.nativeElement.querySelector<HTMLElement>('.payslip-paper');
+        if (!paper) throw new Error('Could not render the demo payslip.');
+        await this.pdfService.download(paper, filename);
+      }
+    } catch {
+      this.loadError = 'Could not generate the demo payslip PDF.';
+    } finally {
+      this.selectedPayslip = undefined;
+      this.isGeneratingPdf = false;
+      this.changes.markForCheck();
+    }
+  }
+
+  refreshCurrentCutoff(id: number) {
+    if (String(id) === this.route.snapshot.paramMap.get("id")) void this.loadCutoff(String(id));
   }
 
   onUpload(): void {
@@ -273,11 +347,14 @@ export class PayrollCutoff implements OnInit {
   //Table Output Listener
   checkBoxOutputListener(message: string[]): void {
     this.selectedRows = message;
+    this.mixedStatuses = this.demoMode && new Set(this.mockData.tableRows
+      .filter((row: { id: string }) => message.includes(row.id))
+      .map((row: { status: number }) => row.status)).size > 1;
     this.finalizeChecker();
     this.downloadChecker();
   }
 
-  //Upload Component Listener
+  //Upload Component Listenere
   closeUloadModalListener(message: boolean): void {
     this.isUploadModalVisible = false;
   };
@@ -287,122 +364,7 @@ export class PayrollCutoff implements OnInit {
   }
 
   downloadChecker(): void{
-    this.isDownloadDisabled = this.samplePayrollCutoffEmployeeList.filter((row:any) => this.selectedRows.includes(row.employeeNo) && row.status==1).length != this.selectedRows.length || this.selectedRows.length == 0;
+    this.isDownloadDisabled = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id) && row.status==1).length != this.selectedRows.length || this.selectedRows.length == 0;
   }
-
-  //Card Functions:
-
-  getGrossPay(): void{
-    this.grossPay = 0;
-    this.tableRows.map(r => {
-      this.grossPay+= r.grossPay;
-    })
-  }
-
-  getNumberOfEmployees(): void{
-    this.employeeCount = this.tableRows.length
-  }
-
-  getDeductions(): void {
-    this.deductions = 0;
-    this.tableRows.map(r => {
-      this.deductions += r.totalDeductions;
-    })
-  }
-
-  getNetPay(): void {
-    this.netPay = this.grossPay - this.netPay;
-  }
-
-  //async service functions
-
-  
-// async downloadPayslip(): Promise<void> {
-//   const element = this.payslipComponent?.nativeElement;
-
-//   if (!element) {
-//     console.error('Payslip element not found.');
-//     return;
-//   }
-
-//   if (this.downloading) {
-//     return;
-//   }
-
-//   this.downloading = true;
-
-//   try {
-//     // Allow web fonts to finish loading.
-//     await document.fonts.ready;
-
-//     // Confirm the content fits within the page.
-//     if (element.scrollHeight > element.clientHeight + 1) {
-//       throw new Error(
-//         'Payslip content exceeds one A4 page. ' +
-//         'Reduce spacing or use multiple pages.'
-//       );
-//     }
-
-//     const canvas = await html2canvas(element, {
-//       scale: 2,
-//       useCORS: true,
-//       backgroundColor: '#ffffff',
-//       width: 794,
-//       height: 1123,
-//       windowWidth: 794,
-//       scrollX: 0,
-//       scrollY: 0,
-//       onclone: (clonedDocument) => {
-//         const clonedElement =
-//           clonedDocument.querySelector(
-//             '.payslip-paper'
-//           ) as HTMLElement | null;
-
-//         if (clonedElement) {
-//           clonedElement.style.backgroundColor = '#ffffff';
-//           clonedElement.style.boxShadow = 'none';
-//           clonedElement.style.margin = '0';
-//           clonedElement.style.transform = 'none';
-//         }
-//       }
-//     });
-
-//     const imageData = canvas.toDataURL('image/png');
-
-//     const pdf = new jsPDF({
-//       orientation: 'portrait',
-//       unit: 'mm',
-//       format: 'a4',
-//       compress: true
-//     });
-
-//     const pageWidth = pdf.internal.pageSize.getWidth();
-//     const pageHeight = pdf.internal.pageSize.getHeight();
-
-//     // Fill exactly one A4 page.
-//     pdf.addImage(
-//       imageData,
-//       'PNG',
-//       0,
-//       0,
-//       pageWidth,
-//       pageHeight
-//     );
-
-//     const filename =
-//       `Payslip_${this.payslipToGenerate.employeeId}_` +
-//       `${this.payslipToGenerate.payrollPeriod}.pdf`;
-
-//     pdf.save(filename);
-
-//   } catch (error) {
-//     console.error('Payslip generation failed:', error);
-//   } finally {
-//     this.downloading = false;
-//   }
-// }
-async downloadPayslip(): Promise<void> {
-  await this.payslipComponent?.downloadPayslip();
-}
 
 }

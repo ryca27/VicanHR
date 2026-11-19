@@ -45,3 +45,35 @@
     background-color: #fff; /* Matches form background to look clean */
     padding: 0 4px;
   }
+ 
+:host(.cutoff-filter) {
+  display: block;
+
+  .select-wrapper {
+    min-width: 0;
+    width: 100%;
+    height: auto;
+    margin: 0;
+
+    select {
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 0;
+      height: 48px;
+      padding: 18px 12px 4px;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    label {
+      top: 11px;
+      left: 12px;
+      padding: 0;
+      font: 600 10px Helvetica, Arial, sans-serif;
+      color: #435774;
+      background: transparent;
+    }
+  }
+}

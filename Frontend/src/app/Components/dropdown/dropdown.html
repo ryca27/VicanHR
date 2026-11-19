@@ -1,5 +1,5 @@
 <div class="select-wrapper">
-    <select [value]="value" (change)="onChanged($event)" (blur)="onTouched()" [disabled]="disabled">
+    <select [formControl]="selectControl" (change)="onChanged($event)" (blur)="onTouched()" [attr.aria-label]="label">
         <option value="" disabled>Choose option</option>
         @for (option of options; track option.value) {
           <option [value]="option.value">{{ option.label }}</option>

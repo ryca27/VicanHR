@@ -7,8 +7,6 @@ import {
 } from '@angular/core';
 
 import { DatePipe, DecimalPipe } from '@angular/common';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 
 import type {
   Payslip,
@@ -202,6 +200,10 @@ export class PayslipComponent {
       }
 
       // CAPTURE PAYSLIP HTML
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ]);
       const canvas = await html2canvas(element, {
         scale: 2,
         backgroundColor: '#ffffff',

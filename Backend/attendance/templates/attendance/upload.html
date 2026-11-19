@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Import attendance</title>
+<main><h1>Import attendance summary</h1>
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+<label>Summary workbook <input type="file" name="file" accept=".xlsx" required></label>
+<button>Save attendance</button></form>
+{% if error %}<p role="alert">{{ error }}</p>{% endif %}
+{% if summary %}<p>{{ action }}. {{ count }} employee rows on file for {{ summary.branch }}, {{ summary.period }}.</p>{% endif %}
+</main></html>

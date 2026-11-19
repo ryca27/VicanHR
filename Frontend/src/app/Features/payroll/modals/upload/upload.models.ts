@@ -63,3 +63,9 @@ export interface AttendanceUpload {
     expense: AttendanceParseResult[];
     allowance: AttendanceParseResult[];
   }
+
+export interface AttendancePost {
+  period: string;
+  detachment: string;
+  employees: (AttendanceRecord & { detachment: string | null })[];
+}

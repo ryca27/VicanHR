@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Attendance sign in</title>
+<main><h1>Sign in to attendance</h1>
+<form method="post">{% csrf_token %}
+{{ form.as_p }}
+<input type="hidden" name="next" value="{{ next }}">
+<button type="submit">Sign in</button>
+</form></main></html>
