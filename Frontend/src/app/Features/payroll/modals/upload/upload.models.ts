@@ -30,6 +30,7 @@ export interface AttendanceUpload {
   export interface AttendanceRecord {
     employeeNo?: string | null;
     employeeName: string;
+    detachment: string | null;
     regularHours: number | null;
     overtimeHours: number | null;
     nightDifferentialHours: number | null;

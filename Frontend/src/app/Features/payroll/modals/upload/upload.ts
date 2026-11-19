@@ -156,14 +156,14 @@ export class UploadModal implements OnInit {
         this.isDisabledUpload = true;
       }
     })
-    let validatedInput = this.uploadService.parseAttendace(this.uploadFileArray.controls[0].value.fileContent);
-    let dateRange = this.uploadService.dateRangeConverter(validatedInput.period? validatedInput.period : '');
-    if(dateRange[0].toString() == this.startDate && dateRange[1].toString() == this.endDate && validatedInput.employees.length > 0){
-      // this.isDisabledUpload = false
-    }
-    else{
+    // let validatedInput = this.uploadService.parseAttendace(this.uploadFileArray.controls[0].value.fileContent);
+    // let dateRange = this.uploadService.dateRangeConverter(validatedInput.period? validatedInput.period : '');
+    // if(dateRange[0].toString() == this.startDate && dateRange[1].toString() == this.endDate && validatedInput.employees.length > 0){
+    //   // this.isDisabledUpload = false
+    // }
+    // else{
 
-    }
+    // }
   }
 
   //Double date picker output listener

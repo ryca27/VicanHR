@@ -7,140 +7,7 @@ import * as Papa from 'papaparse';
 @Injectable({
   providedIn: 'root'
 })
-export class UploadService {
-
-    sample(csvText: string): {
-        payrollPeriod: string;
-        employees: AttendanceUpload[];
-        errors: string[];
-      } {
-    
-        // Step 1: Convert CSV string into rows
-        const result = Papa.parse<string[]>(csvText, {
-          delimiter: ',',
-          skipEmptyLines: false,
-          dynamicTyping: false
-        });
-    
-        if (result.errors.length > 0) {
-          throw new Error(
-            result.errors.map(e => e.message).join('; ')
-          );
-        }
-    
-        const rows = result.data;
-        const errors: string[] = [];
-    
-        // Step 2: Extract payroll period
-        const periodRow = rows.find(row =>
-          row.some(cell =>
-            cell.toLowerCase().includes('payroll period:')
-          )
-        );
-    
-        const labelIndex = periodRow?.findIndex(cell =>
-          cell.toLowerCase().includes('payroll period:')
-        ) ?? -1;
-    
-        const payrollPeriod =
-          periodRow && labelIndex >= 0
-            ? periodRow.slice(labelIndex + 1)
-                .find(cell => cell.trim() !== '')?.trim() ?? ''
-            : '';
-    
-        // Step 3: Convert payroll values into numbers
-        const parseNumber = (
-          value: string | undefined,
-          rowNumber: number,
-          field: string
-        ): number | null => {
-    
-          const text = (value ?? '').trim();
-    
-          // Blank or dash means no reported value
-          if (!text || /^[-–—]$/.test(text)) {
-            return null;
-          }
-    
-          // Detect Excel formula errors
-          if (text.startsWith('#')) {
-            errors.push(
-              `Row ${rowNumber}: ${field} contains ${text}`
-            );
-            return null;
-          }
-    
-          // Remove thousand separators and whitespace
-          const cleaned = text.replace(/[,\s₱]/g, '');
-          const number = Number(cleaned);
-    
-          if (!Number.isFinite(number)) {
-            errors.push(
-              `Row ${rowNumber}: Invalid ${field}: ${text}`
-            );
-            return null;
-          }
-    
-          return number;
-        };
-    
-        // Step 4: Extract employee records
-        const employees: AttendanceUpload[] = [];
-    
-        rows.forEach((row, index) => {
-    
-          const employeeNo = (row[1] ?? '').trim();
-          const employeeName = (row[2] ?? '').trim();
-    
-          // Skip titles, headers, detachment labels,
-          // blank rows and total rows.
-          if (!/^\d+$/.test(employeeNo) || !employeeName) {
-            return;
-          }
-    
-          const num = (column: number, field: string) =>
-            parseNumber(row[column], index + 1, field);
-    
-          employees.push({
-            detachment: (row[0] ?? '').trim(),
-            employeeNo,
-            employeeName,
-    
-            regularRate: num(3, 'Regular Rate'),
-            regularHours: num(4, 'Regular Hours'),
-            regularPay: num(5, 'Regular Pay'),
-    
-            overtimeHours: num(7, 'Overtime Hours'),
-            overtimePay: num(9, 'Overtime Pay'),
-    
-            grossPay: num(28, 'Gross Pay'),
-    
-            sssEmployee: num(31, 'SSS Employee'),
-            sssEmployer: num(32, 'SSS Employer'),
-    
-            philhealthEmployee: num(33, 'PhilHealth Employee'),
-            philhealthEmployer: num(34, 'PhilHealth Employer'),
-    
-            cashBond: num(37, 'Cash Bond'),
-            training: num(43, 'Training'),
-            pagibig: num(46, 'Pag-IBIG'),
-    
-            totalDeductions: num(56, 'Total Deductions'),
-            netPay: num(57, 'Net Pay'),
-    
-            // Preserve every original column
-            rawCells: row
-          });
-        });
-    
-        return {
-          payrollPeriod,
-          employees,
-          errors
-        };
-      }
-
-    
+export class UploadService {    
       parseAttendace(csvText: string): AttendanceParseResult {
 
         // Detect CSV or tab-separated input.
@@ -334,7 +201,7 @@ export class UploadService {
           employees.push({
             employeeNo,
             employeeName,
-    
+            detachment: branch,
             regularHours: hours(
               columns.regularHours, 'Regular Hours'
             ),
@@ -398,4 +265,5 @@ export class UploadService {
         let endDate = new Date(`${year}-${month}-${endDay}`)
         return [startDate, endDate];
       }
+
 }
