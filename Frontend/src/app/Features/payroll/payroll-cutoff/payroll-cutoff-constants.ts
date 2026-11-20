@@ -17,12 +17,14 @@ export const statusList = [
 export const demoEmployees = [
     { name: 'Santos, Alex', detachment: 'Demo Detachment', status: 1 },
     { name: 'Reyes, Jamie', detachment: 'Demo Detachment', status: 1 },
-    { name: 'Cruz, Morgan', detachment: 'Demo Detachment', status: 2 },
+    { name: 'Cruz, Morgan', detachment: 'Demo Detachment', status: 1 },
     { name: 'Tabernilla, Ryan', detachment: 'SM Megamall', status: 1 },
     { name: 'Viernes, Lea', detachment: 'Mall of Asia', status: 2 },
     { name: 'Escobar, Pablo', detachment: 'SM Megamall', status: 3 },
     { name: 'Lopez, Rusty', detachment: 'Mall of Asia', status: 3 },
     { name: 'Raymundo, Carlo', detachment: 'Mall of Asia', status: 2 },
+    { name: 'Piattos, Mary Grace', detachment: 'Mall of Asia', status: 2 },
+    { name: 'Son, Robin', detachment: 'Mall of Asia', status: 2 },
 ];
 
 export const demoAttentionIssues: Record<string, { reason: string; details: string; action: string }> = {
@@ -60,8 +62,8 @@ export const deductionSourceKeys: (keyof payrolCutoffDeduction)[] = ['sSSEyee', 
 export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
     {
       employeeNo: '1',
-      employeeName: 'ABOGADO, MARY GRACE',
-      detachment: 'SMCO Nova',
+      employeeName: 'Santos, Alex',
+      detachment: 'Demo Detachment',
       incomeSource: {
         regularHours: 96,
         regularPay: 8340,
@@ -113,8 +115,8 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
     },
     {
       employeeNo: '2',
-      employeeName: 'AFRICA, ROMMEL',
-      detachment: 'SMCO Nova',
+      employeeName: 'Reyes, Jamie',
+      detachment: 'Demo Detachment',
       incomeSource: {
         regularHours: 111.77,
         regularPay: 9710.02,
@@ -166,8 +168,8 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
     },
     {
       employeeNo: '3',
-      employeeName: 'ANTONIO, ROWEL MARK',
-      detachment: 'SMCO Nova',
+      employeeName: 'Cruz, Morgan',
+      detachment: 'Demo Detachment',
       incomeSource: {
         regularHours: 96,
         regularPay: 8340,
@@ -219,8 +221,8 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
     },
     {
       employeeNo: '4',
-      employeeName: 'CAÑOZA, MARVIN',
-      detachment: 'SMCO Nova',
+      employeeName: 'Tabernilla, Ryan',
+      detachment: 'SM Megamall',
       incomeSource: {
         regularHours: 104,
         regularPay: 9035,
@@ -273,8 +275,8 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
     },
     {
       employeeNo: '5',
-      employeeName: 'CADUCIO, RAMIL',
-      detachment: 'SMCO Nova',
+      employeeName: 'Raymundo, Carlo',
+      detachment: 'Mall of Asia',
       incomeSource: {
         regularHours: 102.75,
         regularPay: 8926.41,
@@ -320,14 +322,14 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      status: 1,
+      status: 2,
       actions: [1,2,3],
       isFinalized: true
     },
     {
       employeeNo: '6',
-      employeeName: 'CARANTO, CEDRICK MIGUEL',
-      detachment: 'SMCO Nova',
+      employeeName: 'Viernes, Lea',
+      detachment: 'Mall of Asia',
       incomeSource: {
         regularHours: 103.92,
         regularPay: 9028.05,
@@ -374,14 +376,14 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      status: 1,
+      status: 2,
       actions: [1,2,3],
       isFinalized: true
     },
     {
       employeeNo: '7',
-      employeeName: 'CERILO, JHOMMAR',
-      detachment: 'SMCO Nova',
+      employeeName: 'Escobar, Pablo',
+      detachment: 'SM Megamall',
       incomeSource: {
         regularHours: 103.28,
         regularPay: 8972.45,
@@ -427,14 +429,14 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      status: 1,
+      status: 3,
       actions: [1,2,3],
       isFinalized: true
     },
     {
       employeeNo: '8',
-      employeeName: 'DELA CRUZ, REYNALYN',
-      detachment: 'SMCO Nova',
+      employeeName: 'Lopez, Rusty',
+      detachment: 'Mall of Asia',
       incomeSource: {
         regularHours: 119.82,
         regularPay: 10409.36,
@@ -480,14 +482,14 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      status: 1,
+      status: 3,
       actions: [1,2,3],
       isFinalized: true
     },
     {
       employeeNo: '9',
-      employeeName: 'FUENTEBELLA, PSYCHE',
-      detachment: 'SMCO Nova',
+      employeeName: 'Piattos, Mary Grace',
+      detachment: 'Mall of Asia',
       incomeSource: {
         regularHours: 103.47,
         regularPay: 8988.96,
@@ -533,14 +535,14 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      status: 1,
+      status: 2,
       actions: [1,2,3],
       isFinalized: true
     },
     {
       employeeNo: '10',
-      employeeName: 'GABRONINO, RANIE',
-      detachment: 'SMCO Nova',
+      employeeName: 'Son, Robin',
+      detachment: 'Mall of Asia',
       incomeSource: {
         regularHours: 111.90,
         regularPay: 9721.31,
@@ -586,8 +588,28 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      status: 1,
+      status: 2,
       actions: [1,2,3],
       isFinalized: true
     }
-  ];
+  ].map((employee): PayrollCutoffEmployee => {
+
+    // Sum all deduction values
+    const totalDeductions = Object.values(
+      employee.deductionSource
+    ).reduce(
+      (sum: number, amount) => sum + (amount ?? 0),
+      0
+    );
+  
+    // Calculate net pay
+    const netPay = employee.grossPay - totalDeductions;
+  
+    return {
+      ...employee,
+  
+      totalDeductions: Math.round(totalDeductions * 100) / 100,
+  
+      netPay: Math.round(netPay * 100) / 100
+    };
+  });
