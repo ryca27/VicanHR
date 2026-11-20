@@ -28,7 +28,7 @@
   
   /* LOGIN CARD */
   .login-card {
-    width: min(100%, 755px);
+    width: min(100%, 455px);
     padding: clamp(20px, 4dvh, 38px) clamp(18px, 9vw, 70px) clamp(20px, 5dvh, 48px);
   
     background: #fff;
@@ -72,7 +72,7 @@
   }
   
   .card-heading h1 {
-    font-size: clamp(28px, min(7vw, 7dvh), 60px);
+    font-size: clamp(28px, min(7vw, 7dvh), 40px);
     line-height: 1.12;
     letter-spacing: -1.7px;
     font-weight: 750;
@@ -83,7 +83,7 @@
   .card-heading p {
     margin: 0;
     color: #5b6c87;
-    font-size: clamp(16px, min(4vw, 3.5dvh), 29px);
+    font-size: clamp(16px, min(4vw, 3.5dvh), 10px);
     line-height: 1.35;
   }
   
@@ -146,7 +146,7 @@
     outline: 0;
   
     font: inherit;
-    font-size: 23px;
+    font-size: 12px;
     color: #0b254b;
   
     background: transparent;
@@ -202,7 +202,7 @@
     align-items: center;
     gap: 10px;
   
-    font-size: 19px;
+    font-size: 12px;
     color: #435470;
     cursor: pointer;
   }
@@ -220,7 +220,7 @@
     background: none;
   
     color: #0648c6;
-    font-size: 19px;
+    font-size: 12px;
     text-decoration: underline;
     cursor: pointer;
   }
@@ -239,7 +239,7 @@
   /* LOGIN BUTTON */
   .login-button {
     width: 100%;
-    min-height: clamp(48px, 8dvh, 73px);
+    min-height: clamp(48px, 8dvh, 23px);
     margin-top: 2px;
   
     border: 0;
@@ -250,7 +250,7 @@
   
     color: white;
     font: inherit;
-    font-size: 28px;
+    font-size: 18px;
     font-weight: 700;
   
     cursor: pointer;
