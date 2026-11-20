@@ -115,9 +115,9 @@
         @if (loadError) { <p class="cutoff-error" role="alert">{{ loadError }}</p> }
         <app-table class="cutoff-register"
         [includeCheckBox]="true"
-        [columnsInput]="mockData.tableColumns"
+        [columnsInput]="tableColumns"
         [rowsInput]="tableRows"
-        [actionRowsInput]="mockData.tableActionRows"
+        [actionRowsInput]="tableActions"
         [rowsIdInput]="tableRowsId"
         (checkBoxOutput)="checkBoxOutputListener($event)"></app-table>
         @let issues = visibleAttentionIssues;

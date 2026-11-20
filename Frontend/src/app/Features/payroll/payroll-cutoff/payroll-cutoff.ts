@@ -3,7 +3,8 @@ import { ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AttendancePost } from '../modals/upload/upload.models';
 import { Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
-import {demoAttentionIssues, demoEmployees, statusList} from './payroll-cutoff-constants';
+import {demoAttentionIssues, demoEmployees, statusList, payrollColumns, payrollCutoffEmployees} from './payroll-cutoff-constants';
+import {employeeTableActionPreparation, employeeTablePreparation} from './payroll-cutoff.mapper'
 import {FormControl, ReactiveFormsModule, Validators, FormArray, FormGroup, FormBuilder,} from '@angular/forms'
 import { PdfService } from './../../../services/pdf-service'
 
@@ -44,8 +45,9 @@ export class PayrollCutoff implements OnInit {
 
   mockData:any ={} ;
   tableRows!: Array<any>;
-  tableColumns!: Array<string>;
+  tableColumns: Array<string> = payrollColumns;
   tableRowsId: Array<string> = [];
+  tableActions: Array<any> = [];
   filters!: Array<{key: string, value: string}>;
   filterFormGroup!: FormGroup;
   selectedRows!: Array<string>;
@@ -56,7 +58,7 @@ export class PayrollCutoff implements OnInit {
   startDate: string = '';
   endDate: string = '';
   selectedPayslip?: Payslip;
-  demoMode = false;
+  demoMode: boolean = false;
   private readonly attentionIssues = new Map<string, { reason: string; details: string; action: string }>();
 
   get visibleAttentionIssues() {
@@ -79,6 +81,7 @@ export class PayrollCutoff implements OnInit {
     this.isDownloadDisabled = this.isFinalizeDisabled = true;
     this.demoPayslips.clear();
     this.attentionIssues.clear();
+    this.tableRows = employeeTablePreparation(payrollCutoffEmployees);
     this.mockData.tableRows = demoEmployees.map(({ name: employeeName, detachment, status }, index) => {
       const employeeId = `DEMO-${String(index + 1).padStart(3, '0')}`;
       const issue = demoAttentionIssues[employeeName];
@@ -210,7 +213,7 @@ export class PayrollCutoff implements OnInit {
   initializeTableRows(): void{
     this.tableRowsId = [];
     this.updateFilterOptions();
-    this.tableRows = structuredClone(this.mockData.tableRows);
+    this.tableRows = structuredClone(employeeTablePreparation(payrollCutoffEmployees));
     this.updateKpis();
     this.tableRows.forEach(row => {
       this.tableRowsId.push(row.id)
@@ -219,6 +222,7 @@ export class PayrollCutoff implements OnInit {
         row.totalHours = row.totalHours.toLocaleString('en-PH', { maximumFractionDigits: 2 });
       }
     })
+    this.tableActions = employeeTableActionPreparation(this.tableRows.length)
   }
 
 
@@ -229,7 +233,7 @@ export class PayrollCutoff implements OnInit {
 
   onPreview(): void {
     const { name, detachment, status } = this.filterFormGroup.value;
-    const tableRows = this.mockData.tableRows.filter((row: any) =>
+    const tableRows = employeeTablePreparation(payrollCutoffEmployees).filter((row: any) =>
       (!name || row.fullName === name) &&
       (!detachment || row.detachment === detachment) &&
       (!status || String(row.status) === status)
@@ -279,9 +283,10 @@ export class PayrollCutoff implements OnInit {
       return values.reduce((total, value) => total + value, 0).toLocaleString('en-PH',
         currency ? { style: 'currency', currency: 'PHP' } : { maximumFractionDigits: 2 });
     };
-    this.totalHoursDisplay = sum('totalHours');
+    let x =  parseFloat(sum('regularHours')) + sum('oTHours');
+    this.totalHoursDisplay = (parseFloat(sum('regularHours')) + parseFloat(sum('oTHours')) + parseFloat(sum('lHOTHours')) + parseFloat(sum('sHOTHours'))).toString()
     this.grossPayTotal = sum('grossPay', true);
-    this.deductionsTotal = sum('totalDeduction', true);
+    this.deductionsTotal = sum('totalDeductions', true);
     this.netPayTotal = sum('netPay', true);
   }
 
@@ -360,11 +365,12 @@ export class PayrollCutoff implements OnInit {
   };
 
   finalizeChecker(): void{
-    this.isFinalizeDisabled = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id) && row.status==2).length != this.selectedRows.length || this.selectedRows.length == 0;
+    this.isFinalizeDisabled = payrollCutoffEmployees.filter((row:any) => this.selectedRows.includes(row.employeeNo) && row.status==2).length != this.selectedRows.length || this.selectedRows.length == 0;
   }
 
   downloadChecker(): void{
-    this.isDownloadDisabled = this.mockData.tableRows.filter((row:any) => this.selectedRows.includes(row.id) && row.status==1).length != this.selectedRows.length || this.selectedRows.length == 0;
+    debugger;
+    this.isDownloadDisabled = payrollCutoffEmployees.filter((row:any) => this.selectedRows.includes(row.employeeNo) && row.status==1).length != this.selectedRows.length || this.selectedRows.length == 0;
   }
 
 }
