@@ -14,19 +14,6 @@ export const statusList = [
     {'value':'3', 'label':'Needs Attention'},
 ]
 
-export const demoEmployees = [
-    { name: 'Santos, Alex', detachment: 'Demo Detachment', status: 1 },
-    { name: 'Reyes, Jamie', detachment: 'Demo Detachment', status: 1 },
-    { name: 'Cruz, Morgan', detachment: 'Demo Detachment', status: 1 },
-    { name: 'Tabernilla, Ryan', detachment: 'SM Megamall', status: 1 },
-    { name: 'Viernes, Lea', detachment: 'Mall of Asia', status: 2 },
-    { name: 'Escobar, Pablo', detachment: 'SM Megamall', status: 3 },
-    { name: 'Lopez, Rusty', detachment: 'Mall of Asia', status: 3 },
-    { name: 'Raymundo, Carlo', detachment: 'Mall of Asia', status: 2 },
-    { name: 'Piattos, Mary Grace', detachment: 'Mall of Asia', status: 2 },
-    { name: 'Son, Robin', detachment: 'Mall of Asia', status: 2 },
-];
-
 export const demoAttentionIssues: Record<string, { reason: string; details: string; action: string }> = {
     'Escobar, Pablo': {
         reason: 'Duplicate attendance name',
@@ -40,19 +27,23 @@ export const demoAttentionIssues: Record<string, { reason: string; details: stri
     },
 };
 
-export const payrollColumns = [
-    'Employee Name', 'Detachment', 'Regular Hours', 'Regular Pay', 'Allowance', 'OT Hours', 'OT Pay', 'LH OT Hours', 'LH OT Pay', 'SH OT Hours', 'SH OT Pay', 'ND Hours',
-    'ND Pay', 'Uniform Allowance', 'WDO Pay', 'SSS Loan Refund', 'CB Refund', 'SSS Cont. Refund', 'SSS EYEE', 'SSS EYER',
+export const payrollDeductionColumns = [
+    'SSS EYEE', 'SSS EYER',
     'PhilHealth EYEE', 'PhilHealth EYER', 'SSS Loan Salary', 'SSS Loan Calamity', 'Cash Bond', 'Benlife Insurance', 'Group Insurance', 'Uniform Paraphernalia',
     'Paraphernalia', 'Training', 'Additional PHIC Contribution', 'Additional SSS Contribution', 'Pagibig Contribution', 'SSS Condonation', 'Family Support', 'Training School',
-    'License', 'SOGCC-1 Credit Coop', 'SOGCC-2 Credit Coop',  'Gross Pay', 'Total Deductions', 'Net Pay', 'Status', 'Actions'
+    'License', 'SOGCC-1 Credit Coop', 'SOGCC-2 Credit Coop'
+];
+
+export const payrollColumns = [
+    'Employee Name', 'Detachment', 'Regular Hours', 'Regular Pay', 'Allowance', 'OT Hours', 'OT Pay', 'LH OT Hours', 'LH OT Pay', 'SH OT Hours', 'SH OT Pay', 'ND Hours',
+    'ND Pay', 'Uniform Allowance', 'WDO Pay', 'SSS Loan Refund', 'CB Refund', 'SSS Cont. Refund', ...payrollDeductionColumns,  'Gross Pay', 'Total Deductions', 'Net Pay', 'Status', 'Actions'
 ]
 
 export const incomeSourceKeys: (keyof payrollCutoffIncome)[] = ['regularHours', 'regularPay', 'allowance', 'oTHours', 'oTPay','lHOTHours', 'lHOTPay', 'sHOTHours', 'sHOTPay', 'nDHours',
 'nDPay', 'uniformAllowance', 'wDOPay', 'sSSLoanRefund', 'cBRefund', 'sSSContRefund'];
 
 export const deductionSourceKeys: (keyof payrolCutoffDeduction)[] = ['sSSEyee', 'sSSEyer', 'philHealthEyee', 'philHealthEyer', 'sSSLoanSalary',
-'sSSLoanCalamity', 'cashBond', 'benlifeInsurance', 'groupInsurance', 'uniformParaphernalia', 'paraphernalia', 'training', 'additionalPhicContribution', 'pagibigContribution',
+'sSSLoanCalamity', 'cashBond', 'benlifeInsurance', 'groupInsurance', 'uniformParaphernalia', 'paraphernalia', 'training', 'additionalPhicContribution', 'additionalSSSContribution', 'pagibigContribution',
 'sSSCondonation', 'familySupport', 'trainingSchool', 'license', 'sogcc1creditcoop', 'sogcc2creditcoop']
 
 
@@ -540,6 +531,27 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       isFinalized: true
     },
     {
+      employeeNo: 'DEMO-NEGATIVE',
+      employeeName: 'Bautista, Sam',
+      detachment: 'Demo Detachment',
+      incomeSource: {
+        ...Object.fromEntries(incomeSourceKeys.map(key => [key, 0])),
+        regularHours: 8,
+        regularPay: 695,
+      },
+      deductionSource: {
+        ...Object.fromEntries(deductionSourceKeys.map(key => [key, 0])),
+        cashBond: 950,
+      },
+      grossPay: 695,
+      totalDeductions: 0,
+      netPay: 0,
+      payrollPeriod: 'September 1-15, 2026',
+      status: 2,
+      actions: [1, 2, 3],
+      isFinalized: false,
+    },
+    {
       employeeNo: '10',
       employeeName: 'Son, Robin',
       detachment: 'Mall of Asia',
@@ -591,7 +603,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       status: 2,
       actions: [1,2,3],
       isFinalized: true
-    }
+    },
   ].map((employee): PayrollCutoffEmployee => {
 
     // Sum all deduction values

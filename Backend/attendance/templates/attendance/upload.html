@@ -2,8 +2,9 @@
 <html lang="en"><meta charset="utf-8"><title>Import attendance</title>
 <main><h1>Import attendance summary</h1>
 <form method="post" enctype="multipart/form-data">{% csrf_token %}
-<label>Summary workbook <input type="file" name="file" accept=".xlsx" required></label>
+<label>Summary CSV or Excel workbook <input type="file" name="file" accept=".xlsx,.csv" required></label>
 <button>Save attendance</button></form>
 {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+{% if warnings %}<ul aria-label="Import warnings">{% for warning in warnings %}<li>{{ warning }}</li>{% endfor %}</ul>{% endif %}
 {% if summary %}<p>{{ action }}. {{ count }} employee rows on file for {{ summary.branch }}, {{ summary.period }}.</p>{% endif %}
 </main></html>

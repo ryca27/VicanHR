@@ -16,9 +16,9 @@ def upload_summary(request):
     if request.method == "POST":
         try:
             if "file" not in request.FILES:
-                raise ValueError("Choose a summary workbook.")
-            cutoff, action = import_summary(request.FILES["file"])
-            context.update(summary=cutoff.latest_upload, action=action, count=len(cutoff.employees))
+                raise ValueError("Choose a Summary CSV or Excel workbook.")
+            cutoff, action, warnings = import_summary(request.FILES["file"])
+            context.update(summary=cutoff.latest_upload, action=action, count=len(cutoff.employees), warnings=warnings)
         except ValueError as exc:
             context["error"] = str(exc)
     return render(request, "attendance/upload.html", context, status=400 if "error" in context else 200)

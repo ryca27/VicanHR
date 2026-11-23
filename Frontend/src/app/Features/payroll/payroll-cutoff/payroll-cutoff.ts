@@ -1,10 +1,10 @@
 import { ActivatedRoute } from '@angular/router';
 import { ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AttendancePost } from '../modals/upload/upload.models';
+import { AttendanceAdjustmentSource, AttendanceHourField, AttendancePost, AttendanceRecord } from '../modals/upload/upload.models';
 import { Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
-import {demoAttentionIssues, demoEmployees, statusList, payrollColumns, payrollCutoffEmployees} from './payroll-cutoff-constants';
-import {employeeTableActionPreparation, employeeTablePreparation} from './payroll-cutoff.mapper'
+import {demoAttentionIssues, statusList, payrollColumns, payrollCutoffEmployees, payrollDeductionColumns, deductionSourceKeys} from './payroll-cutoff-constants';
+import {employeeTableActionPreparation, employeeTablePreparation, payslipToGeneratePreparation} from './payroll-cutoff.mapper'
 import {FormControl, ReactiveFormsModule, Validators, FormArray, FormGroup, FormBuilder,} from '@angular/forms'
 import { PdfService } from './../../../services/pdf-service'
 
@@ -37,7 +37,7 @@ export class PayrollCutoff implements OnInit {
   detachmentOptions: { value: string; label: string }[] = [];
   statusOptions = statusList;
   employeeCount : number = 0;
-  totalHoursDisplay = '—';
+  hourTotals: { label: string; value: string; base: string | null; adjustment: string | null }[] = [];
   grossPayTotal = '—';
   deductionsTotal = '—';
   netPayTotal = '—';
@@ -59,72 +59,49 @@ export class PayrollCutoff implements OnInit {
   endDate: string = '';
   selectedPayslip?: Payslip;
   demoMode: boolean = false;
+  savedCutoffId: string | null = null;
+  savedCutoffPeriod = '';
+  adjustmentSources: AttendanceAdjustmentSource[] = [];
   private readonly attentionIssues = new Map<string, { reason: string; details: string; action: string }>();
 
   get visibleAttentionIssues() {
     return this.tableRowsId.flatMap((id, index) => {
-      const issue = this.attentionIssues.get(id);
-      return issue ? [{ id, employeeName: this.tableRows[index].fullName as string, ...issue }] : [];
+      const row = this.tableRows[index];
+      const issue = typeof row.netPay === 'number' && row.netPay < 0
+        ? {
+            reason: 'Negative net pay',
+            details: `Net pay is ${row.netPay.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })}. Deductions exceed gross pay.`,
+            action: 'Verify gross pay and deductions before finalizing this employee.',
+          }
+        : this.attentionIssues.get(id);
+      return issue ? [{ id, employeeName: row.fullName as string, ...issue }] : [];
     });
   }
   private demoPayslips = new Map<string, Payslip>();
   private readonly demoCutoffStart = '2026-09-01';
   private readonly demoCutoffEnd = '2026-09-15';
-  private readonly demoPayrollPeriod = 'September 1–15, 2026';
 
   private loadDemo() {
     ++this.requestVersion;
     this.demoMode = true;
+    this.savedCutoffId = null;
+    this.adjustmentSources = [];
     this.loadError = '';
     this.selectedRows = [];
     this.mixedStatuses = false;
     this.isDownloadDisabled = this.isFinalizeDisabled = true;
     this.demoPayslips.clear();
     this.attentionIssues.clear();
-    this.tableRows = employeeTablePreparation(payrollCutoffEmployees);
-    this.mockData.tableRows = demoEmployees.map(({ name: employeeName, detachment, status }, index) => {
-      const employeeId = `DEMO-${String(index + 1).padStart(3, '0')}`;
-      const issue = demoAttentionIssues[employeeName];
-      if (issue) this.attentionIssues.set(employeeId, issue);
-      const regularHours = 72 + index * 4;
-      const overtimeHours = 4 + index * 2;
-      const regularPay = regularHours * 100;
-      const overtimePay = overtimeHours * 125;
-      const grossPay = regularPay + overtimePay;
-      const totalDeductions = 225 + 100 + 100;
-      const netPay = grossPay - totalDeductions;
-      this.demoPayslips.set(employeeId, {
-        employeeId, employeeName, assignedPost: 'Demo post', detachment,
-        payrollPeriod: this.demoPayrollPeriod, payDate: '2026-09-18',
-        earning: {
-          regularPay: { label: 'Regular Pay', hours: regularHours, rate: 100, pay: regularPay },
-          otPay: { label: 'Overtime Pay', hours: overtimeHours, rate: 125, pay: overtimePay },
-          allowance: { label: 'Allowance' },
-          lHOTPay: { label: 'Legal Holiday Overtime' },
-          sHOTPay: { label: 'Special Holiday Overtime' },
-          ndPay: { label: 'Night Differential', hours: 0 },
-          uniformAllowance: { label: 'Uniform Allowance' },
-          wDOPay: { label: 'Worked Day Off' },
-          sSSLoanRefund: { label: 'SSS Loan Refund' },
-          cBRRefund: { label: 'Cash Bond Refund' },
-          sSSContRefund: { label: 'SSS Contribution Refund' },
-        },
-        deduction: {
-          sSSEyee: { label: 'SSS Contribution', amount: 225 },
-          philHealthEyee: { label: 'PhilHealth Contribution', amount: 100 },
-          pagibigContribution: { label: 'Pag-IBIG Contribution', amount: 100 },
-        },
-        grossPay, totalDeductions, netPay,
+    this.tableColumns = payrollColumns;
+    this.mockData.tableRows = employeeTablePreparation(payrollCutoffEmployees);
+    payrollCutoffEmployees.forEach((employee, index) => {
+      this.mockData.tableRows[index].fullName = this.formatEmployeeName(employee.employeeName);
+      const issue = demoAttentionIssues[employee.employeeName];
+      if (issue) this.attentionIssues.set(employee.employeeNo, issue);
+      if (employee.netPay < 0) this.mockData.tableRows[index].status = 3;
+      this.demoPayslips.set(employee.employeeNo, {
+        ...payslipToGeneratePreparation(employee), assignedPost: 'Demo post', payDate: '2026-09-18',
       });
-      return {
-        id: employeeId, fullName: employeeName, detachment, regularHours, regularOvertime: overtimeHours,
-        nightDifferentialHours: 0, btrHours: 0, wdoHours: 0, totalHours: regularHours + overtimeHours, grossPay,
-        sss: 225, pagibig: 100, philHealth: 100, expenseA: 0, expenseB: 0, totalDeduction: totalDeductions,
-        netPay, payrollCutoff: this.demoPayrollPeriod,
-        remarks: issue?.reason
-          ?? `Demo · ${this.statusOptions.find(option => Number(option.value) === status)?.label}`,
-        status, actions: [],
-      };
     });
     this.filterFormGroup.reset();
     this.initializeTableRows();
@@ -140,7 +117,7 @@ export class PayrollCutoff implements OnInit {
     
     this.mockData = {
       tableColumns: ['Full Name', 'Detachment', 'Regular Hours', 'Regular Overtime', 'Night Diff. Hours', 'Breaktime Hours', 'WDO Hours',
-      'Total Hours','Gross Pay', 'SSS','PAGIBIG', 'PhilHealth', 'Expense A', 'Expense B', 'Total Deduction', 'Net Pay', 'Payroll Cutoff', 'Remarks', 'Status', 'Actions'],
+      'Gross Pay', ...payrollDeductionColumns, 'Total Deductions', 'Net Pay', 'Payroll Cutoff', 'Remarks', 'Status', 'Actions'],
       tableRows: [],
       tableActionRows: [],
     };
@@ -157,12 +134,14 @@ export class PayrollCutoff implements OnInit {
     const version = ++this.requestVersion;
     this.loadError = '';
     this.demoMode = false;
+    this.savedCutoffId = null;
+    this.adjustmentSources = [];
+    this.tableColumns = this.mockData.tableColumns;
     this.demoPayslips.clear();
     this.attentionIssues.clear();
     this.mockData.tableRows = [];
     this.filterFormGroup.reset();
     this.employeeCount = 0;
-    this.totalHoursDisplay = '—';
     this.selectedRows = [];
     this.mixedStatuses = false;
     this.isFinalizeDisabled = this.isDownloadDisabled = true;
@@ -173,6 +152,9 @@ export class PayrollCutoff implements OnInit {
         ? 'Sign in as admin or finance to view this cutoff.' : 'Could not load this attendance cutoff.');
       const saved: AttendancePost = await response.json();
       if (version !== this.requestVersion) return;
+      this.savedCutoffId = id;
+      this.savedCutoffPeriod = saved.period;
+      this.adjustmentSources = saved.adjustments ?? [];
       this.mockData.tableRows = saved.employees.map((row, index) => {
         if (row.regularHours == null) {
           this.attentionIssues.set(String(index), {
@@ -183,13 +165,21 @@ export class PayrollCutoff implements OnInit {
         }
         return {
           id: String(index), fullName: this.formatEmployeeName(row.employeeName), detachment: row.detachment ?? saved.detachment,
-          regularHours: row.regularHours ?? '—', regularOvertime: row.overtimeHours ?? 0,
-          nightDifferentialHours: row.nightDifferentialHours ?? 0,
-          btrHours: row.btrHours ?? 0, wdoHours: row.wdoHours ?? 0,
-          totalHours: this.sumAttendanceHours(row), grossPay: '—',
-          sss: '—', pagibig: '—', philHealth: '—', expenseA: '—', expenseB: '—',
-          totalDeduction: '—', netPay: '—', payrollCutoff: saved.period,
-          remarks: row.regularHours == null ? 'Missing regular hours' : 'Attendance uploaded',
+          regularHours: row.regularHours ?? '—', regularOvertime: row.overtimeHours ?? '—',
+          nightDifferentialHours: row.nightDifferentialHours ?? '—',
+          btrHours: row.btrHours ?? '—', wdoHours: row.wdoHours ?? '—',
+          adjustmentHours: row.adjustmentHours,
+          holidayHours: {
+            legal: row.legalHolidayHours, legalOt: row.legalHolidayOtHours,
+            special: row.specialHolidayHours, specialOt: row.specialHolidayOtHours,
+          },
+          grossPay: '—',
+          ...Object.fromEntries(deductionSourceKeys.map(key => [key, '—'])),
+          totalDeductions: '—', netPay: '—', payrollCutoff: saved.period,
+          remarks: [
+            row.regularHours == null ? 'Missing regular hours' : '',
+            this.adjustmentRemark(row),
+          ].filter(Boolean).join(' · ') || 'Attendance uploaded',
           status: row.regularHours == null ? 3 : null, actions: [],
         };
       });
@@ -211,18 +201,8 @@ export class PayrollCutoff implements OnInit {
   }
 
   initializeTableRows(): void{
-    this.tableRowsId = [];
     this.updateFilterOptions();
-    this.tableRows = structuredClone(employeeTablePreparation(payrollCutoffEmployees));
-    this.updateKpis();
-    this.tableRows.forEach(row => {
-      this.tableRowsId.push(row.id)
-      delete row.id
-      if (typeof row.totalHours === 'number') {
-        row.totalHours = row.totalHours.toLocaleString('en-PH', { maximumFractionDigits: 2 });
-      }
-    })
-    this.tableActions = employeeTableActionPreparation(this.tableRows.length)
+    this.onPreview();
   }
 
 
@@ -233,36 +213,46 @@ export class PayrollCutoff implements OnInit {
 
   onPreview(): void {
     const { name, detachment, status } = this.filterFormGroup.value;
-    const tableRows = employeeTablePreparation(payrollCutoffEmployees).filter((row: any) =>
+    const rows = this.mockData.tableRows;
+    const tableRows = rows.filter((row: any) =>
       (!name || row.fullName === name) &&
       (!detachment || row.detachment === detachment) &&
       (!status || String(row.status) === status)
     );
     this.tableRowsId = []
     this.checkBoxOutputListener([]);
-    this.tableRows = structuredClone(tableRows)
-    this.updateKpis();
-    this.tableRows.forEach(row => {
-      this.tableRowsId.push(row.id)
-      delete row.id
-      if (typeof row.totalHours === 'number') {
-        row.totalHours = row.totalHours.toLocaleString('en-PH', { maximumFractionDigits: 2 });
-      }
-    })
-  }
-
-  private sumAttendanceHours(row: AttendancePost['employees'][number]): number {
-    return (row.regularHours ?? 0) + (row.overtimeHours ?? 0)
-      + (row.nightDifferentialHours ?? 0) + (row.wdoHours ?? 0);
+    this.tableRows = tableRows.map(({ id, adjustmentHours, holidayHours, ...row }: any) => {
+      this.tableRowsId.push(id);
+      return row;
+    });
+    this.tableActions = employeeTableActionPreparation(tableRows);
+    this.updateKpis(tableRows);
   }
 
   private formatEmployeeName(name: string): string {
+    const titleCase = (value: string) => value.toLocaleLowerCase('en-PH')
+      .replace(/(^|[\s'-])\p{L}/gu, letter => letter.toLocaleUpperCase('en-PH'));
     const trimmed = name.trim().replace(/\s+/g, ' ');
-    if (trimmed.includes(',')) return trimmed.replace(/\s*,\s*/g, ', ');
+    if (trimmed.includes(',')) return titleCase(trimmed.replace(/\s*,\s*/g, ', '));
     const parts = trimmed.split(' ');
-    if (parts.length < 2) return trimmed;
+    if (parts.length < 2) return titleCase(trimmed);
     const surname = parts.pop();
-    return `${surname}, ${parts.join(' ')}`;
+    return titleCase(`${surname}, ${parts.join(' ')}`);
+  }
+
+  private adjustmentRemark(row: AttendanceRecord): string {
+    if (!row.adjustmentPeriods?.length) return '';
+    const labels: Record<AttendanceHourField, string> = {
+      regularHours: 'regular', overtimeHours: 'OT', nightDifferentialHours: 'night diff.',
+      btrHours: 'breaktime', wdoHours: 'worked day off', legalHolidayHours: 'legal holiday',
+      legalHolidayOtHours: 'legal holiday OT', specialHolidayHours: 'special holiday',
+      specialHolidayOtHours: 'special holiday OT',
+    };
+    const additions = (Object.keys(labels) as AttendanceHourField[]).flatMap(field => {
+      const value = row.adjustmentHours?.[field];
+      return value ? [`+${value.toLocaleString('en-PH', { maximumFractionDigits: 2 })} h ${labels[field]}`] : [];
+    });
+    return additions.length ? `Adjustment · ${additions.join(', ')}` : 'Adjustment recorded';
   }
 
   private updateFilterOptions(): void {
@@ -275,19 +265,43 @@ export class PayrollCutoff implements OnInit {
     this.detachmentOptions = optionsFor('detachment');
   }
 
-  private updateKpis(): void {
+  private updateKpis(rows: typeof this.tableRows): void {
     this.employeeCount = this.tableRows.length;
-    const sum = (field: string, currency = false) => {
-      const values = this.tableRows.map(row => row[field]);
-      if (!values.length || values.some(value => typeof value !== 'number')) return '—';
-      return values.reduce((total, value) => total + value, 0).toLocaleString('en-PH',
-        currency ? { style: 'currency', currency: 'PHP' } : { maximumFractionDigits: 2 });
+    const sumValues = (read: (row: any) => unknown): number | null => {
+      const values = rows.map(read);
+      if (!values.length || !values.every(value => typeof value === 'number')) return null;
+      return values.reduce((total, value) => total + value, 0);
     };
-    let x =  parseFloat(sum('regularHours')) + sum('oTHours');
-    this.totalHoursDisplay = (parseFloat(sum('regularHours')) + parseFloat(sum('oTHours')) + parseFloat(sum('lHOTHours')) + parseFloat(sum('sHOTHours'))).toString()
-    this.grossPayTotal = sum('grossPay', true);
-    this.deductionsTotal = sum('totalDeductions', true);
-    this.netPayTotal = sum('netPay', true);
+    const format = (value: number, currency = false) => value.toLocaleString('en-PH',
+      currency ? { style: 'currency', currency: 'PHP' } : { maximumFractionDigits: 2 });
+    const sum = (read: (row: any) => unknown, currency = false) => {
+      const total = sumValues(read);
+      return total === null ? '—' : format(total, currency);
+    };
+    const hourTotal = (label: string, field: AttendanceHourField, read: (row: any) => unknown) => {
+      const total = sumValues(read);
+      const adjustment = rows.reduce((hours, row) => hours + (row.adjustmentHours?.[field] ?? 0), 0);
+      return {
+        label,
+        value: total === null ? '—' : format(total),
+        base: adjustment && total !== null ? format(total - adjustment) : null,
+        adjustment: adjustment ? format(adjustment) : null,
+      };
+    };
+    this.hourTotals = [
+      hourTotal('Regular', 'regularHours', row => row.regularHours),
+      hourTotal('Regular OT', 'overtimeHours', row => this.demoMode ? row.oTHours : row.regularOvertime),
+      hourTotal('Night differential', 'nightDifferentialHours', row => this.demoMode ? row.nDHours : row.nightDifferentialHours),
+      hourTotal('Breaktime', 'btrHours', row => row.btrHours),
+      hourTotal('Worked day off', 'wdoHours', row => row.wdoHours),
+      hourTotal('Legal holiday', 'legalHolidayHours', row => row.holidayHours?.legal),
+      hourTotal('Legal holiday OT', 'legalHolidayOtHours', row => this.demoMode ? row.lHOTHours : row.holidayHours?.legalOt),
+      hourTotal('Special holiday', 'specialHolidayHours', row => row.holidayHours?.special),
+      hourTotal('Special holiday OT', 'specialHolidayOtHours', row => this.demoMode ? row.sHOTHours : row.holidayHours?.specialOt),
+    ];
+    this.grossPayTotal = sum(row => row.grossPay, true);
+    this.deductionsTotal = sum(row => row.totalDeductions, true);
+    this.netPayTotal = sum(row => row.netPay, true);
   }
 
   onToggleFinalize(): void {
@@ -303,7 +317,6 @@ export class PayrollCutoff implements OnInit {
     for (const row of this.mockData.tableRows) {
       if (this.selectedRows.includes(row.id)) {
         row.status = status;
-        row.remarks = status === 1 ? 'Demo · Payroll Ready' : 'Demo · For Approval';
       }
     }
     this.selectedRows = [];
@@ -364,13 +377,17 @@ export class PayrollCutoff implements OnInit {
     this.isUploadModalVisible = false;
   };
 
-  finalizeChecker(): void{
-    this.isFinalizeDisabled = payrollCutoffEmployees.filter((row:any) => this.selectedRows.includes(row.employeeNo) && row.status==2).length != this.selectedRows.length || this.selectedRows.length == 0;
+  finalizeChecker(): void {
+    this.isFinalizeDisabled = !this.canUseSelectedRows(2);
   }
 
-  downloadChecker(): void{
-    debugger;
-    this.isDownloadDisabled = payrollCutoffEmployees.filter((row:any) => this.selectedRows.includes(row.employeeNo) && row.status==1).length != this.selectedRows.length || this.selectedRows.length == 0;
+  downloadChecker(): void {
+    this.isDownloadDisabled = !this.canUseSelectedRows(1);
   }
 
+  private canUseSelectedRows(status: number): boolean {
+    return this.demoMode && this.selectedRows.length > 0 && this.selectedRows.every(id =>
+      this.mockData.tableRows.some((row: { id: string; status: number }) => row.id === id && row.status === status)
+    );
+  }
 }

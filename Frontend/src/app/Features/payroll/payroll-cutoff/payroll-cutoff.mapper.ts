@@ -1,3 +1,4 @@
+import { actionList } from '../../../Components/table/table-constants';
 import { PayrollCutoffEmployee, payrolCutoffDeduction, payrollCutoffIncome } from './payroll-cutoff.models';
 import {incomeSourceKeys, deductionSourceKeys, detachmentList} from './payroll-cutoff-constants'
 import { Payslip, PayslipItem, IncomeItem } from './../payslip/payslip.model'
@@ -14,8 +15,8 @@ export function employeeTablePreparation(employees: Array<PayrollCutoffEmployee>
             id: e.employeeNo, 
             fullName: e.employeeName, 
             detachment: e.detachment, 
-            ...e.incomeSource, 
-            ...e.deductionSource,
+            ...Object.fromEntries(incomeSourceKeys.map(key => [key, e.incomeSource[key]])),
+            ...Object.fromEntries(deductionSourceKeys.map(key => [key, e.deductionSource[key]])),
             grossPay:e.grossPay, 
             totalDeductions:e.totalDeductions,
             netPay: e.netPay, 
@@ -27,15 +28,10 @@ export function employeeTablePreparation(employees: Array<PayrollCutoffEmployee>
     return tableReadyRows
 }
 
-export function employeeTableActionPreparation(size: number): Array<Array<{value:number, isDisabled: boolean}>>{
-    let tableActionReadyRows: Array<Array<{value:number, isDisabled: boolean}>> = [];
-    let i:number = 0;
-    while (i < size){
-        let actionRow = [{value:1, isDisabled: true}, {value:2, isDisabled: true}, {value:3, isDisabled: true}];
-        tableActionReadyRows.push(actionRow);
-        i++
-    }
-    return tableActionReadyRows;
+export function employeeTableActionPreparation(rows: { actions: number[] }[]) {
+    const defaultActions = actionList.map(action => action.value);
+    return rows.map(row => (row.actions.length ? row.actions : defaultActions)
+        .map(value => ({ value, isDisabled: true })));
 }
 
 export function payslipToGeneratePreparation(employee: PayrollCutoffEmployee): Payslip{

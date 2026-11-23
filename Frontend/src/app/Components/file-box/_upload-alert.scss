@@ -1,0 +1,26 @@
+@mixin panel {
+  display: flex;
+  align-items: flex-start;
+  gap: .65rem;
+  box-sizing: border-box;
+  max-width: 400px;
+  margin: .65rem 0;
+  padding: .8rem 1rem;
+  border: 1px solid var(--upload-alert-border, #edc9c4);
+  border-radius: 8px;
+  color: var(--upload-alert-text, #752e29);
+  background: var(--upload-alert-background, #fff6f4);
+  font-size: .875rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+@mixin icon {
+  flex: 0 0 1.2rem;
+  border-radius: 50%;
+  background: var(--upload-alert-icon, #843e35);
+  color: white;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2rem;
+}

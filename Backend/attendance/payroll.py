@@ -4,6 +4,7 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from openpyxl.utils.cell import column_index_from_string
 
 from .merge import normalized
+from .numbers import spreadsheet_number
 
 DEDUCTION_TABS = {
     "SSS LOAN": {"SALARY": "AJ", "CALAMITY": "AK"},
@@ -20,12 +21,10 @@ RECONCILIATION_FIELDS = ("grossPay", "totalDeductions", "netPay")
 
 def amount(value):
     try:
-        number = Decimal(str(0 if value in (None, "") else value))
-    except InvalidOperation as exc:
+        number = spreadsheet_number(value)
+    except (ValueError, InvalidOperation) as exc:
         raise ValueError("An expected payroll amount or hour value is invalid.") from exc
-    if not number.is_finite():
-        raise ValueError("Payroll values must be finite.")
-    return number
+    return Decimal(0) if number is None else number
 
 
 def money(value):
@@ -120,7 +119,7 @@ def calculate_register(register, deduction_book):
             return amount(cell(column))
 
         for column in ("D", "E", "AF", "AG", "AC", "BE", "BF"):
-            if cell(column) in (None, ""):
+            if cell(column) is None or not str(cell(column)).strip():
                 raise ValueError(f"Missing required payroll value at {column}{row_number}.")
 
         earnings = {column: value(column) for column in EARNING_COLUMNS}

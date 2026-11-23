@@ -1,4 +1,10 @@
 import { postToBackend } from '../../backend';
+import type { AttendanceParseResult } from '../../Features/payroll/modals/upload/upload.models';
+
+export interface CheckedAttendanceFile {
+  file: File;
+  preview: AttendanceParseResult;
+}
 import { ChangeDetectorRef, inject, Component, Input, Output, EventEmitter } from '@angular/core';
 import { NgClass } from '@angular/common';
 
@@ -12,10 +18,9 @@ export class FileBoxComponent {
   @Input() isDisabled: boolean = false;
   @Input() id: number = 0;
   @Output() fileNameOutput: EventEmitter<string> = new EventEmitter<string>();
-  @Output() fileContentOutput = new EventEmitter<string | string[][]>();
+  @Output() fileContentOutput = new EventEmitter<CheckedAttendanceFile | null>();
   fileName: string = '';
   hasFile: boolean = false;
-  fileContent: string = '';
 
 
   private changes = inject(ChangeDetectorRef);
@@ -32,23 +37,14 @@ export class FileBoxComponent {
     this.readError = '';
     this.reading = !!file;
     this.fileNameOutput.emit(this.fileName);
-    this.fileContentOutput.emit('');
+    this.fileContentOutput.emit(null);
     if (!file) return;
     try {
-      let content: string | string[][];
-      if (/\.xlsx$/i.test(file.name)) {
-        const form = new FormData();
-        form.append('file', file);
-        const preview = await postToBackend('/api/attendance/preview/', form);
-        content = preview.rows;
-      } else {
-        const bytes = new Uint8Array(await file.arrayBuffer());
-        let encoding = 'utf-8';
-        if (bytes[0] === 255 && bytes[1] === 254) encoding = 'utf-16le';
-        if (bytes[0] === 254 && bytes[1] === 255) encoding = 'utf-16be';
-        content = new TextDecoder(encoding).decode(bytes);
-      }
-      if (selection === this.selection) this.fileContentOutput.emit(content);
+      const form = new FormData();
+      form.append('file', file);
+      const result = await postToBackend('/api/attendance/preview/', form);
+      const preview: AttendanceParseResult = { ...result, errors: [], validationError: '' };
+      if (selection === this.selection) this.fileContentOutput.emit({ file, preview });
     } catch (error) {
       if (selection === this.selection) {
         this.readError = error instanceof Error ? error.message : 'Could not read the selected file.';

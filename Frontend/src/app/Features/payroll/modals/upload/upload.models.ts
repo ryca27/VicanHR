@@ -27,9 +27,15 @@ export interface AttendanceUpload {
     rawCells: string[];
   }
 
+  export type AttendanceHourField = 'regularHours' | 'overtimeHours' | 'nightDifferentialHours' |
+    'wdoHours' | 'btrHours' | 'legalHolidayHours' | 'legalHolidayOtHours' |
+    'specialHolidayHours' | 'specialHolidayOtHours';
+
   export interface AttendanceRecord {
     employeeNo?: string | null;
     employeeName: string;
+    adjustmentPeriods?: string[];
+    adjustmentHours?: Partial<Record<AttendanceHourField, number>>;
     regularHours: number | null;
     overtimeHours: number | null;
     nightDifferentialHours: number | null;
@@ -50,12 +56,14 @@ export interface AttendanceUpload {
     employees: AttendanceRecord[];
     errors: string[];
     validationError: string;
+    warnings?: string[];
   }
 
   export interface UploadValidation {
     isShown: boolean;
     isAccepted: boolean;
     message: string;
+    warnings?: string[];
   }
 
   export interface Upload {
@@ -64,7 +72,13 @@ export interface AttendanceUpload {
     allowance: AttendanceParseResult[];
   }
 
+export interface AttendanceAdjustmentSource {
+  period: string;
+  filename: string;
+}
+
 export interface AttendancePost {
+  adjustments?: AttendanceAdjustmentSource[];
   period: string;
   detachment: string;
   employees: (AttendanceRecord & { detachment: string | null })[];

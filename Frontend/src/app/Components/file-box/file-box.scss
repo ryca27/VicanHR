@@ -1,8 +1,10 @@
+@use './upload-alert';
+
 .upload-container {
     position: relative;
     width: 100%;
     max-width: 400px;
-    font-family: sans-serif;
+    font-family: var(--upload-font, Helvetica, Arial, sans-serif);
   }
   
   .upload-input {
@@ -22,10 +24,10 @@
     padding: 16px 12px;
     height: 50px;
     font-size: 16px;
-    color: #333;
+    color: var(--upload-ink, #333);
     background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    border: 1px solid var(--upload-border, #ccc);
+    border-radius: 8px;
     cursor: pointer;
     box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -38,7 +40,7 @@
   }
   
   .file-name {
-    color: #888;
+    color: var(--upload-muted, #666);
     font-size: 15px;
     display: inline-block;
     margin-top: 3px;
@@ -49,7 +51,7 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: #999;
+    color: var(--upload-muted, #666);
     font-size: 16px;
     background-color: #fff;
     padding: 0 4px;
@@ -58,7 +60,7 @@
   }
   
   .upload-input:focus ~ .upload-box {
-    border-color: #2563eb;
+    border-color: var(--upload-accent, #2563eb);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
   }
   
@@ -67,11 +69,11 @@
   .upload-box.has-file .floating-label {
     top: 0;
     font-size: 12px;
-    color: #2563eb;
+    color: var(--upload-accent, #2563eb);
   }
   
   .upload-box.has-file .file-name {
-    color: #222;
+    color: var(--upload-ink, #222);
   }
 
   .upload-box.has-file{
@@ -84,20 +86,7 @@
 .upload-box.invalid .floating-label { color: #8b352d; }
 
 .file-error {
-  display: flex;
-  align-items: flex-start;
-  gap: .65rem;
-  box-sizing: border-box;
-  max-width: 400px;
-  margin: .65rem 0;
-  padding: .8rem 1rem;
-  border: 1px solid #edc9c4;
-  border-radius: 8px;
-  color: #752e29;
-  background: #fff6f4;
-  font-size: .875rem;
-  line-height: 1.45;
-  overflow-wrap: anywhere;
+  @include upload-alert.panel;
 
   p { margin: .2rem 0 .45rem; }
   button {
@@ -113,11 +102,5 @@
   }
 }
 .error-icon {
-  flex: 0 0 1.2rem;
-  border-radius: 50%;
-  background: #843e35;
-  color: white;
-  font-weight: 700;
-  text-align: center;
-  line-height: 1.2rem;
+  @include upload-alert.icon;
 }

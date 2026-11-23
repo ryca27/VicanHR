@@ -31,3 +31,14 @@ class PayrollDraft(models.Model):
     results = models.JSONField()
     created_by = models.ForeignKey("auth.User", on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class AttendanceAdjustment(models.Model):
+    cutoff = models.ForeignKey(AttendanceCutoff, on_delete=models.CASCADE, related_name="adjustments")
+    source_scope = models.CharField(max_length=64)
+    upload = models.ForeignKey(AttendanceSummary, on_delete=models.PROTECT)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["cutoff", "source_scope"], name="unique_attendance_adjustment_period"),
+        ]

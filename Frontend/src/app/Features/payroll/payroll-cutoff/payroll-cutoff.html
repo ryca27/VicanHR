@@ -84,9 +84,6 @@
             [color]="'blue'"
             ></app-card>
         </div>
-        <div class="card-container" title="Regular hours + regular overtime + night differential + WDO for the filtered employees">
-            <app-card header="Total Hours" [display]="totalHoursDisplay" color="blue"></app-card>
-        </div>
         <div class="card-container">
             <app-card 
             [header]="'Gross Pay'"
@@ -110,9 +107,42 @@
         </div>
         
     </div>
+    <section class="hours-summary" aria-labelledby="hours-summary-heading">
+        <h2 id="hours-summary-heading">Hours</h2>
+        <dl class="hours-grid">
+            @for (total of hourTotals; track total.label) {
+                <div class="hours-box" [class.hours-box-primary]="$first" [class.hours-box-missing]="total.value === '—'">
+                    <dt>{{ total.label }}</dt>
+                    <dd>
+                        {{ total.value }}
+                        @if (total.adjustment) {
+                            <span class="hours-breakdown">
+                                @if (total.base !== null) {
+                                    <span class="hours-breakdown-item">Base <strong>{{ total.base }}</strong></span>
+                                }
+                                <span class="hours-breakdown-item hours-breakdown-adjustment">
+                                    Adjustment <strong>{{ total.adjustment }}</strong>
+                                </span>
+                            </span>
+                        }
+                    </dd>
+                </div>
+            }
+        </dl>
+    </section>
     <div class="table-container">
         @if (demoMode) { <p>Demo payroll · Fictional employees and sample amounts</p> }
         @if (loadError) { <p class="cutoff-error" role="alert">{{ loadError }}</p> }
+        @if (adjustmentSources.length) {
+            <details class="adjustment-sources">
+                <summary>Attendance adjustments ({{ adjustmentSources.length }})</summary>
+                <ul>
+                    @for (source of adjustmentSources; track source.period) {
+                        <li>{{ source.period }} · {{ source.filename }}</li>
+                    }
+                </ul>
+            </details>
+        }
         <app-table class="cutoff-register"
         [includeCheckBox]="true"
         [columnsInput]="tableColumns"
@@ -144,18 +174,24 @@
             </details>
         }
     </div>
-    @if (!demoMode) { <div class="plus-container" (click)="onUpload()">
-        <img src="assets/plus-icon.png" style="width:50px; height:50px;">
-      </div> }
+    @if (!demoMode) {
+        <div class="plus-container" (click)="onUpload()">
+            <img src="assets/plus-icon.png" alt="Upload file" style="width:50px; height:50px;">
+        </div>
+    }
 </div>
 
-<upload-modal 
-  [isOpen]="isUploadModalVisible" 
+@if (isUploadModalVisible) {
+<upload-modal
+  [isOpen]="true"
   [title]="'Upload File'" 
   [startDate]="startDate ?? ''"
   [endDate]="endDate ?? ''"
+  [targetCutoffId]="savedCutoffId"
+  [targetCutoffPeriod]="savedCutoffPeriod"
   (cutoffSaved)="refreshCurrentCutoff($event)"
   (isSubmit)="closeUloadModalListener($event)"> </upload-modal>
+}
 
 <div class="pdf-render-area" aria-hidden="true">
     <div #payslipContent>

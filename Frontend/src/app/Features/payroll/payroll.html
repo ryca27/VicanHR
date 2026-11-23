@@ -44,6 +44,7 @@
   [title]="'Upload File'" 
   [startDate]="createPayrollFormGroup.value.startDate ?? ''"
   [endDate]="createPayrollFormGroup.value.endDate ?? ''"
+  [savedCutoffs]="savedCutoffs()"
   (dataUploadOutput)="dataUploadOutputListener($event)"
   (isSubmit)="closeUploadModalListener($event)"> </upload-modal>
 
@@ -61,6 +62,7 @@
   <p><a routerLink="/cutoff/demo">Open demo payroll cutoff</a></p>
   @if (readError()) { <p role="alert">{{ readError() }}</p> }
   @for (cutoff of savedCutoffs(); track cutoff.cutoffId) {
-    <a [routerLink]="['/attendance', cutoff.cutoffId]">{{ cutoff.detachment }} · {{ cutoff.period }}</a><br>
+    <a [routerLink]="['/attendance', cutoff.cutoffId]">{{ cutoff.detachment }} · {{ cutoff.period }}</a>
+    <a [routerLink]="['/cutoff', cutoff.cutoffId]">Open cutoff to upload adjustments</a><br>
   } @empty { @if (!readError()) { <p>No saved cutoffs.</p> } }
 </section>

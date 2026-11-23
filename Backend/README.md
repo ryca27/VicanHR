@@ -108,3 +108,14 @@ Both draft responses include a `summary` with `employeeCount`, `rowsWithDifferen
 Use `employees[].differences` for row comparisons, `employees[].deductionsMatched` to identify missing deductions overrides, and `warnings` for workbook-wide review notes. Older drafts receive the same summary and cent-rounded comparisons when retrieved. See the [frontend handoff](../vicanhr-frontend-handoff.html) for integration and sample acceptance checks.
 
 Each draft employee also has an `issues` array. Each issue has a `code`, `reason`, and recommended `action`. The `register_difference` issue includes a `fields` array naming the affected amounts. A `deductions_match_missing` issue asks the reviewer to verify the workbook match and confirm the deduction source.
+
+
+### Attendance source checks
+
+Send a DTR workbook with a Summary tab or a comma-delimited Summary CSV as multipart `file` to `POST /api/attendance/preview/`. The response contains parsed employee rows and warnings. Send the same file to `POST /api/attendance/` to repeat the checks and save.
+
+Missing employee numbers and unavailable source totals are warnings. For each available source total, discrepancies up to 0.01 hours are warnings and larger discrepancies block the upload. Invalid or missing hours, duplicate or ambiguous rows, and rows with hours or an ID but no name block the upload. Excel imports use the workbook’s saved formula results. Recalculate and save the workbook before importing if formulas are stale or missing results.
+
+Numeric attendance and payroll cells use a decimal point. Grouped commas or spaces and a single `₱` or `PHP` marker are accepted. Payroll accounting parentheses preserve the negative sign. Attendance hours must be nonnegative. Ambiguous separators, percentage text, and other currency markers are rejected. Employee IDs are kept as identifiers.
+
+For an attendance adjustment, include multipart fields `type=attendance_adjustment` and `cutoffId`. The Summary must use the target cutoff’s branch and a different source period. All employees must match existing rows uniquely. One adjustment per source period contributes to a cutoff at a time. A corrected file for that period replaces the previous adjustment.

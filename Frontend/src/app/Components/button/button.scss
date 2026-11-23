@@ -58,3 +58,31 @@ button:active{
     font-size: 13px;
     font-weight: 600;
 }
+
+:host(.upload-modal-button) button {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--upload-border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--upload-ink);
+    font: 600 .875rem var(--upload-font);
+}
+
+:host(.upload-modal-button) button.blue {
+    border-color: #b8d3ec;
+    background: var(--upload-tint);
+    color: var(--upload-accent);
+}
+
+:host(.upload-modal-button) button.gray {
+    border-color: var(--upload-accent);
+    background: var(--upload-accent);
+    color: #fff;
+}
+
+:host(.upload-modal-button) button:focus-visible {
+    outline: 2px solid var(--upload-accent);
+    outline-offset: 2px;
+}

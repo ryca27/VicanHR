@@ -31,6 +31,13 @@ def draft_response(draft, status=200):
     for employee in draft.results["employees"]:
         differences = reconciliation_differences(employee)
         issues = []
+        if amount(employee["netPay"]) < 0:
+            issues.append({
+                "code": "negative_net_pay",
+                "reason": "Net pay is negative. Deductions exceed gross pay.",
+                "action": "Verify gross pay and deductions before approving.",
+                "fields": ["netPay"],
+            })
         affected_fields = [field for field, value in differences.items() if amount(value)]
         if affected_fields:
             issues.append({
