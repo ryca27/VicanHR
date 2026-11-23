@@ -17,7 +17,7 @@ export function employeeTablePreparation(employees: Array<PayrollCutoffEmployee>
             ...e.incomeSource, 
             ...e.deductionSource,
             grossPay:e.grossPay, 
-            totalDeductions:e.totalDeductions,
+            totalDeductions:employeTotalDeductionPreparation(e.deductionSource),
             netPay: e.netPay, 
             status: e.status,
             actions: e.actions
@@ -25,6 +25,13 @@ export function employeeTablePreparation(employees: Array<PayrollCutoffEmployee>
         tableReadyRows.push(rowToAdd);
     })
     return tableReadyRows
+}
+
+export function employeTotalDeductionPreparation(source: payrolCutoffDeduction): number {
+    let totalDeduction = Object.values(source).reduce((sum: number, value) => sum + (value ?? 0),
+    0
+  );
+    return totalDeduction;
 }
 
 export function employeeTableActionPreparation(size: number): Array<Array<{value:number, isDisabled: boolean}>>{
