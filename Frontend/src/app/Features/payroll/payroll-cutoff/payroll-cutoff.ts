@@ -1,9 +1,10 @@
 import { ActivatedRoute } from '@angular/router';
+import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AttendanceAdjustmentSource, AttendanceHourField, AttendancePost, AttendanceRecord } from '../modals/upload/upload.models';
 import { Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
-import {demoAttentionIssues, statusList, payrollColumns, payrollCutoffEmployees, payrollDeductionColumns, deductionSourceKeys} from './payroll-cutoff-constants';
+import {demoAttentionIssues, demoExpenseAllocation, demoLedgerEmployee, statusList, payrollColumns, payrollCutoffEmployees, payrollDeductionColumns, deductionSourceKeys, expenseDeductionKeys} from './payroll-cutoff-constants';
 import {employeeTableActionPreparation, employeeTablePreparation, payslipToGeneratePreparation} from './payroll-cutoff.mapper'
 import {FormControl, ReactiveFormsModule, Validators, FormArray, FormGroup, FormBuilder,} from '@angular/forms'
 import { PdfService } from './../../../services/pdf-service'
@@ -21,7 +22,7 @@ import {PayslipComponent} from './../payslip/payslip'
 
 @Component({
   selector: 'app-payroll-cutoff',
-  imports: [DropdownComponent, ButtonComponent, CardComponent, TableComponent, UploadModal, PayslipComponent, ReactiveFormsModule],
+  imports: [CurrencyPipe, DropdownComponent, ButtonComponent, CardComponent, TableComponent, UploadModal, PayslipComponent, ReactiveFormsModule],
   templateUrl: './payroll-cutoff.html',
   styleUrl: './payroll-cutoff.scss',
 })
@@ -59,6 +60,10 @@ export class PayrollCutoff implements OnInit {
   endDate: string = '';
   selectedPayslip?: Payslip;
   demoMode: boolean = false;
+  readonly demoExpenseAllocation = demoExpenseAllocation;
+  readonly demoEmployeeLinks = {
+    [demoLedgerEmployee.id]: { path: '/expay/employee', queryParams: { employeeId: demoLedgerEmployee.id } },
+  };
   savedCutoffId: string | null = null;
   savedCutoffPeriod = '';
   adjustmentSources: AttendanceAdjustmentSource[] = [];
@@ -174,7 +179,7 @@ export class PayrollCutoff implements OnInit {
             special: row.specialHolidayHours, specialOt: row.specialHolidayOtHours,
           },
           grossPay: '—',
-          ...Object.fromEntries(deductionSourceKeys.map(key => [key, '—'])),
+          ...Object.fromEntries(deductionSourceKeys.map(key => [key, expenseDeductionKeys.has(key) ? 0 : '—'])),
           totalDeductions: '—', netPay: '—', payrollCutoff: saved.period,
           remarks: [
             row.regularHours == null ? 'Missing regular hours' : '',

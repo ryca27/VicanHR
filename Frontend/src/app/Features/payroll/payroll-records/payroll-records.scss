@@ -1,0 +1,103 @@
+.records {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px clamp(14px, 4vw, 36px) 48px;
+  color: #1e3045;
+  font: 0.9rem/1.45 Helvetica, Arial, sans-serif;
+
+  a { color: #174f83; }
+  h1 { margin: 18px 0 5px; font-size: clamp(1.5rem, 3vw, 2rem); }
+  h2 { margin: 0; font-size: 1.15rem; }
+  h3 { margin: 16px 0 6px; font-size: 0.95rem; }
+  p { margin: 0 0 12px; }
+}
+
+nav, .filters, .record-card header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+nav {
+  margin-top: 12px;
+
+  a {
+    padding: 6px 10px;
+    border: 1px solid #dce4eb;
+    border-radius: 7px;
+    text-decoration: none;
+  }
+
+  .selected {
+    border-color: #b8d3ec;
+    background: #eaf4ff;
+    font-weight: 700;
+  }
+}
+
+.filters {
+  align-items: end;
+  margin: 16px 0;
+
+  label { display: grid; gap: 3px; color: #526479; font-weight: 600; }
+  input, button {
+    box-sizing: border-box;
+    height: 36px;
+    padding: 6px 10px;
+    border: 1px solid #b8c9d7;
+    border-radius: 6px;
+    font: inherit;
+  }
+  input { width: min(190px, 100%); color: #1e3045; }
+  input[type="number"] { width: 100px; }
+  button { background: #174f83; color: #fff; cursor: pointer; }
+  .secondary { color: #174f83; background: #fff; }
+  input:focus-visible, button:focus-visible { outline: 2px solid #174f83; outline-offset: 2px; }
+}
+
+.record-card, .note, .error {
+  margin: 12px 0;
+  padding: 14px;
+  border: 1px solid #dce4eb;
+  border-radius: 10px;
+  background: #f7f9fb;
+}
+
+.record-card header {
+  justify-content: space-between;
+  align-items: start;
+  p { margin: 3px 0 0; color: #526479; }
+}
+
+.status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: #704b16;
+  background: #fff2d9;
+  font-weight: 600;
+}
+
+.status.closed { color: #215c3a; background: #e7f5ec; }
+
+.totals {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  margin: 12px 0;
+  div { padding: 9px; border: 1px solid #dce4eb; border-radius: 7px; background: #fff; }
+  dt { color: #526479; font-size: .8rem; }
+  dd { margin: 3px 0 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+}
+
+.table-scroll { overflow-x: auto; border: 1px solid #dce4eb; border-radius: 8px; }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+th, td { padding: 9px 12px; border-bottom: 1px solid #e3eaf0; text-align: left; min-width: 90px; }
+th { background: #edf3f8; }
+tbody tr:last-child td { border-bottom: 0; }
+td small { display: block; color: #526479; }
+.review-notes { margin-top: 16px; }
+.error { color: #752e29; background: #fff6f4; }
+
+.records .section-heading { margin: 22px 0 8px; }
+.filters button:disabled { opacity: .5; cursor: default; }

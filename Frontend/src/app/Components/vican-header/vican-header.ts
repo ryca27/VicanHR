@@ -22,8 +22,7 @@ export class VicanHeader {
   );
 
   onNavigatePage(url: string): string {
-    let slashIndex = url.indexOf('/');
-    let rawUrl = slashIndex == -1 ? url :  url.substring(0, slashIndex)
+    const rawUrl = url.split(/[/?#]/, 1)[0];
     const found = subHeaderList.find(s => s.url === rawUrl);
     return found ? found.value : ''; // Safeguard against undefined
   }

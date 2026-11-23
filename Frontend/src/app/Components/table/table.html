@@ -31,6 +31,9 @@
                             }
                             @else if($index == statusColumnIndex){
                                 <td class="status-td">
+                                    @if (value === null || value === undefined || value === '') {
+                                        <span aria-label="No status">—</span>
+                                    } @else {
                                     <div class="circle-container">
                                         <div class="circle" role="img"
                                     [attr.aria-label]="value == 1 ? 'Payroll Ready' : value == 2 ? 'For Approval' : value == 3 ? 'Needs Attention' : 'No status'"
@@ -41,10 +44,18 @@
                                     'red': value == 3,
                                     }"></div>
                                     </div>
+                                    }
                                 </td>
                             }
                             @else {
-                                <td>{{value}}</td>
+                                @let link = j === 0 ? firstCellLinks?.[rowsIdInput[displayIndex + i]] : undefined;
+                                <td>
+                                    @if (link) {
+                                        <a class="cell-link" [routerLink]="link.path" [queryParams]="link.queryParams">{{ value }}</a>
+                                    } @else {
+                                        {{ value === '' ? '—' : (value ?? '—') }}
+                                    }
+                                </td>
                             }
                         }
                     </tr>
