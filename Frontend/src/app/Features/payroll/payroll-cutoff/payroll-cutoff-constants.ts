@@ -9,25 +9,41 @@ export const detachmentList = [
 ]
 
 export const statusList = [
-    {'value':'', 'label':''},
     {'value':'1', 'label':'Payroll Ready'},
     {'value':'2', 'label':'For Approval'},
     {'value':'3', 'label':'Needs Attention'},
 ]
 
-export const payrollColumns = [
-    'Employee Name', 'Detachment', 'Regular Hours', 'Regular Pay', 'Allowance', 'OT Hours', 'OT Pay', 'LH OT Hours', 'LH OT Pay', 'SH OT Hours', 'SH OT Pay', 'ND Hours',
-    'ND Pay', 'Uniform Allowance', 'WDO Pay', 'SSS Loan Refund', 'CB Refund', 'SSS Cont. Refund', 'SSS EYEE', 'SSS EYER',
+export const demoAttentionIssues: Record<string, { reason: string; details: string; action: string }> = {
+    'Escobar, Pablo': {
+        reason: 'Duplicate attendance name',
+        details: 'Demo DTR rows 12 and 18 both contain “Escobar, Pablo” under SM Megamall.',
+        action: 'Compare both source rows with the payroll register and confirm which attendance row belongs to this employee.',
+    },
+    'Lopez, Rusty': {
+        reason: 'Missing regular hours',
+        details: 'Regular hours are blank on row 21 of the demo attendance Summary.',
+        action: 'Confirm the regular hours in the source DTR, update the Summary, and re-upload it before finalizing.',
+    },
+};
+
+export const payrollDeductionColumns = [
+    'SSS EYEE', 'SSS EYER',
     'PhilHealth EYEE', 'PhilHealth EYER', 'SSS Loan Salary', 'SSS Loan Calamity', 'Cash Bond', 'Benlife Insurance', 'Group Insurance', 'Uniform Paraphernalia',
     'Paraphernalia', 'Training', 'Additional PHIC Contribution', 'Additional SSS Contribution', 'Pagibig Contribution', 'SSS Condonation', 'Family Support', 'Training School',
-    'License', 'SOGCC-1 Credit Coop', 'SOGCC-2 Credit Coop',  'Gross Pay', 'Total Deductions', 'Net Pay', 'Status', 'Actions'
+    'License', 'SOGCC-1 Credit Coop', 'SOGCC-2 Credit Coop'
+];
+
+export const payrollColumns = [
+    'Employee Name', 'Detachment', 'Regular Hours', 'Regular Pay', 'Allowance', 'OT Hours', 'OT Pay', 'LH OT Hours', 'LH OT Pay', 'SH OT Hours', 'SH OT Pay', 'ND Hours',
+    'ND Pay', 'Uniform Allowance', 'WDO Pay', 'SSS Loan Refund', 'CB Refund', 'SSS Cont. Refund', ...payrollDeductionColumns,  'Gross Pay', 'Total Deductions', 'Net Pay', 'Status', 'Actions'
 ]
 
 export const incomeSourceKeys: (keyof payrollCutoffIncome)[] = ['regularHours', 'regularPay', 'allowance', 'oTHours', 'oTPay','lHOTHours', 'lHOTPay', 'sHOTHours', 'sHOTPay', 'nDHours',
 'nDPay', 'uniformAllowance', 'wDOPay', 'sSSLoanRefund', 'cBRefund', 'sSSContRefund'];
 
 export const deductionSourceKeys: (keyof payrolCutoffDeduction)[] = ['sSSEyee', 'sSSEyer', 'philHealthEyee', 'philHealthEyer', 'sSSLoanSalary',
-'sSSLoanCalamity', 'cashBond', 'benlifeInsurance', 'groupInsurance', 'uniformParaphernalia', 'paraphernalia', 'training', 'additionalPhicContribution', 'pagibigContribution',
+'sSSLoanCalamity', 'cashBond', 'benlifeInsurance', 'groupInsurance', 'uniformParaphernalia', 'paraphernalia', 'training', 'additionalPhicContribution', 'additionalSSSContribution', 'pagibigContribution',
 'sSSCondonation', 'familySupport', 'trainingSchool', 'license', 'sogcc1creditcoop', 'sogcc2creditcoop']
 
 
@@ -37,8 +53,8 @@ export const deductionSourceKeys: (keyof payrolCutoffDeduction)[] = ['sSSEyee', 
 export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
     {
       employeeNo: '1',
-      employeeName: 'ABOGADO, MARY GRACE',
-      detachment: 'SMCO Nova',
+      employeeName: 'Santos, Alex',
+      detachment: 'Demo Detachment',
       incomeSource: {
         regularHours: 96,
         regularPay: 8340,
@@ -90,8 +106,8 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
     },
     {
       employeeNo: '2',
-      employeeName: 'AFRICA, ROMMEL',
-      detachment: 'SMCO Nova',
+      employeeName: 'Reyes, Jamie',
+      detachment: 'Demo Detachment',
       incomeSource: {
         regularHours: 111.77,
         regularPay: 9710.02,
@@ -143,8 +159,8 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
     },
     {
       employeeNo: '3',
-      employeeName: 'ANTONIO, ROWEL MARK',
-      detachment: 'SMCO Nova',
+      employeeName: 'Cruz, Morgan',
+      detachment: 'Demo Detachment',
       incomeSource: {
         regularHours: 96,
         regularPay: 8340,
@@ -196,8 +212,8 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
     },
     {
       employeeNo: '4',
-      employeeName: 'CAÑOZA, MARVIN',
-      detachment: 'SMCO Nova',
+      employeeName: 'Tabernilla, Ryan',
+      detachment: 'SM Megamall',
       incomeSource: {
         regularHours: 104,
         regularPay: 9035,
@@ -250,8 +266,8 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
     },
     {
       employeeNo: '5',
-      employeeName: 'CADUCIO, RAMIL',
-      detachment: 'SMCO Nova',
+      employeeName: 'Raymundo, Carlo',
+      detachment: 'Mall of Asia',
       incomeSource: {
         regularHours: 102.75,
         regularPay: 8926.41,
@@ -297,14 +313,14 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      status: 1,
+      status: 2,
       actions: [1,2,3],
       isFinalized: true
     },
     {
       employeeNo: '6',
-      employeeName: 'CARANTO, CEDRICK MIGUEL',
-      detachment: 'SMCO Nova',
+      employeeName: 'Viernes, Lea',
+      detachment: 'Mall of Asia',
       incomeSource: {
         regularHours: 103.92,
         regularPay: 9028.05,
@@ -351,14 +367,14 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      status: 1,
+      status: 2,
       actions: [1,2,3],
       isFinalized: true
     },
     {
       employeeNo: '7',
-      employeeName: 'CERILO, JHOMMAR',
-      detachment: 'SMCO Nova',
+      employeeName: 'Escobar, Pablo',
+      detachment: 'SM Megamall',
       incomeSource: {
         regularHours: 103.28,
         regularPay: 8972.45,
@@ -404,14 +420,14 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      status: 1,
+      status: 3,
       actions: [1,2,3],
       isFinalized: true
     },
     {
       employeeNo: '8',
-      employeeName: 'DELA CRUZ, REYNALYN',
-      detachment: 'SMCO Nova',
+      employeeName: 'Lopez, Rusty',
+      detachment: 'Mall of Asia',
       incomeSource: {
         regularHours: 119.82,
         regularPay: 10409.36,
@@ -457,14 +473,14 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      status: 1,
+      status: 3,
       actions: [1,2,3],
       isFinalized: true
     },
     {
       employeeNo: '9',
-      employeeName: 'FUENTEBELLA, PSYCHE',
-      detachment: 'SMCO Nova',
+      employeeName: 'Piattos, Mary Grace',
+      detachment: 'Mall of Asia',
       incomeSource: {
         regularHours: 103.47,
         regularPay: 8988.96,
@@ -510,14 +526,35 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       totalDeductions: 0,
       netPay: 0,
       payrollPeriod: 'September 1-15, 2026',
-      status: 1,
+      status: 2,
       actions: [1,2,3],
       isFinalized: true
     },
     {
+      employeeNo: 'DEMO-NEGATIVE',
+      employeeName: 'Bautista, Sam',
+      detachment: 'Demo Detachment',
+      incomeSource: {
+        ...Object.fromEntries(incomeSourceKeys.map(key => [key, 0])),
+        regularHours: 8,
+        regularPay: 695,
+      },
+      deductionSource: {
+        ...Object.fromEntries(deductionSourceKeys.map(key => [key, 0])),
+        cashBond: 950,
+      },
+      grossPay: 695,
+      totalDeductions: 0,
+      netPay: 0,
+      payrollPeriod: 'September 1-15, 2026',
+      status: 2,
+      actions: [1, 2, 3],
+      isFinalized: false,
+    },
+    {
       employeeNo: '10',
-      employeeName: 'GABRONINO, RANIE',
-      detachment: 'SMCO Nova',
+      employeeName: 'Son, Robin',
+      detachment: 'Mall of Asia',
       incomeSource: {
         regularHours: 111.90,
         regularPay: 9721.31,
@@ -562,11 +599,29 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       grossPay: 14536.47,
       totalDeductions: 0,
       netPay: 0,
-      payrollPeriod: 'September 1-15, 2026', 
-      status: 1,
+      payrollPeriod: 'September 1-15, 2026',
+      status: 2,
       actions: [1,2,3],
       isFinalized: true
-    }
-  ];
+    },
+  ].map((employee): PayrollCutoffEmployee => {
+
+    // Sum all deduction values
+    const totalDeductions = Object.values(
+      employee.deductionSource
+    ).reduce(
+      (sum: number, amount) => sum + (amount ?? 0),
+      0
+    );
   
+    // Calculate net pay
+    const netPay = employee.grossPay - totalDeductions;
   
+    return {
+      ...employee,
+  
+      totalDeductions: Math.round(totalDeductions * 100) / 100,
+  
+      netPay: Math.round(netPay * 100) / 100
+    };
+  });

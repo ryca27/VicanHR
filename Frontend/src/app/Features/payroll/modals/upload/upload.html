@@ -9,6 +9,9 @@
       
           <div class="modal-body">
             <form [formGroup]="uploadFormGroup">
+                @if (targetCutoffPeriod) {
+                  <p><strong>Selected cutoff</strong> {{ targetCutoffPeriod }}</p>
+                } @else {
                 <app-double-date-picker [label]="'Cutoff Period'"
                 [startDate]="startDate"
                 [endDate]="endDate"
@@ -17,18 +20,30 @@
                 (startDateOutput)="startDateOutputListener($event)"
                 (endDateOutput)="endDateOutputListener($event)"
                 ></app-double-date-picker>
+                }
                 <div class="add-file-container" formArrayName="uploadFileArray">
                   @if(uploadFileArray.length > 0){
                     @for(uploadFile of uploadFileArray.controls; track uploadFile; let i = $index){
                       <div [formGroupName]="i">
-                        <app-dropdown 
+                        <app-dropdown class="cutoff-filter upload-control"
                           [options]="fileTypeOptions" 
                           [label]="fileTypeLabel" 
                           formControlName="fileType">
                         </app-dropdown>
 
+                        @if (uploadFile.get('fileType')?.value === 'attendance_adjustment' && !targetCutoffId) {
+                          @if (savedCutoffs.length) {
+                            <app-dropdown class="cutoff-filter upload-control"
+                              [options]="adjustmentCutoffOptions"
+                              label="Apply adjustment to cutoff"
+                              formControlName="adjustmentCutoffId"
+                            ></app-dropdown>
+                          } @else {
+                            <p role="status">Save an attendance cutoff before uploading an adjustment.</p>
+                          }
+                        }
                         @if(uploadFileArray.controls[i].get('fileType')?.value == 'expenses' ){
-                          <app-dropdown
+                          <app-dropdown class="cutoff-filter upload-control"
                             [options]="expenseTypeOptions"
                             [label]="expenseTypeLabel"
                             formControlName="expenseType"
@@ -38,18 +53,27 @@
                       (fileContentOutput)="fileContentOutputListener($event,i )"
                       (fileNameOutput)="fileNameOutputListener($event,i )"
                     ></app-file-box>
-                    @if(uploadValidationList[i].isShown){
-                      <div class="validation-message-container">
-                        <span class="validation-message"
-                        [ngClass]="{
-                          'green': uploadValidationList[i].isAccepted,
-                          'red': !uploadValidationList[i].isAccepted
-                        }"
-                        >{{uploadValidationList[i].message}}</span>
-                      </div>
-
+                    @if (uploadValidationList[i]; as validation) {
+                      @if (validation.isShown) {
+                        <div class="upload-alert"
+                          [class.upload-alert-success]="validation.isAccepted && !validation.warnings?.length"
+                          [class.upload-alert-warning]="validation.isAccepted && !!validation.warnings?.length"
+                          [attr.role]="validation.isAccepted ? 'status' : 'alert'">
+                          <span class="upload-alert-icon" aria-hidden="true">{{ validation.isAccepted && !validation.warnings?.length ? '✓' : '!' }}</span>
+                          <div>
+                            <strong>{{ !validation.isAccepted ? 'Validation failed' : validation.warnings?.length ? 'Validated with warnings' : 'File validated' }}</strong>
+                            <p>{{ validation.message }}</p>
+                            @if (validation.warnings?.length) {
+                              <ul aria-label="Import warnings">
+                                @for (warning of validation.warnings; track warning) {
+                                  <li>{{ warning }}</li>
+                                }
+                              </ul>
+                            }
+                          </div>
+                        </div>
+                      }
                     }
-                    
 
                       @if(i!=0){
                         <div class="button-container">
@@ -68,18 +92,24 @@
                   <button mat-icon-button (click)="addUploadFileGroup()"><img src="assets/plus-icon.png" style="width:40px; height:40px;"></button>
                 </div>
 
+                @if (submitError) {
+                  <div class="upload-alert" role="alert">
+                    <span class="upload-alert-icon" aria-hidden="true">!</span>
+                    <div><strong>Upload failed</strong><p>{{ submitError }}</p></div>
+                  </div>
+                }
                 <div class="button-container">
-                  <app-button [label]="'Validate'" (click)="validateInput()"
+                  <app-button class="upload-modal-button" [label]="'Validate'" (click)="validateInput()"
                     [color]="'blue'"
                     [size]="'long'"
-                    [disabled]="!uploadFormGroup.valid"
+                    [disabled]="saving"
                   ></app-button>
-                  <app-button [label]="'Upload'" (click)="submitForm()"
+                  <app-button class="upload-modal-button" [label]="'Upload'" (click)="submitForm()"
                   [color]="'gray'"
-                  [disabled]="isDisabledUpload"
+                  [disabled]="isDisabledUpload || saving"
                   [size]="'long'"
                 ></app-button>
-                <app-button [label]="'Cancel'" (click)="closeUploadModal()"
+                <app-button class="upload-modal-button" [label]="'Cancel'" (click)="closeUploadModal()"
                 [color]="'red'"
                 [disabled]="false"
                 [size]="'long'"

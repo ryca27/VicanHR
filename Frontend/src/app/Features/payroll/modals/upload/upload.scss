@@ -1,91 +1,91 @@
+@use '../../../../Components/file-box/upload-alert';
+
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5); /* Dimmed backdrop */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-container {
-    background-color: #fff;
-    border-radius: 8px;
-    width: 350px;
-    max-width: 90%;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
-    
-  }
-  
-  .modal-header {
-    border-radius: 8px 8px 0px 0px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    padding: 16px;
-    border-bottom: 1px solid #eee;
-    background-color: #CAD9FF;
-    font-size: 25px;
-    font-family: Helvetica, Arial, sans-serif;
-  }
-  
-  .modal-header h3 {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  background: rgb(30 48 69 / 48%);
+}
+
+.modal-container {
+  --upload-font: Helvetica, Arial, sans-serif;
+  --upload-ink: #1e3045;
+  --upload-muted: #526479;
+  --upload-border: #dce4eb;
+  --upload-accent: #174f83;
+  --upload-tint: #eaf4ff;
+  --mat-sys-body-large-font: var(--upload-font);
+  --mat-sys-body-medium-font: var(--upload-font);
+  --mat-sys-body-small-font: var(--upload-font);
+  width: min(400px, 90vw);
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--upload-border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--upload-ink);
+  box-shadow: 0 12px 32px rgb(30 48 69 / 20%);
+  font: .875rem/1.45 var(--upload-font);
+}
+
+.modal-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--upload-border);
+  background: #f4f7fa;
+
+  h3 {
     margin: 0;
-    font-weight: 100;
+    font-size: 1rem;
+    font-weight: 700;
   }
-  
-  .close-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-  }
-  
-  .modal-body {
-    padding: 16px;
-    overflow-y: auto;
-    max-height: 70vh;
-  }
+}
 
-  .add-file-container .button-container{
-    display: flex;
-    justify-content: center;
-  }
+.modal-body {
+  padding: 16px 18px;
+  overflow-y: auto;
+}
 
-  .plus-container{
-    display: flex;
-    justify-content: center;
-  }
+.add-file-container .button-container,
+.plus-container {
+  display: flex;
+  justify-content: center;
+}
 
-  .plus-container button{
-    width: 60px;
-    height: 60px;
-    display: grid;
-    align-items: center;
-    justify-content: center;
-  }
+.plus-container {
+  margin: 8px 0;
+}
 
-  app-button :first-child{
-    padding-bottom:20px
-  }
+.plus-container button,
+.add-file-container button {
+  color: var(--upload-accent);
+  font: inherit;
+}
 
-  .validation-message-container{
-    display: flex;
-    justify-content: center;
-    margin-top: 5px
-  }
-  .validation-message{
-    font-size: 12px;
-  }
+.upload-alert {
+  @include upload-alert.panel;
 
-  .validation-message.green{
-    color: #148f2f;
-  }
-  .validation-message.red{
-    color: #fa2847;
-  }
+  p { margin: .2rem 0 0; }
+  ul { margin: .3rem 0 0; padding-inline-start: 1.25rem; }
+}
+
+.upload-alert-icon {
+  @include upload-alert.icon;
+}
+
+.upload-alert-success {
+  --upload-alert-border: #bce0ca;
+  --upload-alert-text: #215c3a;
+  --upload-alert-background: #f2fbf5;
+  --upload-alert-icon: #2b6b46;
+}
+
+.upload-alert-warning {
+  --upload-alert-border: #ead4a5;
+  --upload-alert-text: #704b16;
+  --upload-alert-background: #fff9ed;
+  --upload-alert-icon: #875b1b;
+}

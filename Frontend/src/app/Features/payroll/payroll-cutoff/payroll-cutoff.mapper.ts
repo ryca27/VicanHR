@@ -1,3 +1,4 @@
+import { actionList } from '../../../Components/table/table-constants';
 import { PayrollCutoffEmployee, payrolCutoffDeduction, payrollCutoffIncome } from './payroll-cutoff.models';
 import {incomeSourceKeys, deductionSourceKeys, detachmentList} from './payroll-cutoff-constants'
 import { Payslip, PayslipItem, IncomeItem } from './../payslip/payslip.model'
@@ -14,8 +15,8 @@ export function employeeTablePreparation(employees: Array<PayrollCutoffEmployee>
             id: e.employeeNo, 
             fullName: e.employeeName, 
             detachment: e.detachment, 
-            ...e.incomeSource, 
-            ...e.deductionSource,
+            ...Object.fromEntries(incomeSourceKeys.map(key => [key, e.incomeSource[key]])),
+            ...Object.fromEntries(deductionSourceKeys.map(key => [key, e.deductionSource[key]])),
             grossPay:e.grossPay, 
             totalDeductions:employeTotalDeductionPreparation(e.deductionSource),
             netPay: e.netPay, 
@@ -44,6 +45,11 @@ export function employeeTableActionPreparation(size: number): Array<Array<{value
     }
     return tableActionReadyRows;
 }
+// export function employeeTableActionPreparation(rows: { actions: number[] }[]) {
+//     const defaultActions = actionList.map(action => action.value);
+//     return rows.map(row => (row.actions.length ? row.actions : defaultActions)
+//         .map(value => ({ value, isDisabled: true })));
+// }
 
 export function payslipToGeneratePreparation(employee: PayrollCutoffEmployee): Payslip{
     let payslip: Payslip = {
@@ -191,4 +197,4 @@ export function payslipToGeneratePreparation(employee: PayrollCutoffEmployee): P
         netPay: employee.netPay
     }
     return payslip;
-}
+};

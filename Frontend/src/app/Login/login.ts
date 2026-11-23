@@ -1,3 +1,6 @@
+import { Router } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
+import { postToBackend } from '../backend';
 
 import { CommonModule } from '@angular/common';
 import {  Component, EventEmitter, Input, Output, inject } from '@angular/core';
@@ -57,7 +60,10 @@ export class LoginComponent {
     this.showPassword = !this.showPassword;
   }
 
-  onSubmit(): void {
+  private router = inject(Router);
+  private changes = inject(ChangeDetectorRef);
+
+  async onSubmit() {
     this.submitted = true;
 
     if (this.loginForm.invalid || this.loading) {
@@ -65,11 +71,19 @@ export class LoginComponent {
       return;
     }
 
-    // Emit credentials to your authentication handler.
-    // Connect this to Django when implementing login.
-    this.loginRequested.emit(
-      this.loginForm.getRawValue()
-    );
+    this.loading = true;
+    this.errorMessage = '';
+    try {
+      const credentials = this.loginForm.getRawValue();
+      await postToBackend('/api/auth/login/', credentials);
+      this.loginRequested.emit(credentials);
+      await this.router.navigateByUrl('/payroll');
+    } catch (error) {
+      this.errorMessage = error instanceof Error ? error.message : 'Sign-in failed.';
+    } finally {
+      this.loading = false;
+      this.changes.markForCheck();
+    }
   }
 
   onForgotPassword(): void {
