@@ -20,7 +20,7 @@ export function employeeTablePreparation(employees: Array<PayrollCutoffEmployee>
                 key, e.deductionSource[key] ?? (expenseDeductionKeys.has(key) ? 0 : null),
             ])),
             grossPay:e.grossPay, 
-            totalDeductions:e.totalDeductions,
+            totalDeductions:employeTotalDeductionPreparation(e.deductionSource),
             netPay: e.netPay, 
             status: e.status,
             actions: e.actions
@@ -28,6 +28,11 @@ export function employeeTablePreparation(employees: Array<PayrollCutoffEmployee>
         tableReadyRows.push(rowToAdd);
     })
     return tableReadyRows
+}
+
+export function employeTotalDeductionPreparation(source: payrolCutoffDeduction): number {
+    const total = Object.values(source).reduce((sum, value) => sum + (value ?? 0), 0);
+    return Math.round(total * 100) / 100;
 }
 
 export function employeeTableActionPreparation(rows: { actions: number[] }[]) {
@@ -182,4 +187,4 @@ export function payslipToGeneratePreparation(employee: PayrollCutoffEmployee): P
         netPay: employee.netPay
     }
     return payslip;
-}
+};
