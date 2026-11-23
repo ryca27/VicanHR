@@ -1,0 +1,22 @@
+<main class="preview">
+  <a class="back" routerLink="/payroll"><span aria-hidden="true">←</span> Payroll</a>
+  @if (selectedAttendance(); as saved) {
+    <header class="overview">
+      <h1>Saved attendance</h1>
+      <dl>
+        <div><dt>Detachment</dt><dd>{{ saved.detachment }}</dd></div>
+        <div><dt>Cutoff period</dt><dd>{{ saved.period }}</dd></div>
+      </dl>
+      <a class="action" [routerLink]="['/cutoff', cutoffId()]">Open payroll cutoff and adjustments →</a>
+    </header>
+    <section>
+      <header class="register"><h2>Attendance hours</h2><span>{{ saved.employees.length }} employees</span></header>
+      <div class="scroll" tabindex="0" role="region" aria-label="Employee attendance hours">
+      <table>
+      <thead><tr><th scope="col">Employee no.</th><th scope="col">Employee name</th><th scope="col">Regular</th><th scope="col">OT</th><th scope="col">Night diff.</th><th scope="col">WDO</th><th scope="col">BTR</th><th scope="col">Legal holiday</th><th scope="col">Legal holiday OT</th><th scope="col">Special holiday</th><th scope="col">Special holiday OT</th></tr></thead>
+      <tbody>@for (row of saved.employees; track $index) {
+        <tr><td>{{ row.employeeNo ?? '—' }}</td><td>{{ row.employeeName }}</td><td>{{ row.regularHours ?? '—' }}</td><td>{{ row.overtimeHours ?? '—' }}</td><td>{{ row.nightDifferentialHours ?? '—' }}</td><td>{{ row.wdoHours ?? '—' }}</td><td>{{ row.btrHours ?? '—' }}</td><td>{{ row.legalHolidayHours ?? '—' }}</td><td>{{ row.legalHolidayOtHours ?? '—' }}</td><td>{{ row.specialHolidayHours ?? '—' }}</td><td>{{ row.specialHolidayOtHours ?? '—' }}</td></tr>
+      }</tbody>
+    </table></div></section>
+  } @else if (error()) { <p role="alert">{{ error() }}</p> } @else { <p role="status">Loading attendance…</p> }
+</main>

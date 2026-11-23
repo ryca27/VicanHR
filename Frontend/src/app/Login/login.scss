@@ -16,7 +16,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: clamp(12px, 4dvh, 40px) clamp(12px, 3vw, 20px);
   
     background-color: #c8ddfa;
     background-image:
@@ -28,9 +28,8 @@
   
   /* LOGIN CARD */
   .login-card {
-    width: min(100%, 755px);
-    min-height: 725px;
-    padding: 38px 70px 48px;
+    width: min(100%, 455px);
+    padding: clamp(20px, 4dvh, 38px) clamp(18px, 9vw, 70px) clamp(20px, 5dvh, 48px);
   
     background: #fff;
     border-radius: 25px;
@@ -45,7 +44,7 @@
   
   /* COMPANY LOGO */
   .brand {
-    min-height: 114px;
+    min-height: clamp(54px, 12dvh, 114px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -53,7 +52,7 @@
   
   .brand-logo {
     display: block;
-    width: min(100%, 418px);
+    width: min(100%, clamp(200px, 45dvh, 418px));
     height: auto;
     object-fit: contain;
   }
@@ -63,17 +62,17 @@
     width: 100%;
     height: 2px;
     background: #e1e7f0;
-    margin: 10px 0 28px;
+    margin: 10px 0 clamp(12px, 3dvh, 28px);
   }
   
   /* PAGE TITLE */
   .card-heading {
     text-align: center;
-    margin-bottom: 41px;
+    margin-bottom: clamp(16px, 4dvh, 41px);
   }
   
   .card-heading h1 {
-    font-size: clamp(36px, 4.5vw, 60px);
+    font-size: clamp(28px, min(7vw, 7dvh), 40px);
     line-height: 1.12;
     letter-spacing: -1.7px;
     font-weight: 750;
@@ -84,7 +83,7 @@
   .card-heading p {
     margin: 0;
     color: #5b6c87;
-    font-size: clamp(18px, 2.5vw, 29px);
+    font-size: clamp(16px, min(4vw, 3.5dvh), 10px);
     line-height: 1.35;
   }
   
@@ -92,7 +91,7 @@
   .login-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: clamp(12px, 2.5dvh, 20px);
   }
   
   .field {
@@ -103,7 +102,7 @@
   
   /* INPUT CONTAINER */
   .input-shell {
-    height: 64px;
+    height: clamp(48px, 7.5dvh, 64px);
     display: flex;
     align-items: center;
     gap: 17px;
@@ -147,7 +146,7 @@
     outline: 0;
   
     font: inherit;
-    font-size: 23px;
+    font-size: 12px;
     color: #0b254b;
   
     background: transparent;
@@ -203,7 +202,7 @@
     align-items: center;
     gap: 10px;
   
-    font-size: 19px;
+    font-size: 12px;
     color: #435470;
     cursor: pointer;
   }
@@ -221,7 +220,7 @@
     background: none;
   
     color: #0648c6;
-    font-size: 19px;
+    font-size: 12px;
     text-decoration: underline;
     cursor: pointer;
   }
@@ -240,7 +239,7 @@
   /* LOGIN BUTTON */
   .login-button {
     width: 100%;
-    min-height: 73px;
+    min-height: clamp(48px, 8dvh, 23px);
     margin-top: 2px;
   
     border: 0;
@@ -251,7 +250,7 @@
   
     color: white;
     font: inherit;
-    font-size: 28px;
+    font-size: 18px;
     font-weight: 700;
   
     cursor: pointer;
@@ -291,74 +290,40 @@
     border: 0;
   }
   
-  /* MOBILE RESPONSIVE */
-  @media (max-width: 700px) {
-  
-    .login-page {
-      padding: 24px 14px;
-      background-position: center;
-    }
-  
+  @media (max-width: 700px), (max-height: 700px) {
     .login-card {
-      min-height: auto;
-      padding: 28px 24px 36px;
       border-radius: 20px;
     }
-  
-    .brand {
-      min-height: 85px;
-    }
-  
-    .brand-logo {
-      width: min(100%, 315px);
-    }
-  
-    .brand-divider {
-      margin: 6px 0 25px;
-    }
-  
-    .card-heading {
-      margin-bottom: 32px;
-    }
-  
-    .card-heading h1 {
-      font-size: 42px;
-    }
-  
-    .card-heading p {
-      font-size: 21px;
-    }
-  
+
     .input-shell {
-      height: 58px;
-      padding: 0 15px;
-      gap: 12px;
+      padding: 0 12px;
+      gap: 10px;
     }
-  
+
     .input-shell input {
-      font-size: 18px;
+      font-size: 16px;
     }
-  
+
     .field-icon {
       width: 24px;
       height: 24px;
     }
-  
+
     .form-options {
       flex-wrap: wrap;
+      margin: 0;
     }
-  
+
     .remember-option,
     .forgot-link {
       font-size: 15px;
     }
-  
+
     .login-button {
-      min-height: 62px;
-      font-size: 22px;
+      font-size: 20px;
     }
   }
-  
+
   @media (prefers-reduced-motion: reduce) {
     .input-shell {
       transition: none;

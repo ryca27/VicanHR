@@ -59,6 +59,10 @@
               "outputHashing": "all"
             },
             "development": {
+              "assets": [
+                { "glob": "**/*", "input": "public" },
+                { "glob": "**/*", "input": ".angular/local-docs" }
+              ],
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
@@ -68,12 +72,14 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": { "proxyConfig": "proxy.conf.json" },
           "configurations": {
             "production": {
               "buildTarget": "HR_Home:build:production"
             },
             "development": {
-              "buildTarget": "HR_Home:build:development"
+              "buildTarget": "HR_Home:build:development",
+              "allowedHosts": ["localhost"]
             }
           },
           "defaultConfiguration": "development"

@@ -39,28 +39,18 @@ export class TableComponent implements OnInit, OnChanges {
   pageArray: number[] = [];
 
 
-  ngOnInit(){
-    this.rowsInput ? this.getTableRows(): '';
+  ngOnInit() {
+    if (!this.tableFormGroup) this.ngOnChanges();
+  }
+
+  ngOnChanges() {
+    this.getTableRows();
     this.getActionColumn();
     this.getStatusColumn();
     this.getActionRows();
-    this.initializeTableFormGroup();
-    if(this.includeCheckBox){
-      this.onChangeCheckBox();
-    }
-    
-    this.getPageArray(this.pageSize);
-    this.getDisplayByPageNumber();
-  }
-
-  ngOnChanges(){
-    this.getTableRows();
     this.reloadTable();
     this.initializeTableFormGroup();
-    if(this.includeCheckBox){
-      this.onChangeCheckBox();
-    }
-    
+    if (this.includeCheckBox) this.onChangeCheckBox();
   }
 
   getTableRows(){
@@ -126,6 +116,7 @@ export class TableComponent implements OnInit, OnChanges {
   }
 
   getActionRows(){
+    this.actionRows = [];
     for (const rowArray of this.actionRowsInput){
       let rowToAdd: {imgSrc: string, isDisabled: boolean}[]  = [];
       for(const row of rowArray){
@@ -202,6 +193,7 @@ export class TableComponent implements OnInit, OnChanges {
 
   movePageNumber(page: number): void {
     this.currentPage = page;
+    if (this.includeCheckBox) this.checkBoxOutput.emit([]);
     this.getDisplayByPageNumber();
     this.initializeTableFormGroup();
     if(this.includeCheckBox){
@@ -210,13 +202,11 @@ export class TableComponent implements OnInit, OnChanges {
   }
 
   decreasePageNumber(): void{
-    this.currentPage > 1 ? this.currentPage -= 1 : '';
-    this.getDisplayByPageNumber();
+    if (this.currentPage > 1) this.movePageNumber(this.currentPage - 1);
   }
 
   increasePageNumber(): void{
-    this.currentPage < this.pageArray.length ? this.currentPage +=1 :'';
-    this.getDisplayByPageNumber();
+    if (this.currentPage < this.pageArray.length) this.movePageNumber(this.currentPage + 1);
   }
 
   getDisplayByPageNumber(): void {

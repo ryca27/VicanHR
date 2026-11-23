@@ -1,6 +1,7 @@
 //File type list
 export const fileTypeList = [
     {'value':'attendance', 'label':'Attendance'},
+    {'value':'attendance_adjustment', 'label':'Attendance Adjustment'},
     {'value':'expenses', 'label':'Expense'},
     {'value':'allowance', 'label':'Allowance'}
 ]
