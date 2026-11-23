@@ -20,6 +20,9 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.auth.views import LoginView
 from attendance.api import attendance, attendance_detail, preview_workbook
 from attendance.payroll_api import create_payroll_draft, payroll_draft
+from attendance.payroll_ledger_api import (
+    expense_employee_detail, expense_employees, finalize_payroll_draft, payroll_loan_payment, payroll_loans, thirteenth_month_pay,
+)
 from .login import csrf, session_login
 from attendance.views import upload_summary
 from django.urls import path, include
@@ -27,6 +30,12 @@ from django.urls import path, include
 urlpatterns = [
     path("api/payroll/drafts/", create_payroll_draft),
     path("api/payroll/drafts/<int:pk>/", payroll_draft),
+    path("api/payroll/drafts/<int:pk>/finalize/", finalize_payroll_draft),
+    path("api/payroll/loans/", payroll_loans),
+    path("api/payroll/expense-employees/", expense_employees),
+    path("api/payroll/expense-employees/detail/", expense_employee_detail),
+    path("api/payroll/loans/<int:pk>/payments/", payroll_loan_payment),
+    path("api/payroll/thirteenth-month/<int:year>/", thirteenth_month_pay),
     path("api/auth/csrf/", csrf),
     path("api/auth/login/", session_login),
     path("api/attendance/preview/", preview_workbook),

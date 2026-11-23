@@ -133,6 +133,26 @@
     <div class="table-container">
         @if (demoMode) { <p>Demo payroll · Fictional employees and sample amounts</p> }
         @if (loadError) { <p class="cutoff-error" role="alert">{{ loadError }}</p> }
+        @if (demoMode) {
+            <details class="adjustment-sources">
+                <summary>Demo · Expense allocation across detachments</summary>
+                <p>{{ demoExpenseAllocation.employeeName }} has
+                    {{ demoExpenseAllocation.regularExpenses | currency:'PHP':'symbol-narrow' }} in expenses, all charged to North, where Avery worked more hours.
+                    Combined take-home pay is {{ demoExpenseAllocation.netPay | currency:'PHP':'symbol-narrow' }}.</p>
+                <ul>
+                    @for (site of demoExpenseAllocation.sites; track site.id) {
+                        <li>{{ site.name }} · {{ site.hours }} hours ·
+                            {{ site.contributionTotal | currency:'PHP':'symbol-narrow' }} government deductions ·
+                            {{ (site.cashBond + site.supplies) | currency:'PHP':'symbol-narrow' }} expenses ·
+                            {{ (site.pay - site.contributionTotal - site.cashBond - site.supplies) | currency:'PHP':'symbol-narrow' }} net pay
+                        </li>
+                    }
+                </ul>
+                <p><strong>Spillover example.</strong> If approved expenses total
+                    {{ demoExpenseAllocation.exampleExpenseTotal | currency:'PHP':'symbol-narrow' }} instead,
+                    {{ demoExpenseAllocation.exampleSpillover | currency:'PHP':'symbol-narrow' }} would move to South after North’s government deductions.</p>
+            </details>
+        }
         @if (adjustmentSources.length) {
             <details class="adjustment-sources">
                 <summary>Attendance adjustments ({{ adjustmentSources.length }})</summary>
@@ -149,6 +169,7 @@
         [rowsInput]="tableRows"
         [actionRowsInput]="tableActions"
         [rowsIdInput]="tableRowsId"
+        [firstCellLinks]="demoMode ? demoEmployeeLinks : undefined"
         (checkBoxOutput)="checkBoxOutputListener($event)"></app-table>
         @let issues = visibleAttentionIssues;
         @if (issues.length) {

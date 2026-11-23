@@ -235,3 +235,296 @@ class AttendanceSourceCheckTests(TestCase):
         self.assertEqual(revision.status_code, 200, revision.json())
         self.assertEqual(self.client.get(f"{path}{cutoff_id}/").json()["employees"][0]["regularHours"], 12)
         self.assertEqual(len(self.client.get(path).json()), 1)
+
+
+class PhilippineStatutoryPayrollTests(TestCase):
+    def setUp(self):
+        user = User.objects.create_user(username="statutory-reviewer")
+        user.groups.add(Group.objects.create(name="finance"))
+        self.client = APIClient()
+        self.client.force_login(user)
+
+    def inputs(self, employee_type="staff", **overrides):
+        return {
+            "payDate": "2026-11-30", "contributionMonth": "2026-11-01",
+            "payFrequency": "semi_monthly", "contributionShareThroughCutoff": "1",
+            "employees": [{
+                "registerRow": 8, "employeeName": "Fictional, Employee", "employeeType": employee_type,
+                "minimumDailyWage": "755.00", "wageOrder": "NCR-28",
+                "minimumWageEarnerConfirmed": False, "sssMonthlyRemuneration": "34400.00",
+                "philhealthMonthlyBasicSalary": "30000.00", "pagibigMonthlyFundSalary": "30000.00",
+                "alreadyDeducted": {"sss": "0", "philhealth": "0", "pagibig": "0"},
+                "otherTaxableRegularPay": "0", "otherTaxableSupplementaryPay": "0",
+                "withholdingMethod": "periodic", **overrides,
+            }],
+        }
+
+    def upload(self, inputs, daily_rate=1500, hours=112, ot_hours=10, detachment_inputs=None, expense=None,
+               payroll_period=None):
+        import json
+        from io import BytesIO
+
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from openpyxl import Workbook
+
+        from .payroll import DEDUCTION_TABS
+
+        register = Workbook()
+        sheet = register.active
+        sheet["C3"] = f"{payroll_period['start']} to {payroll_period['end']}" if payroll_period else "November 16-30, 2026"
+        sheet["C6"] = "EMPLOYEE NAME"
+        sheet["BF6"] = "PAY"
+        for col, value in {
+            "B": 1, "C": "Fictional, Employee", "D": daily_rate, "E": hours,
+            "H": ot_hours, "I": 200, "AF": 999, "AG": 999, "AH": 999,
+            "AU": 999, "AC": 23000, "BE": 0, "BF": 23000,
+        }.items():
+            sheet[f"{col}8"] = value
+        if detachment_inputs:
+            for col, value in {
+                "B": 2, "C": "Fictional, Employee", "D": 800, "E": 48,
+                "AF": 999, "AG": 999, "AH": 999, "AU": 999, "AC": 4800, "BE": 0, "BF": 4800,
+            }.items():
+                sheet[f"{col}9"] = value
+            sheet["AR8"] = expense
+        deductions = Workbook()
+        deductions.remove(deductions.active)
+        for tab, headers in DEDUCTION_TABS.items():
+            deductions.create_sheet(tab).append(["EMPLOYEE NAME", *headers])
+
+        def file(workbook, name):
+            buffer = BytesIO()
+            workbook.save(buffer)
+            return SimpleUploadedFile(name, buffer.getvalue())
+
+        return self.client.post("/api/payroll/drafts/", {
+            "register": file(register, "register.xlsx"), "deductions": file(deductions, "deductions.xlsx"),
+            "statutoryInputs": json.dumps(inputs),
+            **({"detachmentInputs": json.dumps(detachment_inputs)} if detachment_inputs else {}),
+            **({"payrollPeriodDates": json.dumps(payroll_period)} if payroll_period else {}),
+        }, format="multipart")
+
+    def test_standard_draft_replaces_register_contributions_and_includes_overtime_in_tax(self):
+        payload = self.inputs()
+        response = self.upload(payload)
+        self.assertEqual(response.status_code, 201, response.json())
+        employee = response.json()["employees"][0]
+        details = employee["statutory"]
+        self.assertEqual(details["employeeContributions"], {"sss": "1725.00", "philhealth": "750.00", "pagibig": "200.00"})
+        self.assertEqual(details["monthlyContributions"]["employeesCompensation"]["employer"], "30.00")
+        self.assertEqual(details["taxableCompensation"], "20325.00")
+        self.assertEqual(details["withholdingTax"], "1669.10")
+        self.assertEqual(employee["totalDeductions"], "4344.10")
+        self.assertEqual(employee["netPay"], "18655.90")
+        self.assertEqual(self.upload(payload).status_code, 200)
+        payload["employees"][0]["alreadyDeducted"]["sss"] = "800.00"
+        changed = self.upload(payload)
+        self.assertEqual(changed.status_code, 201)
+        self.assertEqual(changed.json()["employees"][0]["statutory"]["employeeContributions"]["sss"], "925.00")
+
+    def test_confirmed_minimum_wage_treatment_for_guards_staff_and_drivers(self):
+        for employee_type in ("security_guard", "staff", "driver"):
+            with self.subTest(employee_type=employee_type):
+                payload = self.inputs(employee_type, minimumWageEarnerConfirmed=True)
+                payload["taxExemptEmployeeTypes"] = []
+                response = self.upload(payload, daily_rate=755)
+                self.assertEqual(response.status_code, 201, response.json())
+                statutory = response.json()["employees"][0]["statutory"]
+                self.assertEqual(statutory["taxTreatment"], "minimum_wage")
+                self.assertEqual(statutory["withholdingTax"], "0.00")
+        payload = self.inputs("security_guard")
+        payload["taxExemptEmployeeTypes"] = []
+        above_minimum = self.upload(payload)
+        self.assertEqual(above_minimum.status_code, 201, above_minimum.json())
+        self.assertIn("statutory_tax_review", [issue["code"] for issue in above_minimum.json()["employees"][0]["issues"]])
+        self.assertEqual(self.upload(self.inputs("staff"), daily_rate=755).status_code, 400)
+        self.assertEqual(self.upload(self.inputs("other")).status_code, 400)
+
+    def test_marked_employee_type_overrides_bir_withholding_but_keeps_contributions(self):
+        for employee_type in ("security_guard", "driver", "other"):
+            with self.subTest(employee_type=employee_type):
+                treatment = {"otherTaxTreatment": "standard"} if employee_type == "other" else {}
+                payload = self.inputs(employee_type, **treatment)
+                if employee_type != "security_guard":
+                    payload["taxExemptEmployeeTypes"] = [employee_type]
+                response = self.upload(payload)
+                self.assertEqual(response.status_code, 201, response.json())
+                result = response.json()["employees"][0]
+                statutory = result["statutory"]
+                self.assertEqual(statutory["taxTreatment"], "employee_type_exempt")
+                self.assertEqual(statutory["withholdingTax"], "0.00")
+                self.assertEqual(statutory["birComparison"]["withholdingTax"], "1669.10")
+                self.assertEqual(result["totalDeductions"], "2675.00")
+                self.assertEqual(result["netPay"], "20325.00")
+                self.assertIn("statutory_tax_review", [issue["code"] for issue in result["issues"]])
+
+        no_history = self.upload(self.inputs("security_guard", withholdingMethod="cumulative"))
+        self.assertEqual(no_history.status_code, 201, no_history.json())
+        statutory = no_history.json()["employees"][0]["statutory"]
+        self.assertIsNone(statutory["birComparison"])
+        self.assertEqual(statutory["withholdingTax"], "0.00")
+
+    def test_cumulative_method_and_contribution_thresholds(self):
+        from decimal import Decimal
+        from .statutory import monthly_contributions
+
+        below = monthly_contributions(Decimal("14749.99"), Decimal("9000"), Decimal("1500"))
+        above = monthly_contributions(Decimal("14750"), Decimal("120000"), Decimal("1500.01"))
+        self.assertEqual(below["sss"]["employee"], Decimal("725"))
+        self.assertEqual(above["sss"]["employee"], Decimal("750"))
+        self.assertEqual(below["employeesCompensation"]["employer"], Decimal("10"))
+        self.assertEqual(above["employeesCompensation"]["employer"], Decimal("30"))
+        self.assertEqual(below["philhealth"]["employee"], Decimal("250"))
+        self.assertEqual(above["philhealth"]["employee"], Decimal("2500"))
+        self.assertEqual(below["pagibig"]["employee"], Decimal("15"))
+        self.assertEqual(above["pagibig"]["employee"], Decimal("30"))
+        response = self.upload(self.inputs(), hours=64)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("cumulative method", response.json()["detail"])
+        response = self.upload(self.inputs(
+            withholdingMethod="cumulative",
+            withholdingHistory={"taxablePay": "18675", "taxWithheld": "100", "periodsIncludingCurrent": 2},
+        ), hours=64)
+        self.assertEqual(response.status_code, 201, response.json())
+        self.assertEqual(response.json()["employees"][0]["statutory"]["withholdingTax"], "1274.90")
+
+    def test_multiple_detachments_collect_statutorily_once_and_spill_expenses(self):
+        rows = {"rows": [{
+            "registerRow": row, "employeeId": "GUARD-01", "employeeName": "Fictional, Employee",
+            "detachment": site, "workedHours": hours, "workFrom": "2026-11-16", "workThrough": "2026-11-30",
+            "basicPayEffectiveFrom": "2026-10-01", "basicPayEffectiveThrough": None,
+            "approvedDailyRate": "800.00", "wageOrder": "NCR-28", "minimumDailyWage": "755.00",
+            "sssRemuneration": pay, "pagibigFundSalary": pay,
+        } for row, site, hours, pay in [(8, "North", "80", "8000"), (9, "South", "48", "4800")]]}
+        inputs = self.inputs("security_guard")
+        response = self.upload(inputs, daily_rate=800, hours=80, ot_hours=0, detachment_inputs=rows, expense=6500)
+        self.assertEqual(response.status_code, 201, response.json())
+        north, south = response.json()["employees"]
+        self.assertEqual(north["detachment"], "North")
+        self.assertEqual(north["statutoryAllocation"], {
+            "sss": "1078.13", "philhealth": "750.00", "pagibig": "125.00", "withholdingTax": "0.00",
+        })
+        self.assertEqual(south["statutoryAllocation"], {
+            "sss": "646.87", "philhealth": "0.00", "pagibig": "75.00", "withholdingTax": "0.00",
+        })
+        self.assertEqual((north["grossPay"], south["grossPay"]), ("8000.00", "4800.00"))
+        self.assertEqual(north["allocatedExpenses"], {"AR": "6046.87"})
+        self.assertEqual(north["netPay"], "0.00")
+        self.assertEqual(south["allocatedExpenses"], {"AR": "453.13"})
+        self.assertEqual(south["netPay"], "3625.00")
+        self.assertNotIn("statutory", south)
+        self.assertEqual(response.json()["expenseAllocations"][0]["unallocatedExpenses"], {})
+
+        blank = self.upload(inputs, daily_rate=800, hours=80, ot_hours=0, detachment_inputs=rows)
+        self.assertEqual(blank.status_code, 201, blank.json())
+        for employee in blank.json()["employees"]:
+            self.assertEqual(employee["deductions"]["AR"], "0.00")
+            self.assertEqual(employee["allocatedExpenses"], {})
+        self.assertEqual(blank.json()["summary"]["calculatedTotals"]["netPay"], "10125.00")
+
+        excess = self.upload(inputs, daily_rate=800, hours=80, ot_hours=0, detachment_inputs=rows, expense=12000)
+        self.assertEqual(excess.status_code, 201, excess.json())
+        primary = excess.json()["employees"][0]
+        self.assertEqual(primary["unallocatedExpenses"], {"AR": "1875.00"})
+        self.assertIn("unallocated_expenses", [issue["code"] for issue in primary["issues"]])
+
+        rows["rows"][1]["basicPayEffectiveThrough"] = "2026-11-20"
+        self.assertEqual(self.upload(inputs, daily_rate=800, hours=80, ot_hours=0,
+                                     detachment_inputs=rows, expense=6500).status_code, 400)
+
+    def create_loan(self, reference, principal, installment, column=""):
+        response = self.client.post("/api/payroll/loans/", {
+            "employeeId": "GUARD-01", "reference": reference, "label": reference,
+            "principal": principal, "monthlyInstallment": installment,
+            "startsOn": "2026-10-01", "registerColumn": column,
+        }, format="json")
+        self.assertEqual(response.status_code, 201, response.json())
+        return response.json()["loanId"]
+
+    def dated_draft(self, start, end):
+        rows = {"rows": [{
+            "registerRow": row, "employeeId": "GUARD-01", "employeeName": "Fictional, Employee",
+            "detachment": site, "workedHours": hours, "workFrom": start, "workThrough": end,
+            "basicPayEffectiveFrom": "2026-09-01", "approvedDailyRate": "800.00",
+            "wageOrder": "NCR-28", "minimumDailyWage": "755.00",
+            "sssRemuneration": pay, "pagibigFundSalary": pay,
+        } for row, site, hours, pay in [(8, "North", "80", "8000"), (9, "South", "48", "4800")]]}
+        inputs = self.inputs("security_guard")
+        inputs["payDate"] = end
+        inputs["contributionMonth"] = f"{end[:7]}-01"
+        return self.upload(inputs, daily_rate=800, hours=80, ot_hours=10,
+                           detachment_inputs=rows, payroll_period={"start": start, "end": end})
+
+    def test_finalization_tracks_multiple_loans_and_thirteenth_month_basic_pay(self):
+        first = self.create_loan("Salary loan", "500.00", "300.00", "AJ")
+        second = self.create_loan("Emergency loan", "900.00", "400.00")
+        october = self.dated_draft("2026-10-16", "2026-10-31")
+        self.assertEqual(october.status_code, 201, october.json())
+        oct_id = october.json()["draftId"]
+        self.assertEqual(self.client.get("/api/payroll/thirteenth-month/2026/").json()["employees"], [])
+        finalized = self.client.post(f"/api/payroll/drafts/{oct_id}/finalize/")
+        self.assertEqual(finalized.status_code, 201, finalized.json())
+        self.assertEqual([(p["loanId"], p["amount"]) for p in finalized.json()["loanPayments"]],
+                         [(first, "300.00"), (second, "400.00")])
+        self.assertEqual(self.client.post(f"/api/payroll/drafts/{oct_id}/finalize/").status_code, 200)
+        self.assertTrue(self.client.get(f"/api/payroll/drafts/{oct_id}/").json()["isFinalized"])
+        listed = self.client.get("/api/payroll/drafts/").json()
+        self.assertEqual(listed[0]["draftId"], oct_id)
+        self.assertTrue(listed[0]["isFinalized"])
+        self.assertNotIn("employees", listed[0])
+
+        november = self.dated_draft("2026-11-01", "2026-11-15")
+        self.assertEqual(november.status_code, 201, november.json())
+        nov_id = november.json()["draftId"]
+        finalized = self.client.post(f"/api/payroll/drafts/{nov_id}/finalize/")
+        self.assertEqual(finalized.status_code, 201, finalized.json())
+        self.assertEqual([(p["loanId"], p["amount"]) for p in finalized.json()["loanPayments"]],
+                         [(first, "200.00"), (second, "400.00")])
+        later_november = self.dated_draft("2026-11-16", "2026-11-30").json()
+        self.assertEqual(later_november["loanPlan"]["GUARD-01"]["loans"], {})
+        overview = self.client.get("/api/payroll/expense-employees/?employeeName=employee+fictional").json()
+        self.assertEqual(overview["count"], 1)
+        self.assertEqual(overview["employees"], [{
+            "employeeId": "GUARD-01", "employeeName": "Fictional, Employee",
+            "loanTypes": ["Salary loan", "Emergency loan"], "loanCount": 2, "remainingBalance": "100.00",
+        }])
+        self.assertEqual(self.client.get(
+            "/api/payroll/expense-employees/?employeeId=missing&employeeName=fictional",
+        ).json()["count"], 0)
+        detail = self.client.get("/api/payroll/expense-employees/detail/?employeeId=guard-01").json()
+        self.assertEqual(detail["employeeName"], "Fictional, Employee")
+        self.assertEqual([len(loan["payments"]) for loan in detail["loans"]], [2, 2])
+        self.assertEqual(len(detail["expenses"]), 4)
+        self.assertTrue(all(item["label"] in ("Salary loan", "Emergency loan") for item in detail["expenses"]))
+        self.assertEqual(self.client.get("/api/payroll/expense-employees/detail/?employeeId=missing").status_code, 404)
+
+        december = self.dated_draft("2026-12-01", "2026-12-15").json()
+        self.assertEqual(december["loanPlan"]["GUARD-01"]["loans"], {f"loan:{second}": "100.00"})
+        loans = self.client.get("/api/payroll/loans/?employeeId=GUARD-01").json()
+        self.assertEqual([(loan["status"], loan["remainingBalance"]) for loan in loans],
+                         [("paid", "0.00"), ("open", "100.00")])
+
+        report = self.client.get("/api/payroll/thirteenth-month/2026/").json()
+        self.assertEqual(report["operationalCutoff"], "2026-10-31")
+        self.assertEqual(self.client.get("/api/payroll/thirteenth-month/2026/?employeeId=missing").json()["employees"], [])
+        filtered = self.client.get("/api/payroll/thirteenth-month/2026/?employeeId=guard-01").json()
+        self.assertEqual(filtered["employees"], report["employees"])
+        employee, = report["employees"]
+        self.assertEqual(employee["basicPayThroughOctober"], "12800.00")
+        self.assertEqual(employee["basicPayCalendarYear"], "25600.00")
+        self.assertEqual(employee["octoberEstimate"], "1066.67")
+        self.assertEqual(employee["calendarYearAccrued"], "2133.33")
+        self.assertEqual(employee["novemberDecemberAccrual"], "1066.66")
+
+        payment = {"reference": "Receipt-01", "paymentDate": "2026-12-02", "amount": "100.00"}
+        path = f"/api/payroll/loans/{second}/payments/"
+        self.assertEqual(self.client.post(path, payment, format="json").status_code, 201)
+        self.assertEqual(self.client.post(path, payment, format="json").status_code, 200)
+        self.assertEqual(self.client.post(f"/api/payroll/drafts/{december['draftId']}/finalize/").status_code, 409)
+        refreshed = self.dated_draft("2026-12-01", "2026-12-15").json()
+        self.assertEqual(refreshed["loanPlan"]["GUARD-01"]["loans"], {})
+
+    def test_dated_draft_requires_split_at_october_end(self):
+        response = self.dated_draft("2026-10-25", "2026-11-05")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Split", response.json()["detail"])

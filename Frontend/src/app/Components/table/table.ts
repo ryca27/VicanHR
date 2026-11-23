@@ -1,12 +1,13 @@
 import { Component, Input, OnInit, inject, OnChanges, DestroyRef, Output, EventEmitter } from '@angular/core';
 import { NgClass } from '@angular/common';
+import { Params, RouterLink } from '@angular/router';
 import { actionList, CheckBoxOutputInterface } from './table-constants'
 import {FormControl, ReactiveFormsModule, Validators, FormArray, FormGroup, FormBuilder,} from '@angular/forms'
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-table',
-  imports: [NgClass, MatFormFieldModule, ReactiveFormsModule],
+  imports: [NgClass, RouterLink, MatFormFieldModule, ReactiveFormsModule],
   templateUrl: './table.html',
   styleUrl: './table.scss',
 })
@@ -18,6 +19,7 @@ export class TableComponent implements OnInit, OnChanges {
   @Input() includeCheckBox: boolean = false;
   @Input() rowsIdInput: Array<string> = [];
   @Input() includeStatus: boolean = false;
+  @Input() firstCellLinks?: Readonly<Partial<Record<string, { path: string; queryParams?: Params }>>>;
   @Input() actionRowsInput: Array<Array<{value: number, isDisabled:boolean}>> = [];
   @Output() checkBoxOutput: EventEmitter<Array<string>> = new EventEmitter<Array<string>>();
   private fb = inject(FormBuilder);

@@ -1,6 +1,6 @@
 import { actionList } from '../../../Components/table/table-constants';
 import { PayrollCutoffEmployee, payrolCutoffDeduction, payrollCutoffIncome } from './payroll-cutoff.models';
-import {incomeSourceKeys, deductionSourceKeys, detachmentList} from './payroll-cutoff-constants'
+import {incomeSourceKeys, deductionSourceKeys, expenseDeductionKeys, detachmentList} from './payroll-cutoff-constants'
 import { Payslip, PayslipItem, IncomeItem } from './../payslip/payslip.model'
 
 export function employeeTablePreparation(employees: Array<PayrollCutoffEmployee>): Array<any>{
@@ -16,7 +16,9 @@ export function employeeTablePreparation(employees: Array<PayrollCutoffEmployee>
             fullName: e.employeeName, 
             detachment: e.detachment, 
             ...Object.fromEntries(incomeSourceKeys.map(key => [key, e.incomeSource[key]])),
-            ...Object.fromEntries(deductionSourceKeys.map(key => [key, e.deductionSource[key]])),
+            ...Object.fromEntries(deductionSourceKeys.map(key => [
+                key, e.deductionSource[key] ?? (expenseDeductionKeys.has(key) ? 0 : null),
+            ])),
             grossPay:e.grossPay, 
             totalDeductions:e.totalDeductions,
             netPay: e.netPay, 
