@@ -34,6 +34,7 @@ export interface AttendanceUpload {
   export interface AttendanceRecord {
     employeeNo?: string | null;
     employeeName: string;
+    detachment?: string | null;
     adjustmentPeriods?: string[];
     adjustmentHours?: Partial<Record<AttendanceHourField, number>>;
     regularHours: number | null;

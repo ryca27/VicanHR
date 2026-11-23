@@ -321,7 +321,8 @@ export class UploadService {
           employees.push({
             employeeNo,
             employeeName,
-    
+            detachment: branch,
+
             regularHours: hours(
               columns.regularHours, 'Regular Hours'
             ),

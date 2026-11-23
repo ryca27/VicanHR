@@ -130,16 +130,24 @@ export class AcceptedRowsModal implements OnInit, OnChanges {
     this.tableColumns = columns;
   }
 
-  initializeTableRows(tableRows:any): void {
-    this.tableRows = [];
-    tableRows.forEach( (ar: AttendanceParseResult) => {
-      ar.employees.forEach(e => {
-        let employeeNo = e.employeeNo ? e.employeeNo : '0';
-        this.tableRowsId.push(employeeNo);
-        delete e.employeeNo;
-        this.tableRows.push(e);
-      })
-    });
+  initializeTableRows(summaries: AttendanceParseResult[]): void {
+    this.tableRowsId = [];
+    this.tableRows = summaries.flatMap(summary => summary.employees.map(employee => {
+      this.tableRowsId.push(employee.employeeNo ?? '0');
+      return {
+        employeeName: employee.employeeName,
+        detachment: employee.detachment ?? summary.branch ?? '—',
+        regularHours: employee.regularHours,
+        overtimeHours: employee.overtimeHours,
+        nightDifferentialHours: employee.nightDifferentialHours,
+        wdoHours: employee.wdoHours,
+        btrHours: employee.btrHours,
+        legalHolidayHours: employee.legalHolidayHours,
+        legalHolidayOtHours: employee.legalHolidayOtHours,
+        specialHolidayHours: employee.specialHolidayHours,
+        specialHolidayOtHours: employee.specialHolidayOtHours,
+      };
+    }));
   }
 
   closeAcceptedRowsModal(){

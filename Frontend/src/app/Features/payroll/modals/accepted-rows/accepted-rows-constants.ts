@@ -6,5 +6,5 @@ export const tabNamesList: {name: string, isActive: boolean}[] = [
 ]
 
 export const attendanceColumnsList: string[] = [
-    'Employee Name', 'Regular Hrs', 'Regular OT Hours', 'ND Hours', 'WDO', 'BTR Hours', 'LH', 'LH OT', 'SH', 'SH OT'
+    'Employee Name', 'Detachment', 'Regular Hrs', 'Regular OT Hours', 'ND Hours', 'WDO', 'BTR Hours', 'LH', 'LH OT', 'SH', 'SH OT'
 ]
