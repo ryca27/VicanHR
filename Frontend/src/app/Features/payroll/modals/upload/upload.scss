@@ -18,7 +18,10 @@
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 4px 15px rgb(0 0 0 / 20%);
-  font-family: Helvetica, Arial, sans-serif;
+  --upload-font: Helvetica, Arial, sans-serif;
+  --mat-form-field-container-text-font: var(--upload-font);
+  --mat-form-field-filled-label-text-font: var(--upload-font);
+  font-family: var(--upload-font);
 }
 
 .modal-header {
