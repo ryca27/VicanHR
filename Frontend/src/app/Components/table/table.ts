@@ -20,6 +20,7 @@ export class TableComponent implements OnInit, OnChanges {
   @Input() includeStatus: boolean = false;
   @Input() actionRowsInput: Array<Array<{value: number, isDisabled:boolean}>> = [];
   @Output() checkBoxOutput: EventEmitter<Array<string>> = new EventEmitter<Array<string>>();
+  @Output() actionOutput: EventEmitter<{actionNumber: number, id: string}> = new EventEmitter<{actionNumber: number, id: string}>();
   private fb = inject(FormBuilder);
   private destroyRef = inject(DestroyRef); 
   actionColumnIndex: number = -1;
@@ -240,5 +241,9 @@ export class TableComponent implements OnInit, OnChanges {
     this.disableIsCheckedFormControl();
     this.getPageArray(this.pageSize);
     this.allCheck?.setValue(false, { emitEvent: false });
+  }
+
+  onClickAction(value: number, id: string): void {
+    this.actionOutput.emit({actionNumber: value, id: id});
   }
 }

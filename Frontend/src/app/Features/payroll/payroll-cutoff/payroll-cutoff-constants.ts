@@ -531,7 +531,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       isFinalized: true
     },
     {
-      employeeNo: 'DEMO-NEGATIVE',
+      employeeNo: '10',
       employeeName: 'Bautista, Sam',
       detachment: 'Demo Detachment',
       incomeSource: {

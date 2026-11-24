@@ -17,11 +17,13 @@ import {CheckBoxOutputInterface} from './../../../Components/table/./table-const
 import {UploadModal} from './../modals/upload/upload';
 import {Payslip } from './../payslip/payslip.model'
 import {PayslipComponent} from './../payslip/payslip'
+import { EditPayroll } from './../modals/edit-payroll/edit-payroll'
+import { PayrollCutoffEmployee } from './payroll-cutoff.models';
 
 
 @Component({
   selector: 'app-payroll-cutoff',
-  imports: [DropdownComponent, ButtonComponent, CardComponent, TableComponent, UploadModal, PayslipComponent, ReactiveFormsModule],
+  imports: [DropdownComponent, ButtonComponent, CardComponent, TableComponent, UploadModal, PayslipComponent, ReactiveFormsModule, EditPayroll],
   templateUrl: './payroll-cutoff.html',
   styleUrl: './payroll-cutoff.scss',
 })
@@ -54,7 +56,9 @@ export class PayrollCutoff implements OnInit {
   isFinalizeDisabled: boolean = true;
   isDownloadDisabled: boolean = true;
   isUploadModalVisible: boolean = false;
+  isEditModalVisible: boolean = false;
   isGeneratingPdf: boolean = false;
+  payrollCutoffEmployees = payrollCutoffEmployees
   startDate: string = '';
   endDate: string = '';
   selectedPayslip?: Payslip;
@@ -62,6 +66,7 @@ export class PayrollCutoff implements OnInit {
   savedCutoffId: string | null = null;
   savedCutoffPeriod = '';
   adjustmentSources: AttendanceAdjustmentSource[] = [];
+  employeeEdit!: PayrollCutoffEmployee;
   private readonly attentionIssues = new Map<string, { reason: string; details: string; action: string }>();
 
   get visibleAttentionIssues() {
@@ -93,8 +98,8 @@ export class PayrollCutoff implements OnInit {
     this.demoPayslips.clear();
     this.attentionIssues.clear();
     this.tableColumns = payrollColumns;
-    this.mockData.tableRows = employeeTablePreparation(payrollCutoffEmployees);
-    payrollCutoffEmployees.forEach((employee, index) => {
+    this.mockData.tableRows = employeeTablePreparation(this.payrollCutoffEmployees);
+    this.payrollCutoffEmployees.forEach((employee, index) => {
       this.mockData.tableRows[index].fullName = this.formatEmployeeName(employee.employeeName);
       const issue = demoAttentionIssues[employee.employeeName];
       if (issue) this.attentionIssues.set(employee.employeeNo, issue);
@@ -225,7 +230,7 @@ export class PayrollCutoff implements OnInit {
       this.tableRowsId.push(id);
       return row;
     });
-    this.tableActions = employeeTableActionPreparation(tableRows);
+    this.tableActions = employeeTableActionPreparation(tableRows.length);
     this.updateKpis(tableRows);
   }
 
@@ -269,8 +274,22 @@ export class PayrollCutoff implements OnInit {
     this.employeeCount = this.tableRows.length;
     const sumValues = (read: (row: any) => unknown): number | null => {
       const values = rows.map(read);
-      if (!values.length || !values.every(value => typeof value === 'number')) return null;
-      return values.reduce((total, value) => total + value, 0);
+    
+      if (!values.length) {
+        return null;
+      }
+    
+      const isNumber = (value: unknown): value is number =>
+        typeof value === 'number' && Number.isFinite(value);
+    
+      if (!values.every(isNumber)) {
+        return null;
+      }
+    
+      return values.reduce(
+        (total: number, value: number) => total + value,
+        0
+      );
     };
     const format = (value: number, currency = false) => value.toLocaleString('en-PH',
       currency ? { style: 'currency', currency: 'PHP' } : { maximumFractionDigits: 2 });
@@ -372,9 +391,22 @@ export class PayrollCutoff implements OnInit {
     this.downloadChecker();
   }
 
+  actionOutputListener(message: {actionNumber: number, id: string}): void {
+    switch(message.actionNumber){
+      case 4:
+        this.isEditModalVisible = true;
+        this.employeeEdit = this.payrollCutoffEmployees.filter(p => p.employeeNo == message.id)[0];
+    }
+    
+  }
+
   //Upload Component Listenere
   closeUloadModalListener(message: boolean): void {
     this.isUploadModalVisible = false;
+  };
+
+  closeEditModalListener(message: boolean): void {
+    this.isEditModalVisible = false;
   };
 
   finalizeChecker(): void {

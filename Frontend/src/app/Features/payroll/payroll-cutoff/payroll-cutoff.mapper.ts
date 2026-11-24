@@ -39,7 +39,7 @@ export function employeeTableActionPreparation(size: number): Array<Array<{value
     let tableActionReadyRows: Array<Array<{value:number, isDisabled: boolean}>> = [];
     let i:number = 0;
     while (i < size){
-        let actionRow = [{value:1, isDisabled: true}, {value:2, isDisabled: true}, {value:3, isDisabled: true}];
+        let actionRow = [{value:4, isDisabled: false},];
         tableActionReadyRows.push(actionRow);
         i++
     }

@@ -25,7 +25,8 @@
                             @if($index == actionColumnIndex){
                                 <td class="action-td">
                                     @for(actionRow of actionRows[displayIndex + i]; track actionRow){
-                                        <img [src]="actionRow.imgSrc" style="width:20px; height:20px; mix-blend-mode: multiply" [ngClass]="{'disabled': actionRow.isDisabled}"> 
+                                        <img [src]="actionRow.imgSrc" style="width:20px; height:20px; mix-blend-mode: multiply" [ngClass]="{'disabled': actionRow.isDisabled}"
+                                         (click)="onClickAction(actionRowsInput[i + displayIndex][0].value, rowsIdInput[i])"> 
                                     }
                                  </td>
                             }

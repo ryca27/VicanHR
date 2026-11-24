@@ -74,7 +74,8 @@
        
     </div>
     @if (mixedStatuses) {
-        <p class="selection-hint" role="status">Select employees with the same status to finalize or undo.</p>
+        <div class="selection-hint-container"><p class="selection-hint" role="status">Select employees with the same status to finalize or undo.</p></div>
+        
     }
     <div class="statistics-container">
         <div class="card-container">
@@ -111,7 +112,7 @@
         <h2 id="hours-summary-heading">Hours</h2>
         <dl class="hours-grid">
             @for (total of hourTotals; track total.label) {
-                <div class="hours-box" [class.hours-box-primary]="$first" [class.hours-box-missing]="total.value === '—'">
+                <div class="hours-box" [class.hours-box-missing]="total.value === '—'">
                     <dt>{{ total.label }}</dt>
                     <dd>
                         {{ total.value }}
@@ -149,29 +150,34 @@
         [rowsInput]="tableRows"
         [actionRowsInput]="tableActions"
         [rowsIdInput]="tableRowsId"
-        (checkBoxOutput)="checkBoxOutputListener($event)"></app-table>
+        (checkBoxOutput)="checkBoxOutputListener($event)"
+        (actionOutput)="actionOutputListener($event)"
+        ></app-table>
         @let issues = visibleAttentionIssues;
         @if (issues.length) {
-            <details class="attention-panel">
-                <summary class="attention-heading">
-                    <span class="attention-title">Needs Attention</span>
-                    <span>{{ issues.length }} {{ issues.length === 1 ? 'employee' : 'employees' }}</span>
-                </summary>
-                <div class="attention-list">
-                    @for (issue of issues; track issue.id) {
-                        <details class="attention-details">
-                            <summary>
-                                <span class="attention-employee">{{ issue.employeeName }}</span>
-                                <span class="attention-reason">{{ issue.reason }}</span>
-                            </summary>
-                            <div class="attention-content">
-                                <p>{{ issue.details }}</p>
-                                <p class="attention-action"><strong>Next action</strong>{{ issue.action }}</p>
-                            </div>
-                        </details>
-                    }
-                </div>
-            </details>
+            <div class="attention-panel-container">
+                <details class="attention-panel">
+                    <summary class="attention-heading">
+                        <span class="attention-title">Needs Attention</span>
+                        <span>{{ issues.length }} {{ issues.length === 1 ? 'employee' : 'employees' }}</span>
+                    </summary>
+                    <div class="attention-list">
+                        @for (issue of issues; track issue.id) {
+                            <details class="attention-details">
+                                <summary>
+                                    <span class="attention-employee">{{ issue.employeeName }}</span>
+                                    <span class="attention-reason">{{ issue.reason }}</span>
+                                </summary>
+                                <div class="attention-content">
+                                    <p>{{ issue.details }}</p>
+                                    <p class="attention-action"><strong>Next action</strong>{{ issue.action }}</p>
+                                </div>
+                            </details>
+                        }
+                    </div>
+                </details>
+            </div>
+            
         }
     </div>
     @if (!demoMode) {
@@ -191,6 +197,13 @@
   [targetCutoffPeriod]="savedCutoffPeriod"
   (cutoffSaved)="refreshCurrentCutoff($event)"
   (isSubmit)="closeUloadModalListener($event)"> </upload-modal>
+}
+
+@if(isEditModalVisible) {
+    <edit-payroll
+    [isOpen]="isEditModalVisible"
+    [employeePayroll]="employeeEdit"
+    (isSubmit)="closeEditModalListener($event)"></edit-payroll>
 }
 
 <div class="pdf-render-area" aria-hidden="true">
