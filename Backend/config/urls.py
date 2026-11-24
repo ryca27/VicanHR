@@ -26,6 +26,11 @@ from attendance.payroll_ledger_api import (
 from .login import csrf, session_login
 from attendance.views import upload_summary
 from django.urls import path, include
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+    SpectacularRedocView,
+)
 
 urlpatterns = [
     path("api/payroll/drafts/", create_payroll_draft),
@@ -46,7 +51,31 @@ urlpatterns = [
     path("attendance/upload/", upload_summary, name="attendance-upload"),
     path('admin/', admin.site.urls),
     path('api/', include('todo.urls')),
+    path(
+        "api/schema/",
+        SpectacularAPIView.as_view(),
+        name="schema",
+    ),
+
+    # Interactive Swagger UI
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(
+            url_name="schema"
+        ),
+        name="swagger-ui",
+    ),
+
+    # Alternative API documentation
+    path(
+        "api/redoc/",
+        SpectacularRedocView.as_view(
+            url_name="schema"
+        ),
+        name="redoc",
+    ),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns()
