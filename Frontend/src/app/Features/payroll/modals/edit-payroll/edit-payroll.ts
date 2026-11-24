@@ -19,6 +19,7 @@ export class EditPayroll implements OnInit {
   @Output() isSubmit: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   editPayrollFormGroup!: FormGroup;
+  private fb = inject(FormBuilder);
 
   ngOnInit(): void {
     
@@ -28,5 +29,12 @@ export class EditPayroll implements OnInit {
   closeUploadModal(){
     this.isOpen = false;
     this.isSubmit.emit(false);
+  }
+  initializeEditPayrollForm(employee: PayrollCutoffEmployee): void {
+    this.editPayrollFormGroup = this.fb.group({
+      id: employee.employeeNo,
+      employeeName: employee.employeeName,
+      
+    })
   }
 }
