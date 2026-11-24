@@ -30,3 +30,13 @@
     font-size: 15px;
     padding-right:20px
 }
+.link-wrapper a.active {
+    color: #174f83;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.link-wrapper a:focus-visible {
+    outline: 2px solid #174f83;
+    outline-offset: 4px;
+}

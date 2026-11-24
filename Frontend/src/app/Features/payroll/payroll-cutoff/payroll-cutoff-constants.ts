@@ -50,6 +50,42 @@ export const deductionSourceKeys: (keyof payrolCutoffDeduction)[] = ['sSSEyee', 
 
 
 
+export const expenseDeductionKeys = new Set<keyof payrolCutoffDeduction>([
+    'sSSLoanSalary', 'sSSLoanCalamity', 'cashBond', 'benlifeInsurance', 'groupInsurance',
+    'uniformParaphernalia', 'paraphernalia', 'training', 'sSSCondonation', 'familySupport',
+    'trainingSchool', 'license', 'sogcc1creditcoop', 'sogcc2creditcoop',
+]);
+
+const northHours = 80;
+const southHours = 48;
+const hourlyPay = 100;
+const cashBond = 200;
+const supplies = 450;
+const northContributions = { sSSEyee: 398.44, philHealthEyee: 320, pagibigContribution: 62.50 };
+const southContributions = { sSSEyee: 239.06, philHealthEyee: 0, pagibigContribution: 37.50 };
+const totalContributions = (contributions: typeof northContributions) =>
+    Object.values(contributions).reduce((sum, amount) => sum + amount, 0);
+const northAvailable = northHours * hourlyPay - totalContributions(northContributions);
+const replacementExpenseTotal = 7400;
+
+export const demoExpenseAllocation = {
+    employeeName: 'Flores, Avery',
+    regularExpenses: cashBond + supplies,
+    netPay: northAvailable - cashBond - supplies + southHours * hourlyPay - totalContributions(southContributions),
+    exampleExpenseTotal: replacementExpenseTotal,
+    exampleSpillover: Math.max(0, replacementExpenseTotal - northAvailable),
+    sites: [
+        { id: 'DEMO-EXPENSE-NORTH', name: 'North Detachment', hours: northHours,
+          pay: northHours * hourlyPay, cashBond, supplies,
+          contributions: northContributions, contributionTotal: totalContributions(northContributions) },
+        { id: 'DEMO-EXPENSE-SOUTH', name: 'South Detachment', hours: southHours,
+          pay: southHours * hourlyPay, cashBond: 0, supplies: 0,
+          contributions: southContributions, contributionTotal: totalContributions(southContributions) },
+    ],
+};
+
+export const demoLedgerEmployee = { id: 'DEMO-LEDGER-2026', name: 'Reyes, Jordan' };
+
 export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
     {
       employeeNo: '1',
@@ -478,6 +514,45 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       isFinalized: true
     },
     {
+      employeeNo: 'DEMO-NEGATIVE',
+      employeeName: 'Bautista, Sam',
+      detachment: 'Demo Detachment',
+      incomeSource: {
+        ...Object.fromEntries(incomeSourceKeys.map(key => [key, 0])),
+        regularHours: 8,
+        regularPay: 695,
+      },
+      deductionSource: {
+        ...Object.fromEntries(deductionSourceKeys.map(key => [key, 0])),
+        cashBond: 950,
+      },
+      grossPay: 695,
+      totalDeductions: 0,
+      netPay: 0,
+      payrollPeriod: 'September 1-15, 2026',
+      status: 2,
+      actions: [1, 2, 3],
+      isFinalized: false,
+    },
+    {
+      employeeNo: demoLedgerEmployee.id,
+      employeeName: demoLedgerEmployee.name,
+      detachment: 'Demo North Detachment',
+      incomeSource: {
+        ...Object.fromEntries(incomeSourceKeys.map(key => [key, 0])),
+        regularHours: 80,
+        regularPay: 8000,
+      },
+      deductionSource: { sSSEyee: 398.44, philHealthEyee: 320, pagibigContribution: 62.50 },
+      grossPay: 8000,
+      totalDeductions: 0,
+      netPay: 0,
+      payrollPeriod: 'September 1-15, 2026',
+      status: 2,
+      actions: [1, 2, 3],
+      isFinalized: false,
+    },
+    {
       employeeNo: '9',
       employeeName: 'Piattos, Mary Grace',
       detachment: 'Mall of Asia',
@@ -532,27 +607,6 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
     },
     {
       employeeNo: '10',
-      employeeName: 'Bautista, Sam',
-      detachment: 'Demo Detachment',
-      incomeSource: {
-        ...Object.fromEntries(incomeSourceKeys.map(key => [key, 0])),
-        regularHours: 8,
-        regularPay: 695,
-      },
-      deductionSource: {
-        ...Object.fromEntries(deductionSourceKeys.map(key => [key, 0])),
-        cashBond: 950,
-      },
-      grossPay: 695,
-      totalDeductions: 0,
-      netPay: 0,
-      payrollPeriod: 'September 1-15, 2026',
-      status: 2,
-      actions: [1, 2, 3],
-      isFinalized: false,
-    },
-    {
-      employeeNo: '10',
       employeeName: 'Son, Robin',
       detachment: 'Mall of Asia',
       incomeSource: {
@@ -604,6 +658,23 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
       actions: [1,2,3],
       isFinalized: true
     },
+    ...demoExpenseAllocation.sites.map(site => ({
+      employeeNo: site.id,
+      employeeName: demoExpenseAllocation.employeeName,
+      detachment: site.name,
+      incomeSource: {
+        ...Object.fromEntries(incomeSourceKeys.map(key => [key, 0])),
+        regularHours: site.hours, regularPay: site.pay,
+      },
+      deductionSource: { ...site.contributions, cashBond: site.cashBond, paraphernalia: site.supplies },
+      grossPay: site.pay,
+      totalDeductions: 0,
+      netPay: 0,
+      payrollPeriod: 'September 1-15, 2026',
+      status: 2,
+      actions: [1, 2, 3],
+      isFinalized: false,
+    })),
   ].map((employee): PayrollCutoffEmployee => {
 
     // Sum all deduction values

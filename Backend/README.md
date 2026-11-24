@@ -119,3 +119,78 @@ Missing employee numbers and unavailable source totals are warnings. For each av
 Numeric attendance and payroll cells use a decimal point. Grouped commas or spaces and a single `₱` or `PHP` marker are accepted. Payroll accounting parentheses preserve the negative sign. Attendance hours must be nonnegative. Ambiguous separators, percentage text, and other currency markers are rejected. Employee IDs are kept as identifiers.
 
 For an attendance adjustment, include multipart fields `type=attendance_adjustment` and `cutoffId`. The Summary must use the target cutoff’s branch and a different source period. All employees must match existing rows uniquely. One adjustment per source period contributes to a cutoff at a time. A corrected file for that period replaces the previous adjustment.
+
+### Philippine statutory payroll drafts
+
+For a draft that calculates government deductions, add the optional multipart text field `statutoryInputs` to `POST /api/payroll/drafts/`. Send a JSON object alongside the `register` and `deductions` workbooks. Requests with just the two workbooks continue using the register reconciliation mode. The new mode covers regular Philippine private-sector employees on semi-monthly and monthly payrolls using the verified 2025–2026 contribution schedules. Special coverage arrangements and older backpay periods require their own verified schedules.
+
+Example with fictional inputs:
+
+```json
+{
+  "payDate": "2026-11-30",
+  "contributionMonth": "2026-11-01",
+  "payFrequency": "semi_monthly",
+  "contributionShareThroughCutoff": "1",
+  "taxExemptEmployeeTypes": ["security_guard"],
+  "employees": [{
+    "registerRow": 8,
+    "employeeName": "Fictional, Employee",
+    "employeeType": "staff",
+    "minimumDailyWage": "755.00",
+    "wageOrder": "NCR-28",
+    "minimumWageEarnerConfirmed": false,
+    "sssMonthlyRemuneration": "34400.00",
+    "philhealthMonthlyBasicSalary": "30000.00",
+    "pagibigMonthlyFundSalary": "30000.00",
+    "alreadyDeducted": {"sss": "0", "philhealth": "0", "pagibig": "0"},
+    "otherTaxableRegularPay": "0",
+    "otherTaxableSupplementaryPay": "0",
+    "withholdingMethod": "periodic"
+  }]
+}
+```
+
+Supply a matching register row and employee name for every employee. Choose `security_guard`, `staff`, `driver`, or `other`. The draft applies zero withholding first for any employee type listed in `taxExemptEmployeeTypes`, even if pay or overtime would result in BIR withholding. The list defaults to `["security_guard"]`. Pass `[]` to use BIR treatment for all types. The response records applied treatment and withholding separately from `birComparison`. A conflicting or unavailable comparison raises a draft review issue. The override records the client's draft policy and does not establish a statutory exemption.
+
+For employees outside the exempt list, supply the wage order and daily minimum applicable to the employee's site, sector, and date. Payroll must confirm minimum-wage eligibility where applicable. Above-minimum employees use standard withholding. For the `other` type, supply `otherTaxTreatment` as `standard` or `minimum_wage` for the BIR calculation. The same inputs can be used to generate an informational BIR comparison for exempt types.
+
+Use independently approved monthly bases for SSS, PhilHealth and Pag-IBIG. The contribution share through the cutoff is `0`, `0.5`, or `1`. Subtract contributions already withheld in the same month from the amount due through this cutoff. The monthly schedule requires `1`. The result separates employee deductions and monthly employer liabilities, including employer-only EC.
+
+For standard withholding, the register supplies basic pay and regular overtime. Include any other approved taxable regular and supplementary items in their own fields, or explicitly send zero. Provide the BIR method appropriate to the employee's history. `cumulative` requires `withholdingHistory` with `taxablePay`, `taxWithheld`, and `periodsIncludingCurrent`. `annual` requires the first two fields and is for year-end or final-pay review. Prior totals exclude the current pay period and include applicable previous-employer amounts. Where ordinary period payroll requires the cumulative method because of the amounts involved, the endpoint asks for the approved history. When employee-type exemption takes precedence, it instead marks the BIR comparison as unavailable until the history is supplied. Use the same cumulative method for the remainder of the year where required. The API returns a signed negative withholding amount when annual reconciliation produces a refund.
+
+See [BIR rules on compensation withholding](https://bir-cdn.bir.gov.ph/local/pdf/RR%20No.%2011-2018.pdf), [BIR Annex E withholding tables](https://bir-cdn.bir.gov.ph/local/pdf/Annex%20E%20RR%2011-2018.pdf), [BIR annual income tax rates](https://www.bir.gov.ph/income-tax), [SSS Circular 2024-006](https://www.sss.gov.ph/wp-content/uploads/2024/12/CI-2024-006-Publication.pdf), [PhilHealth premium guidance](https://www.philhealth.gov.ph/advisories/2025/PA2025-0002.pdf), [Pag-IBIG Circular 460](https://dmw.gov.ph/archives/v1/resources/dsms/DMW/ISN-EXT/2025/DMW-ADVISORY-37-2025.pdf), and [NWPC regional wage orders](https://nwpc.dole.gov.ph/summary-of-current-regional-daily-minimum-wage-rates-non-agriculture-agriculture-and-other-wage-categories/).
+
+### Multiple detachments and expense allocation
+
+For one or more employee assignments, add the optional multipart JSON text field `detachmentInputs` to `POST /api/payroll/drafts/`. Supply an entry in `rows` for every register row. The register must have a separate row for each employee, detachment, and applicable rate segment. Entries use:
+
+| Field | Meaning |
+|---|---|
+| `registerRow`, `employeeName` | Row number and matching name from the register. |
+| `employeeId`, `detachment` | Stable employee ID and site name. The same employee ID can repeat for additional sites or rate periods. |
+| `workedHours` | Approved actual worked hours used to rank detachments. Leave overlapping premium hours out of this figure. |
+| `workFrom`, `workThrough` | Actual work dates covered by this row, inclusive. |
+| `basicPayEffectiveFrom`, `basicPayEffectiveThrough` | Approved rate dates, inclusive. Use null or omit the end date for a current rate. |
+| `approvedDailyRate` | Approved PHP daily rate for this row. Must match the register's daily rate. |
+| `wageOrder`, `minimumDailyWage` | Required on each row when combining multiple rows with statutory mode. They must match the statutory profile for the employee. |
+| `sssRemuneration`, `pagibigFundSalary` | Required on each assignment row in grouped statutory mode. Supply that row’s approved eligible earnings for this cutoff, using the actual site hours and rates. These specify the site split, while the employee's approved monthly bases determine the contributions due. |
+
+Blank or null expense amounts count as zero. The highest-hours detachment receives expenses first. Ties use register order. The draft uses available take-home pay after other deductions, then moves any excess to the next detachment. It splits an expense if necessary, keeps any uncovered balance visible for review, and leaves single-detachment expense handling intact. Approved deductions-workbook overrides replace the group's matching expense once. Enter register-only expenses once or distribute them across rows without duplicating the same charge.
+
+With both input fields present, supply one `statutoryInputs` employee profile per employee ID, keyed to that employee's first register row at the highest-hours detachment. Contributions and withholding are calculated once from the approved bases and combined basic pay and regular overtime. The draft splits SSS and Pag-IBIG across assignment rows using their respective site earnings, with rounding that preserves the employee total. Fixed monthly PhilHealth and employee-level withholding are booked on the primary row. The draft applies each row’s allocated contributions before calculating its available pay for expenses. Each grouped row returns `statutoryAllocation`. Mixed wage orders across a grouped employee's rows need a separate payroll review. Without statutory mode, use the approved contribution inputs on each register row.
+
+The saved draft includes `employeeId`, `detachment`, `workedHours`, and `allocatedExpenses` for each row, plus `expenseAllocations` identifying the primary site and any balance. The simple Employee Profile workbook is a client intake file. Its dated assignments can be used to prepare draft inputs.
+
+### Finalized payroll, 13th-month pay, and loans
+
+- For a finalizable draft, send multipart `payrollPeriodDates` as JSON with ISO dates `start` and `end`, along with `detachmentInputs`. Stable employee IDs, work dates, and approved rates must be present for every register row. Split work segments crossing October 31 or December 31 so earnings are assigned to the correct period.
+- After reviewing the draft, call `POST /api/payroll/drafts/<draftId>/finalize/`. This saves the draft's earnings, deductions, adjustments, and approval metadata together with each matched loan payment. Repeating the request returns the existing approval without posting payments again. The endpoint rejects overlapping or out-of-order payroll for the same employee, negative take-home amounts, and drafts whose loan calculation became stale. Review any unmatched or uncovered expenses before approval.
+- Call `GET /api/payroll/thirteenth-month/<year>/` for finalized basic-pay totals grouped by employee ID across detachments. It shows the **October 31 working estimate**, recorded calendar-year accrual, and the November–December difference. The amount is eligible basic salary earned divided by 12. Overtime, premiums, and deductions are excluded. Payroll should confirm applicable eligibility, any amounts already released, and any earnings not yet recorded in this system. The endpoint does not release payment or generate a government filing. [DOLE 13th-month guidance](https://dole.gov.ph/news/dole-clarifies-13th-month-pay-rules-ensures-workers-receive-rightful-benefits/)
+- Create or list loans at `/api/payroll/loans/`. POST JSON with `employeeId`, unique `reference` per employee, `label`, `principal`, `monthlyInstallment`, and ISO `startsOn`. A loan may have an optional `registerColumn` of `AJ` or `AK` to replace the corresponding register amount with the tracked deduction. Once enrolled, that legacy column remains suppressed for the employee after payoff. For other loan types, omit the column and keep the same charge out of the register to avoid double-counting. Multiple loans can have independent principals, installments, and payment histories.
+- Each dated draft plans the remaining installment for each loan in the cutoff-end month, capped at the outstanding balance. Expense placement and available-pay limits determine how much can actually be deducted. Finalization records only what the draft deducted against each unique loan. A cleared loan drops out of future automatic deductions, and a partial payment can leave a balance for the next eligible cutoff. For off-payroll payments, POST `reference`, `paymentDate`, and `amount` to `/api/payroll/loans/<loanId>/payments/`. A payment reference can be retried without posting it twice.
+
+
+The Payroll dashboard links to read-only pages at `/payroll/loans`, `/payroll/thirteenth-month`, and `/payroll/drafts`. The draft list uses `GET /api/payroll/drafts/` for period and status. Draft details use `GET /api/payroll/drafts/<id>/`. Loans and the 13th-month report accept an optional `employeeId` filter.
+
+The **Expenses and Payments** tab opens `/expay`. Its employee overview uses `GET /api/payroll/expense-employees/` with optional `employeeId`, `employeeName`, and `page`. Each ledger employee appears once with their loan types and outstanding balance. A name link opens `/expay/employee?employeeId=...`. Its detail endpoint uses the same employee ID to return matched loan payments and allocated expenses from finalized payroll. Latest finalized payroll supplies the employee name. When recording a loan before the first finalization, send the optional `employeeName` with the stable ID. Existing unnamed accounts remain searchable by ID.

@@ -3,49 +3,46 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 1000;
-  background: rgb(30 48 69 / 48%);
+  background: rgb(0 0 0 / 50%);
 }
 
 .modal-container {
-  --upload-font: Helvetica, Arial, sans-serif;
-  --upload-ink: #1e3045;
-  --upload-muted: #526479;
-  --upload-border: #dce4eb;
-  --upload-accent: #174f83;
-  --upload-tint: #eaf4ff;
-  --mat-sys-body-large-font: var(--upload-font);
-  --mat-sys-body-medium-font: var(--upload-font);
-  --mat-sys-body-small-font: var(--upload-font);
-  width: min(400px, 90vw);
-  max-height: 90dvh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--upload-border);
-  border-radius: 12px;
+  width: 350px;
+  max-width: 90%;
+  border-radius: 8px;
   background: #fff;
-  color: var(--upload-ink);
-  box-shadow: 0 12px 32px rgb(30 48 69 / 20%);
-  font: .875rem/1.45 var(--upload-font);
+  box-shadow: 0 4px 15px rgb(0 0 0 / 20%);
+  --upload-font: Helvetica, Arial, sans-serif;
+  --mat-form-field-container-text-font: var(--upload-font);
+  --mat-form-field-filled-label-text-font: var(--upload-font);
+  font-family: var(--upload-font);
 }
 
 .modal-header {
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--upload-border);
-  background: #f4f7fa;
+  display: flex;
+  justify-content: center;
+  height: 40px;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+  border-radius: 8px 8px 0 0;
+  background: #cad9ff;
+  font-size: 25px;
 
   h3 {
     margin: 0;
-    font-size: 1rem;
-    font-weight: 700;
+    font-weight: 100;
   }
 }
 
 .modal-body {
-  padding: 16px 18px;
+  max-height: 70vh;
+  padding: 16px;
   overflow-y: auto;
 }
 
@@ -55,14 +52,11 @@
   justify-content: center;
 }
 
-.plus-container {
-  margin: 8px 0;
-}
-
-.plus-container button,
-.add-file-container button {
-  color: var(--upload-accent);
-  font: inherit;
+.plus-container button {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
 }
 
 .upload-alert {

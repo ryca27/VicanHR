@@ -1,0 +1,225 @@
+<main class="records">
+  <a class="back" routerLink="/payroll">← Payroll dashboard</a>
+  <nav aria-label="Payroll records">
+    <a routerLink="/expay" routerLinkActive="selected" ariaCurrentWhenActive="page">Expenses and payments</a>
+    <a routerLink="/payroll/thirteenth-month" routerLinkActive="selected" ariaCurrentWhenActive="page">13th-month pay</a>
+    <a routerLink="/payroll/drafts" routerLinkActive="selected" ariaCurrentWhenActive="page">Payroll drafts</a>
+  </nav>
+
+  @switch (section()) {
+    @case ('expenseOverview') {
+      <h1>Expenses and payments</h1>
+      <p>Select an employee to view their expenses, loans and payments.</p>
+    }
+    @case ('expenseEmployee') {
+      <p><a routerLink="/expay">← Employee overview</a></p>
+      <h1>{{ expenseDetail()?.employeeName || 'Employee expenses and payments' }}</h1>
+      @if (expenseDetail(); as detail) {
+        <p>Employee ID {{ detail.employeeId }}</p>
+        @if (detail.employeeId === demoLedgerEmployeeId) {
+          <p><a routerLink="/cutoff/demo">Open payroll cutoff demo</a></p>
+        }
+      }
+    }
+    @case ('thirteenth') {
+      <h1>13th-month pay</h1>
+      <p>Review the October 31 estimate alongside the amount accrued from finalized payroll for the selected year.</p>
+    }
+    @case ('drafts') {
+      <h1>Payroll drafts</h1>
+      <p>Open a draft to review the calculated amounts and see whether payroll was finalized.</p>
+    }
+    @case ('draft') {
+      <h1>Payroll draft @if (draft(); as detail) { #{{ detail.draftId }} }</h1>
+    }
+  }
+
+  @if (section() === 'expenseOverview' || section() === 'thirteenth') {
+    <form class="filters" (ngSubmit)="applyFilters()">
+      @if (section() === 'thirteenth') {
+        <label>Calendar year <input type="number" min="1900" max="9999" step="1" [formControl]="year"></label>
+      }
+      <label>Employee ID <input type="search" [formControl]="employeeId" placeholder="Exact ID"></label>
+      @if (section() === 'expenseOverview') {
+        <label>Employee name <input type="search" [formControl]="employeeName" placeholder="First or last name"></label>
+      }
+      <button type="submit">Apply filters</button>
+      <button type="button" class="secondary" (click)="clearFilters()">Clear</button>
+    </form>
+  }
+
+  @if (loading()) {
+    <p role="status">Loading payroll records…</p>
+  } @else if (error()) {
+    <p role="alert" class="error">{{ error() }}</p>
+    @if (needsSignIn()) { <p><a routerLink="/login">Open sign-in</a></p> }
+  } @else {
+    @switch (section()) {
+      @case ('expenseOverview') {
+        @if (expenseOverview(); as overview) {
+          @if (overview.employees.length) {
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Employees with payroll records">
+              <table>
+                <thead><tr><th scope="col">Employee ID</th><th scope="col">Employee name</th><th scope="col">Loan types</th><th scope="col">Remaining loans</th></tr></thead>
+                <tbody>
+                  @for (employee of overview.employees; track employee.employeeId) {
+                    <tr>
+                      <td>{{ employee.employeeId }}</td>
+                      <td><a routerLink="/expay/employee" [queryParams]="{ employeeId: employee.employeeId }">{{ employee.employeeName || employee.employeeId }}</a></td>
+                      <td>{{ employee.loanTypes.join(', ') || '—' }}</td>
+                      <td>{{ employee.remainingBalance | currency:'PHP':'symbol-narrow' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            @if (overview.pages > 1) {
+              <div class="filters" aria-label="Employee pages">
+                <button type="button" class="secondary" [disabled]="overview.page === 1" (click)="goToPage(overview.page - 1)">Previous</button>
+                <span>Page {{ overview.page }} of {{ overview.pages }}</span>
+                <button type="button" class="secondary" [disabled]="overview.page === overview.pages" (click)="goToPage(overview.page + 1)">Next</button>
+              </div>
+            }
+          } @else { <p>No employees match these filters.</p> }
+        }
+      }
+      @case ('expenseEmployee') {
+        @if (expenseDetail(); as detail) {
+          <h2>Loans and payment history</h2>
+          @for (loan of detail.loans; track loan.loanId) {
+            <section class="record-card" [attr.aria-label]="loan.label">
+              <header>
+                <div><h2>{{ loan.label }}</h2><p>{{ loan.reference }}</p></div>
+                <span class="status" [class.closed]="loan.status === 'paid'">{{ loan.status === 'paid' ? 'Paid' : 'Open' }}</span>
+              </header>
+              <dl class="totals">
+                <div><dt>Principal</dt><dd>{{ loan.principal | currency:'PHP':'symbol-narrow' }}</dd></div>
+                <div><dt>Monthly installment</dt><dd>{{ loan.monthlyInstallment | currency:'PHP':'symbol-narrow' }}</dd></div>
+                <div><dt>Remaining balance</dt><dd>{{ loan.remainingBalance | currency:'PHP':'symbol-narrow' }}</dd></div>
+              </dl>
+              <h3>Payment history</h3>
+              @if (loan.payments.length) {
+                <div class="table-scroll" tabindex="0" role="region" aria-label="Loan payments">
+                  <table>
+                    <thead><tr><th scope="col">Date</th><th scope="col">Source</th><th scope="col">Reference</th><th scope="col">Amount</th></tr></thead>
+                    <tbody>
+                      @for (payment of loan.payments; track payment.paymentId) {
+                        <tr>
+                          <td>{{ payment.paymentDate | date:'mediumDate' }}</td>
+                          <td>{{ payment.finalizedPayrollId === null ? 'External payment' : 'Payroll deduction' }}</td>
+                          <td>{{ payment.reference || 'Finalized payroll #' + payment.finalizedPayrollId }}</td>
+                          <td>{{ payment.amount | currency:'PHP':'symbol-narrow' }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              } @else { <p>No payments recorded yet.</p> }
+            </section>
+          } @empty { <p>No loans are recorded for this employee.</p> }
+          <h2 class="section-heading">Expenses recorded in finalized payroll</h2>
+          @if (detail.expenses.length) {
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Finalized expenses">
+              <table>
+                <thead><tr><th scope="col">Cutoff end</th><th scope="col">Detachment</th><th scope="col">Expense</th><th scope="col">Amount</th><th scope="col">Payroll</th></tr></thead>
+                <tbody>
+                  @for (expense of detail.expenses; track expense.draftId + ':' + expense.registerRow + ':' + expense.code) {
+                    <tr>
+                      <td>{{ expense.date | date:'mediumDate' }}</td>
+                      <td>{{ expense.detachment || '—' }}</td>
+                      <td>{{ expense.label }}</td>
+                      <td>{{ expense.amount | currency:'PHP':'symbol-narrow' }}</td>
+                      <td><a [routerLink]="['/payroll/drafts', expense.draftId]">View payroll #{{ expense.draftId }}</a></td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else { <p>No finalized payroll expenses are recorded for this employee.</p> }
+        }
+      }
+      @case ('thirteenth') {
+        @if (report(); as summary) {
+          <p class="note">October estimate cutoff {{ summary.operationalCutoff | date:'longDate' }}. {{ summary.note }}</p>
+          @if (summary.employees.length) {
+            <div class="table-scroll" tabindex="0" role="region" aria-label="13th-month pay report">
+              <table>
+                <thead><tr><th scope="col">Employee</th><th scope="col">Basic pay through October</th><th scope="col">October estimate</th><th scope="col">November–December accrual</th><th scope="col">Year-to-date accrual</th><th scope="col">Last finalized work date</th></tr></thead>
+                <tbody>
+                  @for (entry of summary.employees; track entry.employeeId) {
+                    <tr>
+                      <td><strong>{{ entry.employeeName }}</strong><small>{{ entry.employeeId }}</small></td>
+                      <td>{{ entry.basicPayThroughOctober | currency:'PHP':'symbol-narrow' }}</td>
+                      <td>{{ entry.octoberEstimate | currency:'PHP':'symbol-narrow' }}</td>
+                      <td>{{ entry.novemberDecemberAccrual | currency:'PHP':'symbol-narrow' }}</td>
+                      <td><strong>{{ entry.calendarYearAccrued | currency:'PHP':'symbol-narrow' }}</strong></td>
+                      <td>{{ entry.latestFinalizedWorkDate | date:'mediumDate' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else { <p>No finalized basic pay matches these filters.</p> }
+        }
+      }
+      @case ('drafts') {
+        @if (drafts().length) {
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Payroll drafts">
+            <table>
+              <thead><tr><th scope="col">Payroll period</th><th scope="col">Created</th><th scope="col">Status</th></tr></thead>
+              <tbody>
+                @for (item of drafts(); track item.draftId) {
+                  <tr>
+                    <td><a [routerLink]="['/payroll/drafts', item.draftId]">{{ item.period }}</a></td>
+                    <td>{{ item.createdAt | date:'mediumDate' }}</td>
+                    <td><span class="status" [class.closed]="item.isFinalized">{{ item.isFinalized ? 'Finalized' : 'Draft' }}</span></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else { <p>No payroll drafts have been saved yet.</p> }
+      }
+      @case ('draft') {
+        @if (draft(); as detail) {
+          <p>{{ detail.period }} <span class="status" [class.closed]="detail.isFinalized">{{ detail.isFinalized ? 'Finalized' : 'Draft' }}</span></p>
+          @if (detail.finalizedAt) { <p>Finalized {{ detail.finalizedAt | date:'mediumDate' }}</p> }
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Draft employee amounts">
+            <table>
+              <thead><tr><th scope="col">Employee</th><th scope="col">Detachment</th><th scope="col">Gross pay</th><th scope="col">Deductions</th><th scope="col">Net pay</th><th scope="col">Loan deductions</th></tr></thead>
+              <tbody>
+                @for (entry of detail.employees; track entry.registerRow) {
+                  <tr>
+                    <td><strong>{{ entry.employeeName }}</strong>@if (entry.employeeId) { <small>{{ entry.employeeId }}</small> }</td>
+                    <td>{{ entry.detachment || '—' }}</td>
+                    <td>{{ entry.grossPay | currency:'PHP':'symbol-narrow' }}</td>
+                    <td>{{ entry.totalDeductions | currency:'PHP':'symbol-narrow' }}</td>
+                    <td><strong>{{ entry.netPay | currency:'PHP':'symbol-narrow' }}</strong></td>
+                    <td>
+                      @for (deduction of loanDeductions(entry.allocatedExpenses); track deduction[0]) {
+                        <small>Loan #{{ deduction[0] }} · {{ deduction[1] | currency:'PHP':'symbol-narrow' }}</small>
+                      } @empty { — }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <details class="review-notes">
+            <summary>Review notes</summary>
+            @for (entry of detail.employees; track entry.registerRow) {
+              @if (entry.issues.length) {
+                <h3>{{ entry.employeeName }}@if (entry.detachment) { · {{ entry.detachment }} }</h3>
+                <ul>
+                  @for (issue of entry.issues; track $index) {
+                    <li>{{ issue.reason }} {{ issue.action }}</li>
+                  }
+                </ul>
+              }
+            }
+          </details>
+        }
+      }
+    }
+  }
+</main>
