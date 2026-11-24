@@ -30,6 +30,10 @@ Run the commands below in the **Backend** directory. From the repository root, e
 
    A fresh database returns `[]`. You can also open the [tasks API](http://localhost:8080/api/tasks/) in a browser.
 
+## Shared development access
+
+Compose publishes Django on the host's loopback interface. A teammate running Angular on a separate machine can reach the same Django instance and PostgreSQL records through the [SSH tunnel setup](../Frontend/README.md#use-a-shared-development-backend). For a separate development database, start this Compose stack on each machine.
+
 ## Everyday commands
 
 | Task | Command from Backend |

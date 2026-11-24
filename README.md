@@ -43,7 +43,14 @@ npm ci
 npm start -- --host 127.0.0.1 --port 4200
 ```
 
-Leave this terminal running and open the [Angular sign-in page](http://localhost:4200/login). Use port 4200 for all browser links below. Angular serves the project documentation and proxies the Django API, admin, and attendance uploader to port 8080 using the [development proxy](Frontend/proxy.conf.json). Restart Angular to refresh its documentation snapshot.
+Leave this terminal running and open the [Angular sign-in page](http://localhost:4200/login). Use port 4200 for all browser links below. Angular serves the project documentation and proxies the Django API, admin, and attendance uploader to port 8080 using the [development proxy](Frontend/proxy.conf.cjs). Restart Angular to refresh its documentation snapshot.
+
+## Test from another machine
+
+For your own PostgreSQL database, follow the local setup above on your machine.
+To work with the same saved cutoffs, drafts, and employee history as the host,
+run Angular locally and connect it to the host's Django backend using the
+[shared backend setup](Frontend/README.md#use-a-shared-development-backend).
 
 ## Local pages
 

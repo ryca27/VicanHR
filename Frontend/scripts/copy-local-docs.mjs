@@ -11,7 +11,7 @@ for (const page of pages) {
   const html = await readFile(resolve(root, page), 'utf8');
   for (const [, href] of html.matchAll(/href="([^"]+)"/g)) {
     const path = href.split(/[?#]/, 1)[0];
-    if (path === 'README.md' || /^(Backend|Frontend)\/(?:[\w.-]+\/)*[\w-][\w.-]*\.(md|py|ts|html|scss|json)$/.test(path)) {
+    if (path === 'README.md' || /^(Backend|Frontend)\/(?:[\w.-]+\/)*[\w-][\w.-]*\.(md|py|ts|html|scss|json|cjs)$/.test(path)) {
       files.add(path);
     }
   }
