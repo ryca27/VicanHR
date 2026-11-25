@@ -35,10 +35,38 @@
     <h2>Local setup</h2>
     <p>Start Django and PostgreSQL with Docker Compose, then start Angular on port 4200. Use <code>localhost:4200</code> consistently so browser session cookies use the same hostname. The <a href="README.md">repository README</a> has startup commands and local account setup. Open the <a href="http://localhost:4200/login">Angular login</a> or check the <a href="http://localhost:4200/api/tasks/">Django tasks endpoint</a>.</p>
   </section>
+  <section id="windows-shared-backend">
+    <h2>Connect Windows to the shared backend</h2>
+    <p>Django and PostgreSQL run on the host Mac. Angular runs on Windows. Both computers need to be on the same private network for this address to work.</p>
+    <ol>
+      <li>
+        <p><strong>On the Mac, start the backend.</strong> With Colima running, open Terminal at the repository root and run:</p>
+        <pre><code>docker-compose -f Backend/compose.yaml up --build -d
+curl -fsS http://127.0.0.1:8080/api/auth/csrf/</code></pre>
+        <p>The response should contain <code>csrfToken</code>. Keep the Mac awake while testing.</p>
+      </li>
+      <li>
+        <p><strong>On the Mac, allow SSH access.</strong> Open System Settings → General → Sharing → Remote Login. Turn it on and choose <strong>Only these users</strong>. Use a Standard macOS account authorized for the developer. Share its short username and the Mac’s private network address directly with the developer.</p>
+      </li>
+      <li>
+        <p><strong>On Windows, open the SSH tunnel in PowerShell.</strong> Replace <code>mac-user</code> and <code>mac-address</code> with the details from the host.</p>
+        <pre><code>ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:18080:127.0.0.1:8080 mac-user@mac-address</code></pre>
+        <p>Leave the PowerShell window open after SSH authenticates. Open the <a href="http://127.0.0.1:18080/api/auth/csrf/">tunnel check</a> on Windows and look for <code>csrfToken</code>. If SSH times out, check the private network connection and Remote Login on the Mac.</p>
+      </li>
+      <li>
+        <p><strong>On Windows, start Angular in a second PowerShell window.</strong> From the repository root, make sure your checkout has the updated <code>Frontend/angular.json</code> and <code>Frontend/proxy.conf.cjs</code>, then run:</p>
+        <pre><code>cd Frontend
+npm.cmd ci
+$env:VICANHR_API_URL = 'http://127.0.0.1:18080'
+npm.cmd start -- --host 127.0.0.1 --port 4200</code></pre>
+        <p>Open the <a href="http://127.0.0.1:4200/login">VicanHR sign-in page</a> and use <code>rctabernilla</code> with its existing Django password. Open a saved cutoff that also appears on the Mac to confirm both machines are using the same PostgreSQL records. Saved changes are visible to both developers.</p>
+      </li>
+    </ol>
+  </section>
   <section>
     <h2>Completed milestones</h2>
     <ul>
-      <li>Angular signs in through Django sessions. Local Angular requests under <code>/api/</code> use the dev proxy to reach Django.</li>
+      <li>Angular signs in through Django sessions. Local Angular requests under <code>/api/</code> use the dev proxy to reach Django. Set <code>VICANHR_API_URL</code> before starting Angular to use the <a href="#windows-shared-backend">shared backend over SSH</a>.</li>
       <li>Angular previews Summary uploads, submits attendance, and opens saved cutoffs. The cutoff screen reads employee hours from the attendance API.</li>
       <li>Django creates and retrieves payroll drafts from the SMCO payroll register and deductions workbook. Both responses include totals, review counts, row differences, and workbook warnings.</li>
       <li>The cutoff displays names as Last name, First name. The demo roster contains thirteen fictional employees across fourteen assignment rows. Click Reyes, Jordan in the demo table to open the matching Expenses and Payments profile.</li>
@@ -64,7 +92,7 @@
         <thead><tr><th scope="col">Location</th><th scope="col">What to change there</th></tr></thead>
         <tbody>
           <tr><td><a href="Frontend/src/app/app.routes.ts">app.routes.ts</a> and <code>app.routes.server.ts</code></td><td>Browser routes and SSR render modes. Cutoff and attendance detail routes render on the client. Add a route for a reloadable draft review when implementing it.</td></tr>
-          <tr><td><a href="Frontend/proxy.conf.json">proxy.conf.json</a>, <code>angular.json</code>, and <a href="Frontend/src/app/backend.ts">backend.ts</a></td><td>Angular forwards relative <code>/api/</code> requests to Django on port 8080. <code>postToBackend</code> gets a CSRF token and posts JSON or multipart. Its current 403 message refers to attendance.</td></tr>
+          <tr><td><a href="Frontend/proxy.conf.cjs">proxy.conf.cjs</a>, <code>angular.json</code>, and <a href="Frontend/src/app/backend.ts">backend.ts</a></td><td>Angular forwards relative <code>/api/</code> requests to Django on port 8080. <code>postToBackend</code> gets a CSRF token and posts JSON or multipart. Its current 403 message refers to attendance.</td></tr>
           <tr><td><a href="Frontend/src/app/Login/login.ts">Login/login.ts</a></td><td>Collects credentials, calls the session login API, and opens the payroll dashboard.</td></tr>
           <tr><td><a href="Frontend/src/app/Features/payroll/payroll.ts">Features/payroll/payroll.ts</a> and <code>payroll.html</code></td><td>Payroll dashboard and saved cutoff list. Add the draft upload entry point here.</td></tr>
           <tr><td><a href="Frontend/src/app/Features/payroll/modals/upload/upload.ts">modals/upload/upload.ts</a>, <a href="Frontend/src/app/Features/payroll/modals/upload/upload.service.ts">upload.service.ts</a>, and <a href="Frontend/src/app/Features/payroll/modals/upload/upload.models.ts">upload.models.ts</a></td><td>Attendance upload, worksheet parsing and validation, and TypeScript payload definitions. <a href="Frontend/src/app/Components/file-box/file-box.ts">Components/file-box/file-box.ts</a> calls the Excel preview API.</td></tr>

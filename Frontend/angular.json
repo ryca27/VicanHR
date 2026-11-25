@@ -72,7 +72,7 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
-          "options": { "proxyConfig": "proxy.conf.json" },
+          "options": { "proxyConfig": "proxy.conf.cjs" },
           "configurations": {
             "production": {
               "buildTarget": "HR_Home:build:production"
