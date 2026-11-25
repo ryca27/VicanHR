@@ -22,6 +22,7 @@ export class EditPayroll implements OnInit {
   private fb = inject(FormBuilder);
 
   ngOnInit(): void {
+    this.initializeEditPayrollForm(this.employeePayroll);
     
   }
 
@@ -31,6 +32,7 @@ export class EditPayroll implements OnInit {
     this.isSubmit.emit(false);
   }
   initializeEditPayrollForm(employee: PayrollCutoffEmployee): void {
+    debugger;
     this.editPayrollFormGroup = this.fb.group({
       id: employee.employeeNo,
       employeeName: employee.employeeName,

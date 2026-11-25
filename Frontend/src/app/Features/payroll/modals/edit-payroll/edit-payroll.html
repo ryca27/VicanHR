@@ -3,6 +3,7 @@
 <div class="modal-overlay" (click)="closeUploadModal()">
     <div class="modal-container" (click)="$event.stopPropagation()">
         <form [formGroup]="editPayrollFormGroup">
+          <div>
             <section
             class="modal-container"
             role="dialog"
@@ -20,6 +21,7 @@
               Employee number = {{employeePayroll.employeeNo}}
               <app-textbox
               [label]="'Employee Name'"
+              formControlName="employeeName"
               ></app-textbox>
               test
             </div>
@@ -30,6 +32,8 @@
             </div>
         
           </section>
+          </div>
+            
         </form>
             <!-- MODAL CONTAINER -->
 
