@@ -132,9 +132,9 @@
         </dl>
     </section>
     <div class="table-container">
-        @if (demoMode) { <p>Demo payroll · Fictional employees and sample amounts</p> }
+        <!-- @if (demoMode) { <p>Demo payroll · Fictional employees and sample amounts</p> } -->
         @if (loadError) { <p class="cutoff-error" role="alert">{{ loadError }}</p> }
-        @if (demoMode) {
+        <!-- @if (demoMode) {
             <details class="adjustment-sources">
                 <summary>Demo · Expense allocation across detachments</summary>
                 <p>{{ demoExpenseAllocation.employeeName }} has
@@ -153,7 +153,7 @@
                     {{ demoExpenseAllocation.exampleExpenseTotal | currency:'PHP':'symbol-narrow' }} instead,
                     {{ demoExpenseAllocation.exampleSpillover | currency:'PHP':'symbol-narrow' }} would move to South after North’s government deductions.</p>
             </details>
-        }
+        } -->
         @if (adjustmentSources.length) {
             <details class="adjustment-sources">
                 <summary>Attendance adjustments ({{ adjustmentSources.length }})</summary>
