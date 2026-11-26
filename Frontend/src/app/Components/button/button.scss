@@ -32,6 +32,18 @@ button:disabled{
     opacity: 50%;
 }
 
+button:disabled{
+    cursor:not-allowed;
+    // background:linear-gradient(#43A5EB, #0047A4) ;
+    opacity: 50%;
+}
+
+button:disabled:active{
+    cursor:not-allowed;
+    // background:linear-gradient(#43A5EB, #0047A4) ;
+    opacity: 50%;
+}
+
 button:active{
     opacity: 90%;
 }

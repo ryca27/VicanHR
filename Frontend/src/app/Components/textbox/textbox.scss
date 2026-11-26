@@ -18,7 +18,7 @@
     width: 80%;
   }
 
-  .floating-input:focus, .floating-input:hover{
+  .floating-input:focus, .floating-input:not(:disabled):hover{
     border:1px solid #7B7B7B
   }
   

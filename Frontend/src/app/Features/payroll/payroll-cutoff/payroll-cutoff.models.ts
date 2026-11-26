@@ -26,6 +26,7 @@ export interface payrollCutoffIncome{
     nDHours?: number | null;
     nDPay?: number | null;
     uniformAllowance?: number | null;
+    wDOHours?: number | null;
     wDOPay?: number | null;
     sSSLoanRefund?: number | null;
     cBRefund?: number | null;

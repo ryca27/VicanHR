@@ -1,14 +1,15 @@
 <div class="input-wrapper">
-  <input 
-    type="text" 
-    id="textbox" 
-    placeholder="" 
-    class="floating-input" 
-    [formControl]="inputControl" 
-    [value]="value()" 
-    (input)="value.set($event.target.value)" 
-    [disabled]="disabled()" 
-    />
   
-  <label for="textbox" class="floating-label">{{label}}</label>
+
+<input
+  type="text"
+  id="textbox" 
+  [value]="value"
+  [placeholder]="placeholder"
+  class="floating-input" 
+  [disabled]="isDisabled"
+  (input)="onInput($event)"
+  (blur)="onBlur()"
+/>
+<label class="floating-label">{{ label }}</label>
 </div>

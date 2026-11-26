@@ -1,45 +1,777 @@
 
-<!-- MODAL OVERLAY -->
+<!-- EDIT PAYROLL MODAL -->
 <div class="modal-overlay" (click)="closeUploadModal()">
-    <div class="modal-container" (click)="$event.stopPropagation()">
-        <form [formGroup]="editPayrollFormGroup">
-          <div>
-            <section
-            class="modal-container"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-title"
-            >
-        
-            <!-- HEADER -->
-            <div class="modal-header">
-              <h2 id="modal-title">Edit Payroll</h2>
-            </div>
-        
-            <!-- BODY -->
-            <div class="modal-body">
-              Employee number = {{employeePayroll.employeeNo}}
-              <app-textbox
-              [label]="'Employee Name'"
-              formControlName="employeeName"
-              ></app-textbox>
-              test
-            </div>
-        
-            <!-- FOOTER -->
-            <div class="modal-footer">
-              <!-- Add your buttons here -->
-            </div>
-        
-          </section>
+  <section
+    class="modal-container"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    (click)="$event.stopPropagation()"
+  >
+    <form [formGroup]="editPayrollFormGroup">
+
+      <!-- ====================================== -->
+      <!-- HEADER -->
+      <!-- ====================================== -->
+      <div class="modal-header">
+        <h2 id="modal-title">Edit Payroll</h2>
+      </div>
+
+      <!-- ====================================== -->
+      <!-- BODY -->
+      <!-- ====================================== -->
+      <div class="modal-body">
+
+        <!-- TABS -->
+        <div class="tab-container">
+          <app-table-tab
+            [tabNames]="tabNames"
+            (activeTabOutput)="activeTabOutputListener($event)"
+          ></app-table-tab>
+        </div>
+
+        <!-- ====================================== -->
+        <!-- EMPLOYEE DETAILS -->
+        <!-- ====================================== -->
+        <div class="row-container">
+          <div class="left column">
+            <app-textbox
+              label="Employee ID"
+              formControlName="employeeNo"
+              [isDisabled]="true"
+            ></app-textbox>
           </div>
-            
-        </form>
-            <!-- MODAL CONTAINER -->
 
-    </div>
+          <div class="right column">
+            <app-textbox
+              label="Employee Name"
+              formControlName="employeeName"
+              [isDisabled]="true"
+            ></app-textbox>
+          </div>
+        </div>
 
+        <!-- ====================================== -->
+        <!-- INCOME TAB -->
+        <!-- ====================================== -->
+        @if (activeTab == 'Income') {
+          <div formGroupName="incomeSource">
 
-  
-  </div>
-  
+            <!-- REGULAR HOURS / PAY -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="Regular Hours"
+                  formControlName="regularHours"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('incomeSource.regularHours')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('incomeSource.regularHours')?.dirty ||
+                    editPayrollFormGroup.get('incomeSource.regularHours')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="Regular Pay"
+                  formControlName="regularPay"
+                  [isDisabled]="true"
+                ></app-textbox>
+              </div>
+            </div>
+
+            <!-- OVERTIME HOURS / PAY -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="Overtime Hours"
+                  formControlName="oTHours"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('incomeSource.oTHours')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('incomeSource.oTHours')?.dirty ||
+                    editPayrollFormGroup.get('incomeSource.oTHours')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="Overtime Pay"
+                  formControlName="oTPay"
+                  [isDisabled]="true"
+                ></app-textbox>
+              </div>
+            </div>
+
+            <!-- LEGAL HOLIDAY OT -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="Legal Holiday OT Hours"
+                  formControlName="lHOTHours"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('incomeSource.lHOTHours')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('incomeSource.lHOTHours')?.dirty ||
+                    editPayrollFormGroup.get('incomeSource.lHOTHours')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="Legal Holiday OT Pay"
+                  formControlName="lHOTPay"
+                  [isDisabled]="true"
+                ></app-textbox>
+              </div>
+            </div>
+
+            <!-- SPECIAL HOLIDAY OT -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="Special Holiday OT Hours"
+                  formControlName="sHOTHours"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('incomeSource.sHOTHours')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('incomeSource.sHOTHours')?.dirty ||
+                    editPayrollFormGroup.get('incomeSource.sHOTHours')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="Special Holiday Pay"
+                  formControlName="sHOTPay"
+                  [isDisabled]="true"
+                ></app-textbox>
+              </div>
+            </div>
+
+            <!-- NIGHT DIFFERENTIAL -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="Night Differential Hours"
+                  formControlName="nDHours"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('incomeSource.nDHours')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('incomeSource.nDHours')?.dirty ||
+                    editPayrollFormGroup.get('incomeSource.nDHours')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="Night Differential Pay"
+                  formControlName="nDPay"
+                  [isDisabled]="true"
+                ></app-textbox>
+              </div>
+            </div>
+
+            <!-- WORK ON DAY OFF -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="Work on Dayoff Hours"
+                  formControlName="wDOHours"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('incomeSource.wDOHours')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('incomeSource.wDOHours')?.dirty ||
+                    editPayrollFormGroup.get('incomeSource.wDOHours')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="Work on Dayoff Pay"
+                  formControlName="wDOPay"
+                  [isDisabled]="true"
+                ></app-textbox>
+              </div>
+            </div>
+
+            <!-- ALLOWANCE -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="Allowance"
+                  formControlName="allowance"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('incomeSource.allowance')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('incomeSource.allowance')?.dirty ||
+                    editPayrollFormGroup.get('incomeSource.allowance')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="Uniform Allowance"
+                  formControlName="uniformAllowance"
+                  [isDisabled]="true"
+                ></app-textbox>
+              </div>
+            </div>
+
+            <!-- CB REFUND -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="CB Refund"
+                  formControlName="cBRefund"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('incomeSource.cBRefund')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('incomeSource.cBRefund')?.dirty ||
+                    editPayrollFormGroup.get('incomeSource.cBRefund')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+            </div>
+
+          </div>
+        }
+
+        <!-- ====================================== -->
+        <!-- EXPENSES TAB -->
+        <!-- ====================================== -->
+        @if (activeTab == 'Expenses') {
+          <div formGroupName="deductionSource">
+
+            <!-- SSS CONTRIBUTIONS -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="SSS EYEE"
+                  formControlName="sSSEyee"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.sSSEyee')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.sSSEyee')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.sSSEyee')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="SSS EYER"
+                  formControlName="sSSEyer"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.sSSEyer')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.sSSEyer')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.sSSEyer')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+            </div>
+
+            <!-- PHILHEALTH CONTRIBUTIONS -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="PhilHealth EYEE"
+                  formControlName="philHealthEyee"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.philHealthEyee')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.philHealthEyee')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.philHealthEyee')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="PhilHealth EYER"
+                  formControlName="philHealthEyer"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.philHealthEyer')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.philHealthEyer')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.philHealthEyer')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+            </div>
+
+            <!-- SSS LOANS -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="SSS Loan Salary"
+                  formControlName="sSSLoanSalary"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.sSSLoanSalary')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.sSSLoanSalary')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.sSSLoanSalary')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="SSS Loan Calamity"
+                  formControlName="sSSLoanCalamity"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.sSSLoanCalamity')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.sSSLoanCalamity')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.sSSLoanCalamity')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+            </div>
+
+            <!-- CASH BOND / BENLIFE INSURANCE -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="Cash Bond"
+                  formControlName="cashBond"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.cashBond')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.cashBond')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.cashBond')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="Benlife Insurance"
+                  formControlName="benlifeInsurance"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.benlifeInsurance')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.benlifeInsurance')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.benlifeInsurance')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+            </div>
+
+            <!-- GROUP INSURANCE / UNIFORM PARAPHERNALIA -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="Group Insurance"
+                  formControlName="groupInsurance"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.groupInsurance')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.groupInsurance')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.groupInsurance')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="Uniform Paraphernalia"
+                  formControlName="uniformParaphernalia"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.uniformParaphernalia')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.uniformParaphernalia')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.uniformParaphernalia')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+            </div>
+
+            <!-- PARAPHERNALIA / PAG-IBIG -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="Paraphernalia"
+                  formControlName="paraphernalia"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.paraphernalia')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.paraphernalia')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.paraphernalia')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="Pag-IBIG Contribution"
+                  formControlName="pagibigContribution"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.pagibigContribution')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.pagibigContribution')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.pagibigContribution')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+            </div>
+
+            <!-- ADDITIONAL CONTRIBUTIONS -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="Additional PHIC Contribution"
+                  formControlName="additionalPhicContribution"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.additionalPhicContribution')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.additionalPhicContribution')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.additionalPhicContribution')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="Additional SSS Contribution"
+                  formControlName="additionalSSSContribution"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.additionalSSSContribution')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.additionalSSSContribution')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.additionalSSSContribution')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+            </div>
+
+            <!-- CONDONATION / FAMILY SUPPORT -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="SSS Condonation"
+                  formControlName="sSSCondonation"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.sSSCondonation')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.sSSCondonation')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.sSSCondonation')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="Family Support"
+                  formControlName="familySupport"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.familySupport')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.familySupport')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.familySupport')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+            </div>
+
+            <!-- TRAINING SCHOOL / LICENSE -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="Training School"
+                  formControlName="trainingSchool"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.trainingSchool')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.trainingSchool')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.trainingSchool')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="License"
+                  formControlName="license"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.license')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.license')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.license')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+            </div>
+
+            <!-- CREDIT COOPERATIVES -->
+            <div class="row-container">
+              <div class="left column">
+                <app-textbox
+                  label="SOGCC-1 Credit Coop"
+                  formControlName="sogcc1creditcoop"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.sogcc1creditcoop')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.sogcc1creditcoop')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.sogcc1creditcoop')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+
+              <div class="right column">
+                <app-textbox
+                  label="SOGCC-2 Credit Coop"
+                  formControlName="sogcc2creditcoop"
+                  [isDisabled]="false"
+                ></app-textbox>
+
+                @if (
+                  editPayrollFormGroup.get('deductionSource.sogcc2creditcoop')?.invalid &&
+                  (
+                    editPayrollFormGroup.get('deductionSource.sogcc2creditcoop')?.dirty ||
+                    editPayrollFormGroup.get('deductionSource.sogcc2creditcoop')?.touched
+                  )
+                ) {
+                  <small class="field-error" role="alert">
+                    Please enter a valid number.
+                  </small>
+                }
+              </div>
+            </div>
+
+          </div>
+        }
+
+      </div>
+
+      <!-- ====================================== -->
+      <!-- FOOTER -->
+      <!-- ====================================== -->
+      <div class="modal-footer">
+        <div class="button-container">
+
+          <!-- UPDATE BUTTON -->
+          <div>
+            <app-button
+              label="Update"
+              color="blue"
+              size="medium"
+              [disabled]="saving || editPayrollFormGroup.invalid"
+              (click)="submitForm()"
+            ></app-button>
+          </div>
+
+          <!-- CANCEL BUTTON -->
+          <div>
+            <app-button
+              label="Cancel"
+              color="gray"
+              size="medium"
+              [disabled]="false"
+              (click)="closeEditPayrollModal()"
+            ></app-button>
+          </div>
+
+        </div>
+      </div>
+
+    </form>
+  </section>
+</div>

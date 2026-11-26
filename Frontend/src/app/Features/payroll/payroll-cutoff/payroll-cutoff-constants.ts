@@ -36,11 +36,11 @@ export const payrollDeductionColumns = [
 
 export const payrollColumns = [
     'Employee Name', 'Detachment', 'Regular Hours', 'Regular Pay', 'Allowance', 'OT Hours', 'OT Pay', 'LH OT Hours', 'LH OT Pay', 'SH OT Hours', 'SH OT Pay', 'ND Hours',
-    'ND Pay', 'Uniform Allowance', 'WDO Pay', 'SSS Loan Refund', 'CB Refund', 'SSS Cont. Refund', ...payrollDeductionColumns,  'Gross Pay', 'Total Deductions', 'Net Pay', 'Status', 'Actions'
+    'ND Pay', 'Uniform Allowance','WDO Hours', 'WDO Pay', 'SSS Loan Refund', 'CB Refund', 'SSS Cont. Refund', ...payrollDeductionColumns,  'Gross Pay', 'Total Deductions', 'Net Pay', 'Status', 'Actions'
 ]
 
 export const incomeSourceKeys: (keyof payrollCutoffIncome)[] = ['regularHours', 'regularPay', 'allowance', 'oTHours', 'oTPay','lHOTHours', 'lHOTPay', 'sHOTHours', 'sHOTPay', 'nDHours',
-'nDPay', 'uniformAllowance', 'wDOPay', 'sSSLoanRefund', 'cBRefund', 'sSSContRefund'];
+'nDPay', 'uniformAllowance', 'wDOHours', 'wDOPay', 'sSSLoanRefund', 'cBRefund', 'sSSContRefund'];
 
 export const deductionSourceKeys: (keyof payrolCutoffDeduction)[] = ['sSSEyee', 'sSSEyer', 'philHealthEyee', 'philHealthEyer', 'sSSLoanSalary',
 'sSSLoanCalamity', 'cashBond', 'benlifeInsurance', 'groupInsurance', 'uniformParaphernalia', 'paraphernalia', 'training', 'additionalPhicContribution', 'additionalSSSContribution', 'pagibigContribution',
@@ -104,6 +104,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         nDHours: 0,
         nDPay: 0,
         uniformAllowance: 39.36,
+        wDOHours: 0,
         wDOPay: 0,
         sSSLoanRefund: 0,
         cBRefund: 0,
@@ -157,6 +158,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         nDHours: 2.25,
         nDPay: 19.55,
         uniformAllowance: 45.83,
+        wDOHours: 0,
         wDOPay: 208.50,
         sSSLoanRefund: 0,
         cBRefund: 0,
@@ -210,6 +212,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         nDHours: 64,
         nDPay: 556.16,
         uniformAllowance: 39.36,
+        wDOHours: 0,
         wDOPay: 0,
         sSSLoanRefund: 0,
         cBRefund: 0,
@@ -263,6 +266,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         nDHours: 81.25,
         nDPay: 706.06,
         uniformAllowance: 42.64,
+        wDOHours: 0,
         wDOPay: 0,
         sSSLoanRefund: 0,
         cBRefund: 0,
@@ -317,6 +321,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         nDHours: 48.50,
         nDPay: 421.47,
         uniformAllowance: 42.13,
+        wDOHours: 0,
         wDOPay: 208.50,
         sSSLoanRefund: 0,
         cBRefund: 0,
@@ -370,6 +375,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         nDHours: 96,
         nDPay: 834.24,
         uniformAllowance: 42.61,
+        wDOHours: 0,
         wDOPay: 0,
         sSSLoanRefund: 0,
         cBRefund: 0,
@@ -424,6 +430,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         nDHours: 96,
         nDPay: 834.24,
         uniformAllowance: 42.34,
+        wDOHours: 0,
         wDOPay: 0,
         sSSLoanRefund: 0,
         cBRefund: 0,
@@ -477,6 +484,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         nDHours: 0,
         nDPay: 0,
         uniformAllowance: 49.13,
+        wDOHours: 0,
         wDOPay: 208.50,
         sSSLoanRefund: 0,
         cBRefund: 0,
@@ -569,6 +577,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         nDHours: 0,
         nDPay: 0,
         uniformAllowance: 42.42,
+        wDOHours: 0,
         wDOPay: 0,
         sSSLoanRefund: 0,
         cBRefund: 0,
@@ -622,6 +631,7 @@ export const payrollCutoffEmployees: PayrollCutoffEmployee[] = [
         nDHours: 0,
         nDPay: 0,
         uniformAllowance: 45.88,
+        wDOHours: 0,
         wDOPay: 208.50,
         sSSLoanRefund: 0,
         cBRefund: 0,
