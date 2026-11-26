@@ -33,6 +33,7 @@
   </header>
   <section>
     <h2>Local setup</h2>
+    <p>Docker Compose installs Python dependencies from <code>Backend/requirements.txt</code>. Git now ignores <code>Backend/venv/</code>. If your IDE uses that folder as its Python interpreter, check the interpreter after pulling this change and recreate the environment from <code>Backend/requirements.txt</code> if needed.</p>
     <p>Start Django and PostgreSQL with Docker Compose, then start Angular on port 4200. Use <code>localhost:4200</code> consistently so browser session cookies use the same hostname. The <a href="README.md">repository README</a> has startup commands and local account setup. Open the <a href="http://localhost:4200/login">Angular login</a> or check the <a href="http://localhost:4200/api/tasks/">Django tasks endpoint</a>.</p>
   </section>
   <section id="windows-shared-backend">
@@ -105,6 +106,14 @@ npm.cmd start -- --host 127.0.0.1 --port 4200</code></pre>
   <section>
     <h2>API routes and backend locations</h2>
     <p>Start in <a href="Backend/config/urls.py">Backend/config/urls.py</a>. Call the routes as relative URLs from Angular. Attendance and payroll draft APIs require an active admin or finance session. The role check lives in <a href="Backend/attendance/permissions.py">Backend/attendance/permissions.py</a>.</p>
+    <h3>Where Angular builds and sends POST payloads</h3>
+    <ul>
+      <li><strong>Shared sender.</strong> <code>postToBackend(path, payload)</code> fetches the CSRF token, sends cookies, and passes <code>FormData</code> through or serializes the payload as JSON. See <a href="Frontend/src/app/backend.ts">backend.ts</a>.</li>
+      <li><strong>Login.</strong> <code>onSubmit()</code> reads the login form with <code>getRawValue()</code> and posts its JSON to <code>/api/auth/login/</code>. See <a href="Frontend/src/app/Login/login.ts">login.ts</a>.</li>
+      <li><strong>Attendance preview.</strong> The file picker builds <code>FormData</code> with the original <code>file</code> and posts it to <code>/api/attendance/preview/</code>. See <a href="Frontend/src/app/Components/file-box/file-box.ts">file-box.ts</a>.</li>
+      <li><strong>Attendance save and adjustment.</strong> <code>submitForm()</code> builds one <code>FormData</code> per file and posts each to <code>/api/attendance/</code>. Adjustment requests also send <code>type=attendance_adjustment</code> and <code>cutoffId</code>. See <a href="Frontend/src/app/Features/payroll/modals/upload/upload.ts">upload.ts</a>.</li>
+      <li><strong>Payroll writes.</strong> Draft creation, finalization, loan creation, and payment entry are called directly through the Django API today. The payload fields and routes are in the <a href="Backend/README.md">backend API guide</a>.</li>
+    </ul>
     <div class="table-scroll">
       <table>
         <thead><tr><th scope="col">Method and route</th><th scope="col">Request and result</th><th scope="col">Django handler</th></tr></thead>
