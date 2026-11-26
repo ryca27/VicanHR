@@ -50,7 +50,7 @@ curl -fsS http://127.0.0.1:8080/api/auth/csrf/</code></pre>
       </li>
       <li>
         <p><strong>On Windows, open the SSH tunnel in PowerShell.</strong> Replace <code>mac-user</code> and <code>mac-address</code> with the details from the host.</p>
-        <pre><code>ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:18080:127.0.0.1:8080 mac-user@mac-address</code></pre>
+        <pre><code>ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:18080:127.0.0.1:8080 skippynutella@192.168.254.124</code></pre>
         <p>Leave the PowerShell window open after SSH authenticates. Open the <a href="http://127.0.0.1:18080/api/auth/csrf/">tunnel check</a> on Windows and look for <code>csrfToken</code>. If SSH times out, check the private network connection and Remote Login on the Mac.</p>
       </li>
       <li>
