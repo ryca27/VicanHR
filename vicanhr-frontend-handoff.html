@@ -29,12 +29,46 @@
   <header>
     <a href="vicanhr-update.html">Development summary</a>
     <h1>VicanHR frontend handoff</h1>
-    <p>Attendance, payroll drafts, and reconciliation · November 19, 2026</p>
+    <p>Angular integration guide for the Django attendance and payroll APIs</p>
   </header>
+  <section id="django-task-check">
+    <h2>Start here with the Django task list</h2>
+    <p>Use <code>/api/tasks/</code> to practice one read and one write before connecting attendance or payroll. Start the services using <a href="#connect-api">the connection steps</a>. If you’re on Windows using the shared Mac, <a href="#windows-shared-backend">open the tunnel first</a>.</p>
+    <ol>
+      <li><strong>Open <a href="http://127.0.0.1:4200/api/tasks/">the task list through Angular</a>.</strong> The browser makes a GET request. GET needs no payload or login. Expect HTTP 200 with a JSON array. <code>[]</code> means Django responded and the table is empty.</li>
+      <li><strong>Read it from Angular code.</strong> Use the relative URL so the Angular proxy sends the request to Django. Each task has <code>id</code>, <code>title</code>, <code>completed</code>, and <code>created_at</code>.
+        <pre><code>const response = await fetch('/api/tasks/');
+if (!response.ok) throw new Error(`Task list failed (HTTP ${response.status})`);
+const tasks = await response.json();
+console.log(tasks);</code></pre>
+        <p>You can paste this in DevTools Console on the Angular page, then inspect the request and response in the Network tab.</p>
+      </li>
+      <li><strong>Try a write on your local database.</strong> POST creates a task. The payload is the JSON body you send. In Angular, import <code>postToBackend</code> from <a href="Frontend/src/app/backend.ts">backend.ts</a>. It serializes the object and supplies the CSRF header.
+        <pre><code>const task = await postToBackend('/api/tasks/', {
+  title: 'API smoke test',
+  completed: false,
+});
+console.log(task);</code></pre>
+        <p>Expect HTTP 201 with the new task, including its generated <code>id</code> and <code>created_at</code>. Reload the task list to see it. If the title is missing, expect HTTP 400 with a validation error for <code>title</code>.</p>
+      </li>
+    </ol>
+    <p>If the Angular URL fails, check Django directly at <a href="http://127.0.0.1:8080/api/tasks/">port 8080</a>, or at <a href="http://127.0.0.1:18080/api/tasks/">port 18080 on Windows through the tunnel</a>. If Django works directly, check the Angular proxy target and restart Angular after changing <code>VICANHR_API_URL</code>.</p>
+    <p>For real integrations, use the same relative URLs and POST helper. Sign in before calling attendance or payroll. Send files as <code>FormData</code> with the exact field names listed in the <a href="#api-contracts">API reference</a>. The task example is defined in <a href="Backend/todo/views.py">Django’s task_list handler</a> and <a href="Backend/todo/serializers.py">TaskSerializer</a>.</p>
+  </section>
+  <section id="connect-api">
+    <h2>Connect Angular to Django</h2>
+    <ol>
+      <li><strong>Start the services.</strong> Run <code>docker-compose -f Backend/compose.yaml up --build -d</code> from the repo root, then run <code>npm ci</code> and <code>npm start -- --host 127.0.0.1 --port 4200</code> in <code>Frontend/</code>. If Django runs on the shared Mac, use the <a href="#windows-shared-backend">Windows tunnel instructions</a>.</li>
+      <li><strong>Check the proxy.</strong> Open <a href="http://127.0.0.1:4200/api/auth/csrf/">/api/auth/csrf/ on port 4200</a> and look for <code>csrfToken</code>. In Angular, use relative <code>/api/…</code> URLs. The <a href="Frontend/proxy.conf.cjs">proxy</a> defaults to Django on port 8080 and reads <code>VICANHR_API_URL</code> when Angular starts.</li>
+      <li><strong>Sign in through Angular.</strong> Use an admin or finance account on <a href="http://127.0.0.1:4200/login">/login</a>. Same-origin requests send the session cookie. Use <code>postToBackend</code> for writes because it fetches a CSRF token and adds <code>X-CSRFToken</code>. Pass a plain object for JSON or a <code>FormData</code> instance for uploads. Let the browser set the multipart boundary.</li>
+      <li><strong>Verify access.</strong> In the signed-in browser, open <a href="http://127.0.0.1:4200/api/attendance/">/api/attendance/</a>. Expect an array of saved cutoffs, which can be empty on a fresh database. If it returns 403, check the session and account role. For POST requests, also check the CSRF token and cookie.</li>
+    </ol>
+    <p>Jump to the <a href="#api-contracts">route and payload reference</a> or the <a href="#payroll-upload">payroll upload example</a>. For a local Django backend on port 8080, open <a href="http://127.0.0.1:8080/api/docs/">Swagger UI</a> and its <a href="http://127.0.0.1:4200/api/schema/">OpenAPI schema</a>.</p>
+  </section>
   <section>
     <h2>Local setup</h2>
     <p>Docker Compose installs Python dependencies from <code>Backend/requirements.txt</code>. Git now ignores <code>Backend/venv/</code>. If your IDE uses that folder as its Python interpreter, check the interpreter after pulling this change and recreate the environment from <code>Backend/requirements.txt</code> if needed.</p>
-    <p>Start Django and PostgreSQL with Docker Compose, then start Angular on port 4200. Use <code>localhost:4200</code> consistently so browser session cookies use the same hostname. The <a href="README.md">repository README</a> has startup commands and local account setup. Open the <a href="http://localhost:4200/login">Angular login</a> or check the <a href="http://localhost:4200/api/tasks/">Django tasks endpoint</a>.</p>
+    <p>Start Django and PostgreSQL with Docker Compose, then start Angular on port 4200. Use <code>127.0.0.1:4200</code> consistently so browser session cookies use the same hostname. The <a href="README.md">repository README</a> has startup commands and local account setup. Open the <a href="http://127.0.0.1:4200/login">Angular login</a> or check the <a href="http://127.0.0.1:4200/api/tasks/">Django tasks endpoint</a>.</p>
   </section>
   <section id="windows-shared-backend">
     <h2>Connect Windows to the shared backend</h2>
@@ -78,13 +112,13 @@ npm.cmd start -- --host 127.0.0.1 --port 4200</code></pre>
   <section>
     <h2>Verify the cutoff demo</h2>
     <ol>
-      <li>Open the <a href="http://localhost:4200/cutoff/demo">local demo cutoff</a>. Select Name, Detachment, and Status, then click Preview to update the table and KPI cards. Click Reset Filters immediately after Preview in the toolbar to restore Choose option in all three dropdowns and show all fourteen assignment rows.</li>
+      <li>Open the <a href="http://127.0.0.1:4200/cutoff/demo">local demo cutoff</a>. Select Name, Detachment, and Status, then click Preview to update the table and KPI cards. Click Reset Filters immediately after Preview in the toolbar to restore Choose option in all three dropdowns and show all fourteen assignment rows.</li>
       <li>Try Finalize or Undo Finalize with rows of the same eligible status. To test bulk export, check two Payroll Ready rows and leave another Payroll Ready row unchecked. Download Selected should save two individual PDFs using the updated payslip layout, one for each checked employee. If the browser asks, allow multiple downloads.</li>
       <li>Check that a single selection uses the same filename format as each file from a multiple selection. An example is <code>Demo_Payslip_DEMO-001_Santos_Alex_2026-09-01_to_2026-09-15.pdf</code>.</li>
       <li>Filter Status to Needs Attention and preview. The demo shows three flagged employees. Sam Bautista appears on the first page of the unfiltered demo and has −₱255 in net pay. The row is flagged for review. Confirm that the panel sits below the table, starts collapsed, and opens a scrollable list. Expand an employee to see the source-row detail and next action. Filter to Payroll Ready and verify that the panel disappears.</li>
       <li>Filter or change pages and confirm that each employee keeps the correct status badge and action icons.</li>
     </ol>
-    <p>Demo finalization and payslips use frontend sample data. The payroll draft review below is the next frontend milestone.</p>
+    <p>Demo finalization and payslips use frontend sample data. The existing draft review can reopen saved drafts. The next integration is connecting draft upload to that review.</p>
   </section>
   <section>
     <h2>Frontend source map</h2>
@@ -92,7 +126,7 @@ npm.cmd start -- --host 127.0.0.1 --port 4200</code></pre>
       <table>
         <thead><tr><th scope="col">Location</th><th scope="col">What to change there</th></tr></thead>
         <tbody>
-          <tr><td><a href="Frontend/src/app/app.routes.ts">app.routes.ts</a> and <code>app.routes.server.ts</code></td><td>Browser routes and SSR render modes. Cutoff and attendance detail routes render on the client. Add a route for a reloadable draft review when implementing it.</td></tr>
+          <tr><td><a href="Frontend/src/app/app.routes.ts">app.routes.ts</a> and <code>app.routes.server.ts</code></td><td>Browser routes and SSR render modes. Cutoff and attendance detail routes render on the client. The draft list and detail routes already exist.</td></tr>
           <tr><td><a href="Frontend/proxy.conf.cjs">proxy.conf.cjs</a>, <code>angular.json</code>, and <a href="Frontend/src/app/backend.ts">backend.ts</a></td><td>Angular forwards relative <code>/api/</code> requests to Django on port 8080. <code>postToBackend</code> gets a CSRF token and posts JSON or multipart. Its current 403 message refers to attendance.</td></tr>
           <tr><td><a href="Frontend/src/app/Login/login.ts">Login/login.ts</a></td><td>Collects credentials, calls the session login API, and opens the payroll dashboard.</td></tr>
           <tr><td><a href="Frontend/src/app/Features/payroll/payroll.ts">Features/payroll/payroll.ts</a> and <code>payroll.html</code></td><td>Payroll dashboard and saved cutoff list. Add the draft upload entry point here.</td></tr>
@@ -103,7 +137,7 @@ npm.cmd start -- --host 127.0.0.1 --port 4200</code></pre>
       </table>
     </div>
   </section>
-  <section>
+  <section id="api-contracts">
     <h2>API routes and backend locations</h2>
     <p>Start in <a href="Backend/config/urls.py">Backend/config/urls.py</a>. Call the routes as relative URLs from Angular. Attendance and payroll draft APIs require an active admin or finance session. The role check lives in <a href="Backend/attendance/permissions.py">Backend/attendance/permissions.py</a>.</p>
     <h3>Where Angular builds and sends POST payloads</h3>
@@ -124,7 +158,8 @@ npm.cmd start -- --host 127.0.0.1 --port 4200</code></pre>
           <tr><td><code>GET /api/attendance/</code></td><td>Returns saved cutoffs with <code>cutoffId</code>, <code>period</code>, and <code>detachment</code>.</td><td><a href="Backend/attendance/api.py">attendance/api.py</a> · <code>attendance</code></td></tr>
           <tr><td><code>POST /api/attendance/</code></td><td>Submit the original multipart <code>file</code> again. Django reruns the checks before saving and returns <code>cutoffId</code>, <code>status</code>, <code>employeeCount</code>, and <code>warnings</code>. New cutoffs return 201. Updates and exact retries return 200. Existing JSON clients receive a warning that they supplied no source file for comparison.</td><td><a href="Backend/attendance/api.py">attendance/api.py</a> · <code>attendance</code></td></tr>
           <tr><td><code>GET /api/attendance/&lt;cutoffId&gt;/</code></td><td>Returns the period, detachment, and saved employee hours. A null <code>regularHours</code> displays as missing on the cutoff.</td><td><a href="Backend/attendance/api.py">attendance/api.py</a> · <code>attendance_detail</code></td></tr>
-          <tr><td><code>POST /api/payroll/drafts/</code></td><td>Multipart Excel files in <code>register</code> and <code>deductions</code>. Returns the full draft. A new upload returns 201, and identical files return the existing draft with 200.</td><td><a href="Backend/attendance/payroll_api.py">attendance/payroll_api.py</a> · <code>create_payroll_draft</code></td></tr>
+          <tr><td><code>POST /api/payroll/drafts/</code></td><td>Multipart Excel files in <code>register</code> and <code>deductions</code>. Returns the full draft. A new draft returns 201. A repeat with the same inputs and loan plan can return the existing draft with 200.</td><td><a href="Backend/attendance/payroll_api.py">attendance/payroll_api.py</a> · <code>create_payroll_draft</code></td></tr>
+          <tr><td><code>GET /api/payroll/drafts/</code></td><td>Returns an array with <code>draftId</code>, <code>period</code>, <code>createdAt</code>, and <code>isFinalized</code>.</td><td><a href="Backend/attendance/payroll_api.py">attendance/payroll_api.py</a> · <code>create_payroll_draft</code></td></tr>
           <tr><td><code>GET /api/payroll/drafts/&lt;draftId&gt;/</code></td><td>Fetch the saved draft when opening or refreshing review. A missing draft returns 404.</td><td><a href="Backend/attendance/payroll_api.py">attendance/payroll_api.py</a> · <code>payroll_draft</code></td></tr>
           <tr><td><code>GET /api/tasks/</code><br><code>POST /api/tasks/</code></td><td>Demo tasks list and creation. Use GET as a Django smoke check.</td><td><a href="Backend/todo/urls.py">todo/urls.py</a> and <a href="Backend/todo/views.py">todo/views.py</a> · <code>task_list</code></td></tr>
         </tbody>
@@ -139,12 +174,12 @@ npm.cmd start -- --host 127.0.0.1 --port 4200</code></pre>
     <p>Send <code>payrollPeriodDates</code> and employee assignment metadata for finalization. <code>POST /api/payroll/drafts/&lt;draftId&gt;/finalize/</code> saves an immutable snapshot and matched loan payments. <code>GET /api/payroll/thirteenth-month/&lt;year&gt;/</code> shows the October estimate and calendar-year accrual. Use <code>/api/payroll/loans/</code> for loan setup and the payment subroute for receipts. See <a href="Backend/README.md">the backend guide</a> for payloads, retry behavior, and test cases. The Payroll records pages under <code>/payroll/loans</code>, <code>/payroll/thirteenth-month</code>, and <code>/payroll/drafts</code> provide read-only review. The global Expenses and Payments tab opens <code>/expay</code> for a searchable employee overview. <code>GET /api/payroll/expense-employees/</code> supplies the paged list. <code>GET /api/payroll/expense-employees/detail/?employeeId=...</code> supplies the employee’s finalized expenses, loans and matched payments. Test a name search and an ID search for a person with both a paid loan and an open loan.</p>
     <p>Attendance saving and workbook parsing live in <a href="Backend/attendance/importer.py">attendance/importer.py</a>, with cutoff merge rules in <a href="Backend/attendance/merge.py">attendance/merge.py</a>. Payroll calculation and reconciliation totals live in <a href="Backend/attendance/payroll.py">attendance/payroll.py</a>. The API adds review issues in <code>draft_response</code>. Persistent records are defined in <a href="Backend/attendance/models.py">attendance/models.py</a>.</p>
   </section>
-  <section>
-    <h2>Build the payroll draft review</h2>
+  <section id="payroll-upload">
+    <h2>Connect payroll draft upload</h2>
     <ol>
       <li>Add a payroll draft entry point on the payroll dashboard. Require two <code>.xlsx</code> files labeled Payroll register and Deductions workbook.</li>
       <li>Submit <code>FormData</code> to <code>POST /api/payroll/drafts/</code> with fields <code>register</code> and <code>deductions</code>. Follow the session and CSRF flow in <code>Frontend/src/app/backend.ts</code>. Use payroll-specific wording for authorization errors. Admin and finance have access.</li>
-      <li>Open the review using the returned <code>draftId</code>. Load it with <code>GET /api/payroll/drafts/&lt;draftId&gt;/</code> so it can be refreshed. A new draft returns HTTP 201 and an identical upload returns the existing draft with HTTP 200.</li>
+      <li>Navigate to the existing <code>/payroll/drafts/&lt;draftId&gt;</code> review using the returned <code>draftId</code>. The review reloads via <code>GET /api/payroll/drafts/&lt;draftId&gt;/</code>. Treat HTTP 201 and 200 as success. A repeated upload with the same inputs and loan plan can return the existing draft.</li>
       <li>Show the period, workbook filenames, employee count, calculated and register totals, and issue counts. Display the top-level <code>warnings</code>, including the note about using SSS values from the register.</li>
       <li>Show employee name, register row, calculated amounts, register amounts, and signed differences. Highlight nonzero differences and flag <code>deductionsMatched: false</code>. Add filters for both flags.</li>
       <li>Include loading, upload validation, session or role errors, and a missing-draft state.</li>
@@ -168,7 +203,7 @@ const draft = await postToBackend('/api/payroll/drafts/', form);</code></pre>
   <section>
     <h2>Acceptance check and future milestones</h2>
     <p>Start Angular and Django using the <a href="Frontend/README.md">frontend setup guide</a>. Upload the SMCO payroll and deductions samples from <code>Files/</code>. Expect 16 rows, a +0.01 net pay difference at register rows 11 and 21, a +0.02 net pay difference in the totals, and zero unmatched deductions. Refresh the review and verify the same draft loads.</p>
-    <p>The proposed attendance-to-payroll phase will compare names after trimming whitespace, collapsing repeated spaces, and ignoring case. Unique names within the cutoff can be suggested as matches. Reviewers will need to confirm duplicate or unresolved rows. The match preview and attendance-driven calculation are pending. Production approval, finalization, and payslips also require future backend endpoints.</p>
+    <p>Attendance-to-payroll matching and attendance-driven calculation are pending. Django already has a finalization endpoint for eligible dated drafts. Production approval and payslip release still need workflow decisions.</p>
     <p><a href="Backend/README.md">Backend setup and API contract</a></p>
   </section>
   <section>
