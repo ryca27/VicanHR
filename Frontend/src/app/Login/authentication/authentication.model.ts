@@ -6,7 +6,7 @@ export type UserRole =
   | 'operations';
 
 export interface AuthUser {
-  id: number;
+  id?: number;
   username: string;
   role: UserRole;
 }
@@ -17,5 +17,7 @@ export interface LoginCredentials {
 }
 
 export interface LoginResponse {
-  user: AuthUser;
+  username: string;
+  roles: string[];
+  csrfToken: string;
 }

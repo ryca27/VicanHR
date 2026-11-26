@@ -1,11 +1,13 @@
 import { RouterLink } from '@angular/router';
-import { Component, OnInit, signal, afterNextRender } from '@angular/core';
+import { Component, OnInit, signal, afterNextRender,inject, PLATFORM_ID } from '@angular/core';
 import {FormControl, ReactiveFormsModule, Validators, FormGroup, FormBuilder} from '@angular/forms'
+import { isPlatformBrowser } from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { FormField } from '@angular/forms/signals';
+import { PayrollService } from './payroll.service';
 
 // Components Import
 import {TextboxComponent} from './../../Components/textbox/textbox'
@@ -38,6 +40,8 @@ import { AttendancePost, Upload } from './modals/upload/upload.models'
 export class Payroll implements OnInit {
   savedCutoffs = signal<{cutoffId: number; period: string; detachment: string}[]>([]);
   readError = signal('');
+  private payrollService = inject(PayrollService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   constructor() {
     afterNextRender(() => this.loadCutoffs());
@@ -103,6 +107,9 @@ export class Payroll implements OnInit {
     };
     this.initializeTableRows();
     this.initializeTableColumns();
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadAttendance();
+    }
   }
 
   initializeTableRows(): void{
@@ -143,4 +150,18 @@ export class Payroll implements OnInit {
     this.createPayrollFormGroup.controls.endDate.setValue(message)
   }
 
+  //async functions
+
+  loadAttendance(): void {
+    this.payrollService.getAttendance().subscribe({
+      next: (response) => {
+        debugger;
+        let x  = response;
+        console.log('Attendance data:', response);
+      },
+      error: (error) => {
+        console.error('Failed to load attendance:', error);
+      }
+    });
+  }
 }
